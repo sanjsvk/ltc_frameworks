@@ -89,11 +89,15 @@ def load_scenario(
             f"Unknown scenario '{scenario}'. Valid options: {SCENARIOS}"
         )
 
-    path = Path(data_dir) / f"{scenario}.csv"
+    # Support both naming conventions: S1.csv and mmm_synthetic_S1.csv
+    data_dir = Path(data_dir)
+    path = data_dir / f"{scenario}.csv"
+    if not path.exists():
+        path = data_dir / f"mmm_synthetic_{scenario}.csv"
     if not path.exists():
         raise FileNotFoundError(
-            f"Scenario CSV not found: {path}\n"
-            f"Run the data generation script first (see notebooks/00_data_exploration.ipynb)."
+            f"Scenario CSV not found in {data_dir} (tried {scenario}.csv and mmm_synthetic_{scenario}.csv).\n"
+            f"Run the data generation script first: data/raw/mmm_synthetic_generator.py"
         )
 
     df = pd.read_csv(path)
@@ -128,10 +132,12 @@ def load_all_scenarios(data_dir: str | Path) -> dict[str, pd.DataFrame]:
 
     for scenario in SCENARIOS:
         path = data_dir / f"{scenario}.csv"
+        if not path.exists():
+            path = data_dir / f"mmm_synthetic_{scenario}.csv"
         if path.exists():
             loaded[scenario] = load_scenario(data_dir, scenario)
         else:
-            print(f"[loader] Warning: {path} not found — skipping {scenario}")
+            print(f"[loader] Warning: {scenario} not found — skipping")
 
     if not loaded:
         raise FileNotFoundError(
