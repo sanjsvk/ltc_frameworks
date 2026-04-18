@@ -87,3 +87,108 @@ LTC[t]   = ltc_coef × stock[t]
 ## Reference Document
 
 Full technical write-up, assumptions, and scenario design: `docs/MMM_Synthetic_Data_WriteUp.docx` (gitignored — local only).
+
+---
+
+## Repo Architecture
+
+### Directory Structure
+
+```
+ltc_frameworks/
+├── pyproject.toml                   # package metadata + pinned dependencies
+├── ltc/                             # main installable Python package
+│   ├── transforms/                  # stateless lag/adstock primitives (pure functions)
+│   │   ├── geometric.py             # geometric_adstock(x, decay)
+│   │   ├── weibull.py               # weibull_adstock(x, shape, scale, max_lag)
+│   │   ├── almon.py                 # almon_pdl_weights(degree, max_lag)
+│   │   ├── koyck.py                 # koyck_transform(y, x, lambda_)
+│   │   └── brand_stock.py           # brand_stock_dynamics(spend, delta, build_rate)
+│   ├── data/
+│   │   ├── loader.py                # load_scenario(path, scenario) → pd.DataFrame
+│   │   └── features.py              # build_features(df) → X_obs, X_truth
+│   ├── models/
+│   │   ├── base.py                  # abstract BaseLTCModel: fit / decompose / get_params
+│   │   ├── framework1/              # static adstock regression (F1)
+│   │   │   ├── geometric_regression.py   # GeometricAdstockOLS
+│   │   │   ├── weibull_regression.py     # WeibullAdstockNLS
+│   │   │   ├── almon_regression.py       # AlmonPDL
+│   │   │   └── dual_adstock.py           # DualAdstockOLS
+│   │   ├── framework2/              # dynamic time-series distributed lag (F2)
+│   │   │   ├── koyck_model.py            # KoyckModel
+│   │   │   ├── ardl_model.py             # ARDLModel
+│   │   │   └── finite_dl_model.py        # FiniteDLModel
+│   │   └── framework3/              # state-space / latent brand-stock (F3)
+│   │       ├── kalman_dlm.py             # KalmanDLM
+│   │       ├── mcmc_latent_stock.py      # MCMCLatentStock (PyMC)
+│   │       └── bayesian_sts.py           # BayesianStructuralTS
+│   ├── evaluation/
+│   │   ├── metrics.py               # recovery_accuracy, mape, ci_coverage
+│   │   ├── scorer.py                # score_model(model, df) → dict
+│   │   └── benchmark.py             # run_benchmark(models, scenarios) → DataFrame
+│   └── visualization/
+│       ├── decomposition.py         # plot_contribution_area(df, estimated, truth)
+│       ├── brand_stock_plot.py      # plot_stock_evolution(df, estimated, truth)
+│       └── benchmark_plot.py        # plot_heatmap(benchmark_df), plot_radar(benchmark_df)
+├── experiments/
+│   ├── registry.py                  # MODEL_REGISTRY = {"geo_adstock": GeometricAdstockOLS, ...}
+│   ├── configs/
+│   │   ├── framework1.yaml          # hyperparameter grids for F1 models
+│   │   ├── framework2.yaml          # hyperparameter grids for F2 models
+│   │   └── framework3.yaml          # hyperparameter grids / priors for F3 models
+│   └── run_experiment.py            # CLI: --model, --scenario, --all-scenarios
+├── notebooks/                       # per-framework exploration + final benchmark
+├── outputs/
+│   ├── results/                     # JSON per model×scenario run (gitignored)
+│   ├── figures/                     # saved PNG/SVG (gitignored)
+│   └── reports/                     # paper-ready summary tables (tracked)
+└── docs/                            # gitignored — local write-up only
+```
+
+### Model Registry
+
+```python
+MODEL_REGISTRY = {
+    # Framework 1 — Static Adstock Regression
+    "geo_adstock":     GeometricAdstockOLS,
+    "weibull_adstock": WeibullAdstockNLS,
+    "almon_pdl":       AlmonPDL,
+    "dual_adstock":    DualAdstockOLS,
+    # Framework 2 — Dynamic Time-Series Distributed Lag
+    "koyck":           KoyckModel,
+    "ardl":            ARDLModel,
+    "finite_dl":       FiniteDLModel,
+    # Framework 3 — State-Space / Latent Brand-Stock
+    "kalman_dlm":      KalmanDLM,
+    "mcmc_stock":      MCMCLatentStock,
+    "bsts":            BayesianStructuralTS,
+}
+```
+
+### Interface Contract (all models)
+
+```python
+class BaseLTCModel(ABC):
+    def fit(self, df: pd.DataFrame, config: dict) -> "BaseLTCModel":
+        """Fit on observed columns only — no ground truth."""
+
+    def decompose(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Return DataFrame with estimated: baseline, stc_{ch}, ltc_{ch} columns."""
+
+    def get_params(self) -> dict:
+        """Return fitted parameters as a serialisable dict."""
+```
+
+### Experiment Flow
+
+```
+run_experiment.py --model geo_adstock --scenario S1
+  → loader.py:   load_scenario(data/raw/, "S1")
+  → features.py: build_features(df)  [observed cols only]
+  → registry:    MODEL_REGISTRY["geo_adstock"]
+  → model.fit(df, config)
+  → model.decompose(df)
+  → scorer.py:   score_model(decomposition, ground_truth)
+  → outputs/results/geo_adstock_S1.json
+  → outputs/figures/geo_adstock_S1_decomp.png
+```

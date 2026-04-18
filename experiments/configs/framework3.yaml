@@ -1,0 +1,44 @@
+# Framework 3 — State-Space / Latent Brand-Stock Models
+# Hyperparameter defaults for each model.
+
+kalman_dlm:
+  # State evolution variances (tune these to control smoothness)
+  level_var: 0.01         # local level random walk variance
+  slope_var: 0.001        # slope random walk variance
+  obs_var: null           # null = estimated from data residuals
+  stc_cutoff_weeks: 4
+  feature: impressions
+  channels: [tv, search, social, display, video]
+  # Adstock decays applied before regression (from synthetic spec)
+  decay_per_channel:
+    tv:      0.55
+    search:  0.20
+    social:  0.45
+    display: 0.50
+    video:   0.60
+
+mcmc_stock:
+  backend: map             # "map" (fast, deterministic) or "mcmc" (full Bayesian)
+  feature: spend           # brand stock is driven by spend, not impressions
+  channels: [tv, search, social, display, video]
+  # MCMC settings (only used when backend: mcmc)
+  draws: 1000
+  tune: 500
+  chains: 2
+  target_accept: 0.9
+
+bsts:
+  backend: custom          # "custom" (Kalman) or "orbit" (if orbit-ml installed)
+  level_var: 0.05
+  slope_var: 0.005
+  seasonal_periods: 2      # number of annual Fourier harmonics (2 = captures main + half-year)
+  obs_var_init: null       # null = estimated from residuals
+  stc_cutoff: 4
+  feature: impressions
+  channels: [tv, search, social, display, video]
+  decay_per_channel:
+    tv:      0.55
+    search:  0.20
+    social:  0.45
+    display: 0.50
+    video:   0.60

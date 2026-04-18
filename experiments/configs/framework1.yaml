@@ -1,0 +1,33 @@
+# Framework 1 — Static Adstock Regression
+# Hyperparameter grids / defaults for each model.
+# These values are passed as `config` to model.fit(df, config).
+
+geo_adstock:
+  # Decay grid for per-channel grid search
+  decay_grid: [0.10, 0.20, 0.30, 0.40, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90]
+  feature: impressions     # "impressions" or "spend"
+  channels: [tv, search, social, display, video]
+  fit_intercept: true
+
+weibull_adstock:
+  max_lag: 20
+  feature: impressions
+  channels: [tv, search, social, display, video]
+  # Search bounds for Weibull shape and scale parameters
+  shape_bounds: [0.5, 5.0]
+  scale_bounds: [1.0, 15.0]
+
+almon_pdl:
+  max_lag: 13              # one quarter of lags (weeks)
+  degree: 3                # polynomial degree (higher = more flexible)
+  stc_cutoff: 4            # lags 0-4 → STC; lags 5-13 → LTC
+  feature: impressions
+  channels: [tv, search, social, display, video]
+
+dual_adstock:
+  # Short-term decay grid (fast channels)
+  stc_decay_grid: [0.10, 0.20, 0.30, 0.40, 0.50]
+  # Long-term decay grid (slow channels — enforced > stc_decay)
+  ltc_decay_grid: [0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90]
+  feature: impressions
+  channels: [tv, search, social, display, video]

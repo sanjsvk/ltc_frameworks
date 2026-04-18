@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "ltc"
+version = "0.1.0"
+description = "Long-Term Media Contribution Estimation — Framework Benchmarking"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    # Core numerics
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "scipy>=1.11",
+    # Econometrics / time-series
+    "statsmodels>=0.14",
+    # Bayesian / MCMC (Framework 3)
+    "pymc>=5.10",
+    "numpyro>=0.13",
+    # Kalman filtering (Framework 3)
+    "pykalman>=0.9.7",
+    # Optimisation helpers
+    "scikit-learn>=1.4",
+    # Plotting
+    "matplotlib>=3.8",
+    "seaborn>=0.13",
+    # Experiment config & CLI
+    "pyyaml>=6.0",
+    "click>=8.1",
+    # Notebook support
+    "jupyterlab>=4.0",
+    "ipywidgets>=8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.3",
+]
+
+[project.scripts]
+run-experiment = "experiments.run_experiment:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ltc*", "experiments*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

@@ -1,0 +1,28 @@
+# Framework 2 — Dynamic Time-Series Distributed Lag
+# Hyperparameter defaults for each model.
+
+koyck:
+  # Lambda grid — shared decay across all channels
+  lambda_grid: [0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50,
+                0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90]
+  feature: impressions
+  channels: [tv, search, social, display, video]
+
+ardl:
+  ar_order: 4              # AR lags p (number of lagged y terms)
+  media_lags: 8            # distributed lag depth q per channel (2 months)
+  stc_cutoff: 4            # lags 0-4 attributed to STC, 5+ to LTC
+  feature: impressions
+  channels: [tv, search, social, display, video]
+
+finite_dl:
+  lag_shape: weibull       # "weibull" or "almon"
+  max_lag: 13
+  stc_cutoff: 4
+  feature: impressions
+  channels: [tv, search, social, display, video]
+  # Weibull initialisation
+  shape_init: 1.5
+  scale_init: 4.0
+  # Almon fallback (used when lag_shape: almon)
+  degree: 3
