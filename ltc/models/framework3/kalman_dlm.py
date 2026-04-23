@@ -88,8 +88,12 @@ class KalmanDLM(BaseLTCModel):
         self._obs_var = config.get("obs_var", None)
         self._channels = config.get("channels", _CHANNELS)
         self._feature = config.get("feature", "impressions")
-        self._stc_cutoff = config.get("stc_cutoff_weeks", 4)
-        self._decays = config.get("decay_per_channel", self._DEFAULT_DECAYS)
+        self._stc_cutoff = config.get("stc_cutoff_weeks", 6)
+        # Support both new (stc_decay_per_channel) and legacy (decay_per_channel) keys
+        stc_decays = config.get("stc_decay_per_channel", config.get("decay_per_channel", self._DEFAULT_DECAYS))
+        ltc_decays = config.get("ltc_decay_per_channel", None)
+        self._decays = stc_decays
+        self._ltc_decays: dict[str, float] = ltc_decays if ltc_decays else {}
         exog_cols = [c for c in _EXOG if c in df.columns]
         self._exog_names = exog_cols
         prefix = "impr" if self._feature == "impressions" else "spend"
@@ -97,32 +101,31 @@ class KalmanDLM(BaseLTCModel):
         y = df["net_sales_observed"].to_numpy(float)
         T = len(y)
 
-        # Step 1: Pre-compute adstocked media features for OLS initialisation
+        # Pre-compute adstocked features using STC decay (short-term carryover)
         adstocked: dict[str, np.ndarray] = {}
         for ch in self._channels:
             col = f"{prefix}_{ch}"
             if col in df.columns:
-                d = self._decays.get(ch, 0.5)
-                adstocked[ch] = geometric_adstock(df[col].to_numpy(float), d)
+                adstocked[ch] = geometric_adstock(df[col].to_numpy(float), stc_decays.get(ch, 0.5))
 
-        # Step 2: OLS to get initial media and exog coefficients
+        # OLS to estimate media and exog coefficients
         X_parts: list[np.ndarray] = []
-        for ch in self._channels:
-            if ch in adstocked:
-                X_parts.append(adstocked[ch].reshape(-1, 1))
+        ch_list = [ch for ch in self._channels if ch in adstocked]
+        for ch in ch_list:
+            X_parts.append(adstocked[ch].reshape(-1, 1))
         if exog_cols:
             X_parts.append(df[exog_cols].to_numpy(float))
         X_parts.append(np.ones((T, 1)))
         X_ols = np.hstack(X_parts)
         coefs_ols, _, _, _ = np.linalg.lstsq(X_ols, y, rcond=None)
 
-        ch_list = [ch for ch in self._channels if ch in adstocked]
         for i, ch in enumerate(ch_list):
             self._media_coefs[ch] = float(coefs_ols[i])
         n_ch = len(ch_list)
         self._exog_coefs = coefs_ols[n_ch: n_ch + len(exog_cols)]
+        self._adstocked = adstocked
 
-        # Step 3: Subtract media and exog contributions → residual for DLM
+        # Subtract media and exog contributions → residual for DLM
         media_contrib = np.zeros(T)
         for ch in ch_list:
             media_contrib += self._media_coefs[ch] * adstocked[ch]
@@ -192,9 +195,9 @@ class KalmanDLM(BaseLTCModel):
                 continue
             x_raw = df[col].to_numpy(float)
             d = self._decays.get(ch, 0.5)
-            adstocked = geometric_adstock(x_raw, d)
-            total = self._media_coefs[ch] * adstocked
-            # Approximate STC/LTC split via decay
+            adstk = geometric_adstock(x_raw, d)
+            total = self._media_coefs[ch] * adstk
+            # STC = contemporaneous (lag-0) response; LTC = accumulated carryover
             stc = self._media_coefs[ch] * x_raw
             ltc = total - stc
             stc_dict[ch] = pd.Series(stc, index=index)

@@ -63,9 +63,9 @@ class WeibullAdstockNLS(BaseLTCModel):
     def fit(self, df: pd.DataFrame, config: dict) -> "WeibullAdstockNLS":
         self._feature = config.get("feature", "impressions")
         self._channels = config.get("channels", ["tv", "search", "social", "display", "video"])
-        self._max_lag = config.get("max_lag", 20)
-        shape_bounds = config.get("shape_bounds", (0.5, 5.0))
-        scale_bounds = config.get("scale_bounds", (1.0, 15.0))
+        self._max_lag = config.get("max_lag", 52)
+        shape_bounds_cfg = config.get("shape_bounds", (0.8, 3.0))
+        scale_bounds_cfg = config.get("scale_bounds", (1.0, 15.0))
         exog_cols = [c for c in _EXOG if c in df.columns]
 
         y = df["net_sales_observed"].to_numpy(dtype=float)
@@ -79,6 +79,10 @@ class WeibullAdstockNLS(BaseLTCModel):
                 continue
 
             x_raw = df[col].to_numpy(dtype=float)
+            ch_shape_bounds = shape_bounds_cfg.get(ch, (0.8, 3.0)) if isinstance(shape_bounds_cfg, dict) else shape_bounds_cfg
+            ch_scale_bounds = scale_bounds_cfg.get(ch, (1.0, 15.0)) if isinstance(scale_bounds_cfg, dict) else scale_bounds_cfg
+            ch_shape_init = float(sum(ch_shape_bounds)) / 2
+            ch_scale_init = float(sum(ch_scale_bounds)) / 2
 
             def neg_r2(params: list[float]) -> float:
                 shape, scale = params
@@ -91,8 +95,8 @@ class WeibullAdstockNLS(BaseLTCModel):
 
             result = minimize(
                 neg_r2,
-                x0=[1.5, 4.0],
-                bounds=[shape_bounds, scale_bounds],
+                x0=[ch_shape_init, ch_scale_init],
+                bounds=[ch_shape_bounds, ch_scale_bounds],
                 method="L-BFGS-B",
             )
             self._channel_params[ch] = {"shape": result.x[0], "scale": result.x[1]}

@@ -71,11 +71,12 @@ class FiniteDLModel(BaseLTCModel):
         super().__init__()
         self._lag_shape: str = "weibull"
         self._max_lag: int = 13
-        self._stc_cutoff: int = 4
+        self._stc_cutoff: int = 6
         self._feature: str = "impressions"
         self._channels: list[str] = []
         self._channel_weights: dict[str, np.ndarray] = {}
-        self._channel_coefs: dict[str, float] = {}     # overall scale per channel
+        self._channel_max_lag: dict[str, int] = {}
+        self._channel_coefs: dict[str, float] = {}
         self._exog_coefs: np.ndarray | None = None
         self._intercept: float = 0.0
         self._exog_names: list[str] = []
@@ -83,9 +84,12 @@ class FiniteDLModel(BaseLTCModel):
     def fit(self, df: pd.DataFrame, config: dict) -> "FiniteDLModel":
         self._lag_shape = config.get("lag_shape", "weibull")
         self._max_lag = config.get("max_lag", 13)
-        self._stc_cutoff = config.get("stc_cutoff", 4)
+        self._stc_cutoff = config.get("stc_cutoff", 6)
         self._feature = config.get("feature", "impressions")
         self._channels = config.get("channels", ["tv", "search", "social", "display", "video"])
+        max_lag_override = config.get("max_lag_override", {})
+        shape_init_cfg = config.get("shape_init", 1.5)
+        scale_init_cfg = config.get("scale_init", 4.0)
         exog_cols = [c for c in _EXOG if c in df.columns]
         self._exog_names = exog_cols
         prefix = "impr" if self._feature == "impressions" else "spend"
@@ -96,44 +100,47 @@ class FiniteDLModel(BaseLTCModel):
         # Step 1: optimise lag shape parameters per channel
         for ch in self._channels:
             col = f"{prefix}_{ch}"
+            max_lag_ch = max_lag_override.get(ch, self._max_lag) if max_lag_override else self._max_lag
+            self._channel_max_lag[ch] = max_lag_ch
             if col not in df.columns:
-                self._channel_weights[ch] = np.zeros(self._max_lag + 1)
+                self._channel_weights[ch] = np.zeros(max_lag_ch + 1)
                 continue
             x_raw = df[col].to_numpy(float)
 
             if self._lag_shape == "weibull":
-                shape_init = config.get("shape_init", 1.5)
-                scale_init = config.get("scale_init", 4.0)
+                shape_init = shape_init_cfg.get(ch, 1.0) if isinstance(shape_init_cfg, dict) else shape_init_cfg
+                scale_init = scale_init_cfg.get(ch, 4.0) if isinstance(scale_init_cfg, dict) else scale_init_cfg
 
-                def obj(params: list) -> float:
+                def obj(params: list, _x=x_raw, _ml=max_lag_ch) -> float:
                     s, sc = params
                     if s <= 0 or sc <= 0:
                         return 1e9
                     try:
-                        w = weibull_cdf_weights(s, sc, self._max_lag)
+                        w = weibull_cdf_weights(s, sc, _ml)
                     except Exception:
                         return 1e9
-                    w_full = np.concatenate([[0.0], w])  # lag 0 = first weight
-                    if len(w_full) < self._max_lag + 1:
-                        w_full = np.pad(w_full, (0, self._max_lag + 1 - len(w_full)))
-                    X_lag = build_lag_matrix(x_raw, self._max_lag)
-                    adstocked = X_lag @ w_full[:self._max_lag + 1]
+                    w_full = np.concatenate([[w[0] if len(w) > 0 else 0.0], w])[:_ml + 1]
+                    if len(w_full) < _ml + 1:
+                        w_full = np.pad(w_full, (0, _ml + 1 - len(w_full)))
+                    X_lag = build_lag_matrix(_x, _ml)
+                    adstocked = X_lag @ w_full[:_ml + 1]
                     corr = np.corrcoef(adstocked, y)[0, 1]
                     return -(corr ** 2) if not np.isnan(corr) else 1e9
 
                 res = minimize(obj, [shape_init, scale_init], method="Nelder-Mead")
                 s_opt, sc_opt = res.x
                 try:
-                    w = weibull_cdf_weights(s_opt, sc_opt, self._max_lag)
-                    w_full = np.concatenate([[w[0]], w])[:self._max_lag + 1]
+                    w = weibull_cdf_weights(s_opt, sc_opt, max_lag_ch)
+                    w_full = np.concatenate([[w[0] if len(w) > 0 else 0.0], w])[:max_lag_ch + 1]
                 except Exception:
-                    w_full = np.ones(self._max_lag + 1) / (self._max_lag + 1)
+                    w_full = np.ones(max_lag_ch + 1) / (max_lag_ch + 1)
+                if len(w_full) < max_lag_ch + 1:
+                    w_full = np.pad(w_full, (0, max_lag_ch + 1 - len(w_full)))
                 self._channel_weights[ch] = w_full
 
             else:  # almon
                 degree = config.get("degree", 3)
-                Z, A = almon_compressed_regressors(x_raw, self._max_lag, degree)
-                # OLS on compressed Z to get polynomial coefs, recover weights
+                Z, A = almon_compressed_regressors(x_raw, max_lag_ch, degree)
                 coefs_ch, _, _, _ = np.linalg.lstsq(
                     np.column_stack([Z, np.ones(T)]), y, rcond=None
                 )
@@ -147,9 +154,10 @@ class FiniteDLModel(BaseLTCModel):
             if col not in df.columns:
                 continue
             x_raw = df[col].to_numpy(float)
-            X_lag = build_lag_matrix(x_raw, self._max_lag)
+            max_lag_ch = self._channel_max_lag.get(ch, self._max_lag)
+            X_lag = build_lag_matrix(x_raw, max_lag_ch)
             w = self._channel_weights[ch]
-            adstocked = X_lag @ w
+            adstocked = X_lag @ w[:max_lag_ch + 1]
             X_parts.append(adstocked.reshape(-1, 1))
 
         if exog_cols:
@@ -184,8 +192,9 @@ class FiniteDLModel(BaseLTCModel):
             x_raw = df[col].to_numpy(float)
             w = self._channel_weights[ch]
             scale = self._channel_coefs.get(ch, 1.0)
-            X_lag = build_lag_matrix(x_raw, self._max_lag)
-            contrib_per_lag = scale * X_lag * w[np.newaxis, :]
+            max_lag_ch = self._channel_max_lag.get(ch, self._max_lag)
+            X_lag = build_lag_matrix(x_raw, max_lag_ch)
+            contrib_per_lag = scale * X_lag * w[:max_lag_ch + 1][np.newaxis, :]
             stc = contrib_per_lag[:, : self._stc_cutoff + 1].sum(axis=1)
             ltc = contrib_per_lag[:, self._stc_cutoff + 1:].sum(axis=1)
             stc_dict[ch] = pd.Series(stc, index=index)

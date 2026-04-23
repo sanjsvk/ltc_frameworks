@@ -1,0 +1,264 @@
+exp_id,model,parameter_name,value,assumed_or_estimated,rationale
+EXP-01a,geo_adstock,model,geo_adstock,estimated,Model fit on observed data
+EXP-01a,geo_adstock,feature,impressions,estimated,Model fit on observed data
+EXP-01a,geo_adstock,channel_decays.tv,0.9,assumed,Selected decay parameter
+EXP-01a,geo_adstock,channel_decays.search,0.2,assumed,Selected decay parameter
+EXP-01a,geo_adstock,channel_decays.social,0.45,assumed,Selected decay parameter
+EXP-01a,geo_adstock,channel_decays.display,0.5,assumed,Selected decay parameter
+EXP-01a,geo_adstock,channel_decays.video,0.88,assumed,Selected decay parameter
+EXP-01a,geo_adstock,coefs.adstock_tv,4.715045237882338,estimated,Model fit on observed data
+EXP-01a,geo_adstock,coefs.adstock_search,25.530142992240783,estimated,Model fit on observed data
+EXP-01a,geo_adstock,coefs.adstock_social,54.79029465072776,estimated,Model fit on observed data
+EXP-01a,geo_adstock,coefs.adstock_display,-21.902733527181407,estimated,Model fit on observed data
+EXP-01a,geo_adstock,coefs.adstock_video,-5.206421024877936,estimated,Model fit on observed data
+EXP-01a,geo_adstock,coefs.promo,11.414198036087948,estimated,Model fit on observed data
+EXP-01a,geo_adstock,coefs.covid_index,-4.3519996804095475,estimated,Model fit on observed data
+EXP-01a,geo_adstock,coefs.dgs30,0.27182735560206955,estimated,Model fit on observed data
+EXP-01a,geo_adstock,coefs.mobility_index,-1.5271217598824336,estimated,Model fit on observed data
+EXP-01a,geo_adstock,coefs.competitor_ishare,2.865911517038928,estimated,Model fit on observed data
+EXP-01a,geo_adstock,coefs.intercept,9.258547151620439,estimated,Model fit on observed data
+EXP-01b,weibull_adstock,model,weibull_adstock,estimated,Model fit on observed data
+EXP-01b,weibull_adstock,feature,impressions,estimated,Model fit on observed data
+EXP-01b,weibull_adstock,max_lag,52,estimated,Model fit on observed data
+EXP-01b,weibull_adstock,channel_params.tv,"{'shape': np.float64(0.8), 'scale': np.float64(15.0)}",assumed,Selected decay parameter
+EXP-01b,weibull_adstock,channel_params.search,"{'shape': np.float64(0.8), 'scale': np.float64(1.0)}",assumed,Selected decay parameter
+EXP-01b,weibull_adstock,channel_params.social,"{'shape': np.float64(0.8), 'scale': np.float64(3.0)}",assumed,Selected decay parameter
+EXP-01b,weibull_adstock,channel_params.display,"{'shape': np.float64(0.8), 'scale': np.float64(1.5)}",assumed,Selected decay parameter
+EXP-01b,weibull_adstock,channel_params.video,"{'shape': np.float64(0.8), 'scale': np.float64(14.0)}",assumed,Selected decay parameter
+EXP-01b,weibull_adstock,coefs.weibull_adstock_tv,69.46360860430094,estimated,Model fit on observed data
+EXP-01b,weibull_adstock,coefs.weibull_adstock_search,39.88919660670898,estimated,Model fit on observed data
+EXP-01b,weibull_adstock,coefs.weibull_adstock_social,86.90389196993985,estimated,Model fit on observed data
+EXP-01b,weibull_adstock,coefs.weibull_adstock_display,4.301560693195734,estimated,Model fit on observed data
+EXP-01b,weibull_adstock,coefs.weibull_adstock_video,-98.83180963212847,estimated,Model fit on observed data
+EXP-01b,weibull_adstock,coefs.promo,13.454765569312606,estimated,Model fit on observed data
+EXP-01b,weibull_adstock,coefs.covid_index,-4.47242122964412,estimated,Model fit on observed data
+EXP-01b,weibull_adstock,coefs.dgs30,0.23459944913649275,estimated,Model fit on observed data
+EXP-01b,weibull_adstock,coefs.mobility_index,-1.4450768375756475,estimated,Model fit on observed data
+EXP-01b,weibull_adstock,coefs.competitor_ishare,3.8730889169309233,estimated,Model fit on observed data
+EXP-01b,weibull_adstock,coefs.intercept,8.170929007052871,estimated,Model fit on observed data
+EXP-01c,almon_pdl,model,almon_pdl,estimated,Model fit on observed data
+EXP-01c,almon_pdl,stc_max_lag,6,estimated,Model fit on observed data
+EXP-01c,almon_pdl,ltc_degree,3,estimated,Model fit on observed data
+EXP-01c,almon_pdl,stc_cutoff,6,estimated,Model fit on observed data
+EXP-01c,almon_pdl,channel_max_lag.tv,52,estimated,Model fit on observed data
+EXP-01c,almon_pdl,channel_max_lag.search,4,estimated,Model fit on observed data
+EXP-01c,almon_pdl,channel_max_lag.social,26,estimated,Model fit on observed data
+EXP-01c,almon_pdl,channel_max_lag.display,12,estimated,Model fit on observed data
+EXP-01c,almon_pdl,channel_max_lag.video,52,estimated,Model fit on observed data
+EXP-01c,almon_pdl,channel_weights.tv,"[1.5704604376501292, 2.54844637903019, 3.443463614645884, 4.258217543071136, 4.995413562879868, 5.657757072646006, 6.247953470943472, 6.768708156346189, 7.222726527428083, 7.612713982763077, 7.941375920925096, 8.21141774048806, 8.425544840025896, 8.586462618112526, 8.696876473321876, 8.759491804227864, 8.777014009404425, 8.752148487425472, 8.687600636864932, 8.586075856296734, 8.450279544294798, 8.282917099433039, 8.086693920285391, 7.864315405425778, 7.618486953428121, 7.351913962866341, 7.067301832314371, 6.76735596034613, 6.454781745535527, 6.132284586456507, 5.8025698816829845, 5.46834302978889, 5.132309429348133, 4.79717447893465, 4.465643577122364, 4.140422122485191, 3.8242155135970677, 3.519729149031896, 3.2296684273636345, 2.9567387471661704, 2.703645507013448, 2.473094105479376, 2.267789941137906, 2.090438412562932, 1.9437449183283775, 1.8304148570081935, 1.7531536271762889, 1.7146666274065865, 1.7176592562730093, 1.7648369123494945, 1.8589049942099365, 2.0025689004282725, 2.1985340295784397]",estimated,Model fit on observed data
+EXP-01c,almon_pdl,channel_weights.search,"[25.865143964955646, -5.311173874006705, -7.770879622639995, -0.6228116703284172, -2.9758084064563377]",estimated,Model fit on observed data
+EXP-01c,almon_pdl,channel_weights.social,"[26.564514806341876, 20.847138613483775, 15.917236106325472, 11.723612824661561, 8.215074308286624, 5.340426096995241, 3.0484737305820033, 1.2880227488414988, 0.007878691568315332, -0.8431529014429628, -1.3162664903977657, -1.4626565355014804, -1.33351749695953, -0.9800438349773515, -0.4534300097603392, 0.19512951848609816, 0.9144402895565236, 1.6533078432455852, 2.360537719347832, 2.984935457657741, 3.475306597970075, 3.7804566800792827, 3.8491912437800977, 3.630315828867026, 3.072635975134517, 2.124957222377418, 0.7360851103900927]",estimated,Model fit on observed data
+EXP-01c,almon_pdl,channel_weights.display,"[25.102023293481576, 5.165096014447823, -8.636373499316512, -17.205518505933412, -21.44547226352485, -22.259368030212812, -20.55033906411927, -17.221518623366194, -13.176039966075592, -9.317036350369392, -6.54764103436969, -5.770987276198241, -7.890208333977284]",estimated,Model fit on observed data
+EXP-01c,almon_pdl,channel_weights.video,"[5.9470176466578755, 4.162382114405097, 2.4915774759283575, 0.9316538487549622, -0.5203386495877815, -1.8673499015725685, -3.1123297896720867, -4.2582281963590365, -5.307995004106109, -6.2645800953859965, -7.130933352671395, -7.910004658434989, -8.604743895149479, -9.218100945287567, -9.75302569132193, -10.212468015725275, -10.599377800970284, -10.91670492952965, -11.167399283876083, -11.354410746482259, -11.480689199820883, -11.549184526364638, -11.562846608586227, -11.524625328958336, -11.437470569953653, -11.30433221404489, -11.128160143704733, -10.911904241405864, -10.65851438962099, -10.370940470822795, -10.052132367483978, -9.70503996207723, -9.332613137075242, -8.937801774950728, -8.523555758176357, -8.092824969224822, -7.648559290568826, -7.193708604681063, -6.731222794034224, -6.264051741100985, -5.7951453283540815, -5.327453438266161, -4.863925953309945, -4.407512755958123, -3.9611637286833883, -3.527828753958431, -3.110457714255915, -2.7120004920485883, -2.3354069698090996, -1.9836270300102115, -1.6596105551245444, -1.3663074276247755, -1.1066675299836959]",estimated,Model fit on observed data
+EXP-01c,almon_pdl,intercept,5.838811611415714,estimated,Model fit on observed data
+EXP-01d,dual_adstock,model,dual_adstock,estimated,Model fit on observed data
+EXP-01d,dual_adstock,feature,impressions,estimated,Model fit on observed data
+EXP-01d,dual_adstock,channel_decays.tv,"{'stc': 0.45, 'ltc': 0.92}",assumed,Selected decay parameter
+EXP-01d,dual_adstock,channel_decays.search,"{'stc': 0.2, 'ltc': 0.3}",assumed,Selected decay parameter
+EXP-01d,dual_adstock,channel_decays.social,"{'stc': 0.35, 'ltc': 0.75}",assumed,Selected decay parameter
+EXP-01d,dual_adstock,channel_decays.display,"{'stc': 0.4, 'ltc': 0.58}",assumed,Selected decay parameter
+EXP-01d,dual_adstock,channel_decays.video,"{'stc': 0.5, 'ltc': 0.9}",assumed,Selected decay parameter
+EXP-01d,dual_adstock,coefs.stc_adstock_tv,-8.137191054282013,estimated,Model fit on observed data
+EXP-01d,dual_adstock,coefs.ltc_adstock_tv,9.414661403075044,estimated,Model fit on observed data
+EXP-01d,dual_adstock,coefs.stc_adstock_search,88.29007682822586,estimated,Model fit on observed data
+EXP-01d,dual_adstock,coefs.ltc_adstock_search,-71.8179135121209,estimated,Model fit on observed data
+EXP-01d,dual_adstock,coefs.stc_adstock_social,66.9655502384351,estimated,Model fit on observed data
+EXP-01d,dual_adstock,coefs.ltc_adstock_social,6.454786038110865,estimated,Model fit on observed data
+EXP-01d,dual_adstock,coefs.stc_adstock_display,56.34903222220052,estimated,Model fit on observed data
+EXP-01d,dual_adstock,coefs.ltc_adstock_display,-44.612087397245034,estimated,Model fit on observed data
+EXP-01d,dual_adstock,coefs.stc_adstock_video,25.399144560583192,estimated,Model fit on observed data
+EXP-01d,dual_adstock,coefs.ltc_adstock_video,-17.55340921266517,estimated,Model fit on observed data
+EXP-01d,dual_adstock,coefs.promo,9.106746302573383,estimated,Model fit on observed data
+EXP-01d,dual_adstock,coefs.covid_index,-2.8922288235356657,estimated,Model fit on observed data
+EXP-01d,dual_adstock,coefs.dgs30,0.3157461121895958,estimated,Model fit on observed data
+EXP-01d,dual_adstock,coefs.mobility_index,-0.01687270630228217,estimated,Model fit on observed data
+EXP-01d,dual_adstock,coefs.competitor_ishare,3.011838200915705,estimated,Model fit on observed data
+EXP-01d,dual_adstock,coefs.intercept,7.902721737090799,estimated,Model fit on observed data
+EXP-02a,koyck,model,koyck,estimated,Model fit on observed data
+EXP-02a,koyck,lambda,0.15688552146877136,estimated,Model fit on observed data
+EXP-02a,koyck,coefs.beta_tv,3.4918070288258893,estimated,Model fit on observed data
+EXP-02a,koyck,coefs.beta_search,14.316925796394896,estimated,Model fit on observed data
+EXP-02a,koyck,coefs.beta_social,84.18378621422254,estimated,Model fit on observed data
+EXP-02a,koyck,coefs.beta_display,14.576406873715866,estimated,Model fit on observed data
+EXP-02a,koyck,coefs.beta_video,5.2336135603855,estimated,Model fit on observed data
+EXP-02a,koyck,coefs.ydep_lag1,0.15688552146877136,estimated,Model fit on observed data
+EXP-02a,koyck,coefs.ydep_lag2,0.0595297578295331,estimated,Model fit on observed data
+EXP-02a,koyck,coefs.promo,7.5938130545997335,estimated,Model fit on observed data
+EXP-02a,koyck,coefs.covid_index,-2.6029445970981064,estimated,Model fit on observed data
+EXP-02a,koyck,coefs.dgs30,0.2130329433163751,estimated,Model fit on observed data
+EXP-02a,koyck,coefs.mobility_index,0.12646781872343302,estimated,Model fit on observed data
+EXP-02a,koyck,coefs.competitor_ishare,1.9336694015796019,estimated,Model fit on observed data
+EXP-02a,koyck,coefs.intercept,6.1118248825948385,estimated,Model fit on observed data
+EXP-02b,ardl,model,ardl,estimated,Model fit on observed data
+EXP-02b,ardl,ar_order,2,estimated,Model fit on observed data
+EXP-02b,ardl,stc_cutoff,6,estimated,Model fit on observed data
+EXP-02b,ardl,ltc_degree,2,estimated,Model fit on observed data
+EXP-02b,ardl,ltc_max_lag_override.tv,52,estimated,Model fit on observed data
+EXP-02b,ardl,ltc_max_lag_override.search,4,estimated,Model fit on observed data
+EXP-02b,ardl,ltc_max_lag_override.social,26,estimated,Model fit on observed data
+EXP-02b,ardl,ltc_max_lag_override.display,12,estimated,Model fit on observed data
+EXP-02b,ardl,ltc_max_lag_override.video,52,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.y_lag1,0.12088970306132386,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.y_lag2,0.14154385596928987,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.tv_stc_lag0,2.168919549017687,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.tv_stc_lag1,0.47170053665157863,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.tv_stc_lag2,-0.26129000566283067,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.tv_stc_lag3,-6.503919352650934,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.tv_stc_lag4,2.331482597468325,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.tv_stc_lag5,3.988313684775206,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.tv_stc_lag6,-1.9953744031340648,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.tv_ltc_almon0,6.8788771900858725,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.tv_ltc_almon1,-0.36465179574198436,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.tv_ltc_almon2,0.006687392993534047,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.search_stc_lag0,9.580115676508214,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.search_stc_lag1,-3.6720404375859967,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.search_stc_lag2,-5.8566393303162565,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.search_stc_lag3,5.084052725565337,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.search_stc_lag4,-5.0544462859190045,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.social_stc_lag0,78.88506163042604,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.social_stc_lag1,-6.763245693536118,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.social_stc_lag2,-12.93989754103109,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.social_stc_lag3,-13.439970601990549,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.social_stc_lag4,-5.950269615620279,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.social_stc_lag5,-6.987951269125187,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.social_stc_lag6,2.857727486861888,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.social_ltc_almon0,11.519359102427687,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.social_ltc_almon1,-0.8354976807474601,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.social_ltc_almon2,0.02687217820237997,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.display_stc_lag0,3.050467783996268,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.display_stc_lag1,-18.390900592903726,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.display_stc_lag2,-6.802581116721129,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.display_stc_lag3,-20.34011465787183,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.display_stc_lag4,18.407387246095578,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.display_stc_lag5,-12.308319645845483,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.display_stc_lag6,0.8451465245900529,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.display_ltc_almon0,-1.5480098239517295,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.display_ltc_almon1,-5.751583496577542,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.display_ltc_almon2,0.5591413050056966,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.video_stc_lag0,-3.011691618237765,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.video_stc_lag1,-1.744135054792455,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.video_stc_lag2,-6.709842702786759,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.video_stc_lag3,7.3902238720524664,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.video_stc_lag4,-11.456285606442634,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.video_stc_lag5,-8.325229115350012,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.video_stc_lag6,-7.441623610659341,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.video_ltc_almon0,-3.6619075997041386,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.video_ltc_almon1,-0.21888018178335855,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.video_ltc_almon2,0.0024939269497714633,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.promo,10.469956154084134,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.covid_index,-2.299314783903031,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.dgs30,0.20887533688025428,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.mobility_index,1.5554059115393102,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.competitor_ishare,0.8748206016800033,estimated,Model fit on observed data
+EXP-02b,ardl,coefs.intercept,9.532733148274094,estimated,Model fit on observed data
+EXP-02c,finite_dl,model,finite_dl,estimated,Model fit on observed data
+EXP-02c,finite_dl,lag_shape,weibull,estimated,Model fit on observed data
+EXP-02c,finite_dl,max_lag,13,estimated,Model fit on observed data
+EXP-02c,finite_dl,stc_cutoff,6,estimated,Model fit on observed data
+EXP-02c,finite_dl,channel_weights.tv,"[0.14487310094396605, 0.14487310094396605, 0.05844288925092568, 0.04457944449291417, 0.037439742334936105, 0.03289247168373405, 0.02967065184213641, 0.027234348372976402, 0.025308864711303527, 0.023737617282501556, 0.022423921750571816, 0.02130441340339833, 0.020335599603578714, 0.019486503835098402, 0.018734383170914776, 0.018062116689027224, 0.017456531616308283, 0.016907310524316918, 0.016406237270179057, 0.015946680398244772, 0.015523217564370018, 0.015131371421379288, 0.014767400750504865, 0.014428158469534628, 0.014110972902423703, 0.013813557641122081, 0.013533946122707557, 0.013270433960339969, 0.01302153823569947, 0.012785957760652469, 0.01256254981578779, 0.012350303981269854, 0.012148321783057808, 0.01195580554678745, 0.011772039013218018, 0.01159638152286623, 0.011428253477591388, 0.011267135371367717, 0.011112553251869462, 0.010964078720470886, 0.010821320209197342, 0.010683921526883767, 0.010551556528422558, 0.010423925237852938, 0.010300753848360948, 0.010181788422299661, 0.01006679634503067, 0.009955560509558125, 0.009847882708825553, 0.009743576851122225, 0.00964247186776615, 0.00954440638235193, 0.00944923307227524]",estimated,Model fit on observed data
+EXP-02c,finite_dl,channel_weights.search,"[0.9999999999999983, 0.9999999999999983, 1.6653345369377348e-15, 0.0, 0.0, 0.0, 0.0]",estimated,Model fit on observed data
+EXP-02c,finite_dl,channel_weights.social,"[0.5501744052057348, 0.5501744052057348, 0.07458410044917341, 0.048230664287246955, 0.03646104720341903, 0.029635849572241055, 0.025130592343045214, 0.021912864880269566, 0.01948882772606292, 0.017590856030436423, 0.016060651625291945, 0.014798284181802861, 0.01373740505584219, 0.012832149480182095, 0.012049748843588198, 0.011366137871521997, 0.010763226032228866, 0.010227139212704522, 0.009747050497610895, 0.009314381280873616, 0.008922242315064692, 0.008565034370305095, 0.008238157582260907, 0.007937796362265595, 0.007660757830376577, 0.007404348800568575, 0.007166280959881988]",estimated,Model fit on observed data
+EXP-02c,finite_dl,channel_weights.display,"[0.9999999999879878, 0.9999999999879878, 3.350583103940582e-12, 1.960083212243901e-12, 1.3908511610895564e-12, 1.0785726708234583e-12, 8.815105414204425e-13, 7.450423822884074e-13, 6.454575094082738e-13, 5.692320511543442e-13, 5.095162543655516e-13, 4.606898087558917e-13, 4.206450979681131e-13]",estimated,Model fit on observed data
+EXP-02c,finite_dl,channel_weights.video,"[0.1494250179430251, 0.1494250179430251, 0.05914420768429756, 0.04492526988612155, 0.03762890974722697, 0.03299296272463688, 0.029714251970767724, 0.027238546555948692, 0.02528432065937732, 0.023691305966581252, 0.022360650478708326, 0.021227631271320276, 0.020247861199457883, 0.019389750180247554, 0.01863012288143925, 0.017951541279554842, 0.017340599728094794, 0.016786800596745255, 0.01628179128672915, 0.015818831696125402, 0.015392415277044928, 0.014997993534123965, 0.01463177159811549, 0.014290555504593563, 0.013971634792566436, 0.013672692805588534, 0.01339173577211969, 0.013127037369435955, 0.012877094293920414, 0.012640590630239723, 0.01241636871863768, 0.012203405743059064, 0.01200079398806685, 0.011807724888918597, 0.011623475444594517, 0.011447396869411293, 0.011278905327764313, 0.011117473539431053, 0.010962624094905239, 0.01081392348583481, 0.01067097706820393, 0.010533424740618812, 0.010400937120057022, 0.010273212246171773, 0.010149972689785307, 0.010030963189937256, 0.009915948197658581, 0.009804710197032265, 0.009697047870796623, 0.009592774483588931, 0.00949171676265253, 0.009393713467629265, 0.009298614551089808]",estimated,Model fit on observed data
+EXP-02c,finite_dl,channel_coefs.tv,61.67013872764214,estimated,Model fit on observed data
+EXP-02c,finite_dl,channel_coefs.search,2.9744620403014537,estimated,Model fit on observed data
+EXP-02c,finite_dl,channel_coefs.social,88.35634848562152,estimated,Model fit on observed data
+EXP-02c,finite_dl,channel_coefs.display,1.729397500980446,estimated,Model fit on observed data
+EXP-02c,finite_dl,channel_coefs.video,-82.75596342770284,estimated,Model fit on observed data
+EXP-02c,finite_dl,intercept,9.416793983090098,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,model,kalman_dlm,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,media_coefs.tv,-12.637863208881894,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,media_coefs.search,122.38917063078497,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,media_coefs.social,54.83189278967594,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,media_coefs.display,55.14954027974829,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,media_coefs.video,34.94017472085148,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,decays.tv,0.55,assumed,Selected decay parameter
+EXP-03a,kalman_dlm,decays.search,0.2,assumed,Selected decay parameter
+EXP-03a,kalman_dlm,decays.social,0.45,assumed,Selected decay parameter
+EXP-03a,kalman_dlm,decays.display,0.5,assumed,Selected decay parameter
+EXP-03a,kalman_dlm,decays.video,0.6,assumed,Selected decay parameter
+EXP-03b,mcmc_stock,model,mcmc_stock,estimated,Model fit on observed data
+EXP-03b,mcmc_stock,backend,mcmc,estimated,Model fit on observed data
+EXP-03b,mcmc_stock,channel_params.tv,"{'stc_coef': 6.783998653716288, 'delta': 0.8997634900526598, 'build_rate': 0.23425775562990891, 'ltc_coef': 0.13148769402955238}",assumed,Selected decay parameter
+EXP-03b,mcmc_stock,channel_params.search,"{'stc_coef': 23.010182487402155, 'delta': 0.2995302884856643, 'build_rate': 0.42974389917741634, 'ltc_coef': 0.23669188237651378}",assumed,Selected decay parameter
+EXP-03b,mcmc_stock,channel_params.social,"{'stc_coef': 56.2055582605417, 'delta': 0.830695921538945, 'build_rate': 0.36067742426282745, 'ltc_coef': 0.20885972145154896}",assumed,Selected decay parameter
+EXP-03b,mcmc_stock,channel_params.display,"{'stc_coef': 0.0, 'delta': 0.6442049127297538, 'build_rate': 0.46992952471144717, 'ltc_coef': 0.2575426285145979}",assumed,Selected decay parameter
+EXP-03b,mcmc_stock,channel_params.video,"{'stc_coef': 0.0, 'delta': 0.8765862830119839, 'build_rate': 0.2538217856671622, 'ltc_coef': 0.1340707629198883}",assumed,Selected decay parameter
+EXP-03b,mcmc_stock,intercept,7.245354706883107,estimated,Model fit on observed data
+EXP-03b,mcmc_stock,exog_coefs,"[9.927720723262922, -3.53352463709446, 0.2964324487555263, -0.4304349664542265, 2.376047140064655]",estimated,Model fit on observed data
+EXP-03b,mcmc_stock,exog_names,"['promo', 'covid_index', 'dgs30', 'mobility_index', 'competitor_ishare']",estimated,Model fit on observed data
+EXP-03c,bsts,model,bsts,estimated,Model fit on observed data
+EXP-03c,bsts,media_coefs.tv,13.49613743433747,estimated,Model fit on observed data
+EXP-03c,bsts,media_coefs.search,24.12235090226037,estimated,Model fit on observed data
+EXP-03c,bsts,media_coefs.social,52.57213779515381,estimated,Model fit on observed data
+EXP-03c,bsts,media_coefs.display,-7.260830042945641,estimated,Model fit on observed data
+EXP-03c,bsts,media_coefs.video,-14.046212083279038,estimated,Model fit on observed data
+EXP-03c,bsts,decays.tv,0.55,assumed,Selected decay parameter
+EXP-03c,bsts,decays.search,0.2,assumed,Selected decay parameter
+EXP-03c,bsts,decays.social,0.45,assumed,Selected decay parameter
+EXP-03c,bsts,decays.display,0.5,assumed,Selected decay parameter
+EXP-03c,bsts,decays.video,0.6,assumed,Selected decay parameter
+EXP-03a,kalman_dlm,model,kalman_dlm,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,media_coefs.tv,6.783998653716288,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,media_coefs.search,23.010182487402155,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,media_coefs.social,56.2055582605417,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,media_coefs.display,-7.759109026829485,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,media_coefs.video,-2.8908812230914087,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,decays.tv,0.55,assumed,Selected decay parameter
+EXP-03a,kalman_dlm,decays.search,0.2,assumed,Selected decay parameter
+EXP-03a,kalman_dlm,decays.social,0.45,assumed,Selected decay parameter
+EXP-03a,kalman_dlm,decays.display,0.5,assumed,Selected decay parameter
+EXP-03a,kalman_dlm,decays.video,0.6,assumed,Selected decay parameter
+EXP-03b,mcmc_stock,model,mcmc_stock,estimated,Model fit on observed data
+EXP-03b,mcmc_stock,backend,mcmc,estimated,Model fit on observed data
+EXP-03b,mcmc_stock,channel_params.tv,"{'stc_coef': 6.783998653716288, 'delta': 0.8997634900526598, 'build_rate': 0.23425775562990891, 'ltc_coef': 0.13148769402955238}",assumed,Selected decay parameter
+EXP-03b,mcmc_stock,channel_params.search,"{'stc_coef': 23.010182487402155, 'delta': 0.2995302884856643, 'build_rate': 0.42974389917741634, 'ltc_coef': 0.23669188237651378}",assumed,Selected decay parameter
+EXP-03b,mcmc_stock,channel_params.social,"{'stc_coef': 56.2055582605417, 'delta': 0.830695921538945, 'build_rate': 0.36067742426282745, 'ltc_coef': 0.20885972145154896}",assumed,Selected decay parameter
+EXP-03b,mcmc_stock,channel_params.display,"{'stc_coef': 0.0, 'delta': 0.6442049127297538, 'build_rate': 0.46992952471144717, 'ltc_coef': 0.2575426285145979}",assumed,Selected decay parameter
+EXP-03b,mcmc_stock,channel_params.video,"{'stc_coef': 0.0, 'delta': 0.8765862830119839, 'build_rate': 0.2538217856671622, 'ltc_coef': 0.1340707629198883}",assumed,Selected decay parameter
+EXP-03b,mcmc_stock,intercept,7.245354706883107,estimated,Model fit on observed data
+EXP-03b,mcmc_stock,exog_coefs,"[9.927720723262922, -3.53352463709446, 0.2964324487555263, -0.4304349664542265, 2.376047140064655]",estimated,Model fit on observed data
+EXP-03b,mcmc_stock,exog_names,"['promo', 'covid_index', 'dgs30', 'mobility_index', 'competitor_ishare']",estimated,Model fit on observed data
+EXP-03c,bsts,model,bsts,estimated,Model fit on observed data
+EXP-03c,bsts,media_coefs.tv,13.49613743433747,estimated,Model fit on observed data
+EXP-03c,bsts,media_coefs.search,24.12235090226037,estimated,Model fit on observed data
+EXP-03c,bsts,media_coefs.social,52.57213779515381,estimated,Model fit on observed data
+EXP-03c,bsts,media_coefs.display,-7.260830042945641,estimated,Model fit on observed data
+EXP-03c,bsts,media_coefs.video,-14.046212083279038,estimated,Model fit on observed data
+EXP-03c,bsts,decays.tv,0.55,assumed,Selected decay parameter
+EXP-03c,bsts,decays.search,0.2,assumed,Selected decay parameter
+EXP-03c,bsts,decays.social,0.45,assumed,Selected decay parameter
+EXP-03c,bsts,decays.display,0.5,assumed,Selected decay parameter
+EXP-03c,bsts,decays.video,0.6,assumed,Selected decay parameter
+EXP-03a,kalman_dlm,model,kalman_dlm,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,media_coefs.tv,6.783998653716288,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,media_coefs.search,23.010182487402155,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,media_coefs.social,56.2055582605417,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,media_coefs.display,-7.759109026829485,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,media_coefs.video,-2.8908812230914087,estimated,Model fit on observed data
+EXP-03a,kalman_dlm,decays.tv,0.55,assumed,Selected decay parameter
+EXP-03a,kalman_dlm,decays.search,0.2,assumed,Selected decay parameter
+EXP-03a,kalman_dlm,decays.social,0.45,assumed,Selected decay parameter
+EXP-03a,kalman_dlm,decays.display,0.5,assumed,Selected decay parameter
+EXP-03a,kalman_dlm,decays.video,0.6,assumed,Selected decay parameter
+EXP-03b,mcmc_stock,model,mcmc_stock,estimated,Model fit on observed data
+EXP-03b,mcmc_stock,backend,mcmc,estimated,Model fit on observed data
+EXP-03b,mcmc_stock,channel_params.tv,"{'stc_coef': 6.783998653716288, 'delta': 0.8997634900526598, 'build_rate': 0.23425775562990891, 'ltc_coef': 0.13148769402955238}",assumed,Selected decay parameter
+EXP-03b,mcmc_stock,channel_params.search,"{'stc_coef': 23.010182487402155, 'delta': 0.2995302884856643, 'build_rate': 0.42974389917741634, 'ltc_coef': 0.23669188237651378}",assumed,Selected decay parameter
+EXP-03b,mcmc_stock,channel_params.social,"{'stc_coef': 56.2055582605417, 'delta': 0.830695921538945, 'build_rate': 0.36067742426282745, 'ltc_coef': 0.20885972145154896}",assumed,Selected decay parameter
+EXP-03b,mcmc_stock,channel_params.display,"{'stc_coef': 0.0, 'delta': 0.6442049127297538, 'build_rate': 0.46992952471144717, 'ltc_coef': 0.2575426285145979}",assumed,Selected decay parameter
+EXP-03b,mcmc_stock,channel_params.video,"{'stc_coef': 0.0, 'delta': 0.8765862830119839, 'build_rate': 0.2538217856671622, 'ltc_coef': 0.1340707629198883}",assumed,Selected decay parameter
+EXP-03b,mcmc_stock,intercept,7.245354706883107,estimated,Model fit on observed data
+EXP-03b,mcmc_stock,exog_coefs,"[9.927720723262922, -3.53352463709446, 0.2964324487555263, -0.4304349664542265, 2.376047140064655]",estimated,Model fit on observed data
+EXP-03b,mcmc_stock,exog_names,"['promo', 'covid_index', 'dgs30', 'mobility_index', 'competitor_ishare']",estimated,Model fit on observed data
+EXP-03c,bsts,model,bsts,estimated,Model fit on observed data
+EXP-03c,bsts,media_coefs.tv,13.49613743433747,estimated,Model fit on observed data
+EXP-03c,bsts,media_coefs.search,24.12235090226037,estimated,Model fit on observed data
+EXP-03c,bsts,media_coefs.social,52.57213779515381,estimated,Model fit on observed data
+EXP-03c,bsts,media_coefs.display,-7.260830042945641,estimated,Model fit on observed data
+EXP-03c,bsts,media_coefs.video,-14.046212083279038,estimated,Model fit on observed data
+EXP-03c,bsts,decays.tv,0.55,assumed,Selected decay parameter
+EXP-03c,bsts,decays.search,0.2,assumed,Selected decay parameter
+EXP-03c,bsts,decays.social,0.45,assumed,Selected decay parameter
+EXP-03c,bsts,decays.display,0.5,assumed,Selected decay parameter
+EXP-03c,bsts,decays.video,0.6,assumed,Selected decay parameter

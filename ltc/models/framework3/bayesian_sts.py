@@ -97,8 +97,9 @@ class BayesianStructuralTS(BaseLTCModel):
         n_harmonics = config.get("seasonal_periods", 2)
         self._channels = config.get("channels", _CHANNELS)
         self._feature = config.get("feature", "impressions")
-        self._stc_cutoff = config.get("stc_cutoff", 4)
-        self._decays = config.get("decay_per_channel", self._DEFAULT_DECAYS)
+        self._stc_cutoff = config.get("stc_cutoff", 6)
+        # Support new stc_decay_per_channel key; fall back to legacy decay_per_channel
+        self._decays = config.get("stc_decay_per_channel", config.get("decay_per_channel", self._DEFAULT_DECAYS))
         exog_cols = [c for c in _EXOG if c in df.columns]
         self._exog_names = exog_cols
 
@@ -183,7 +184,7 @@ class BayesianStructuralTS(BaseLTCModel):
         G = np.array([[1.0, 1.0], [0.0, 1.0]])
         F = np.array([[1.0, 0.0]])
         W = np.diag([level_var, slope_var])
-        obs_var = config.get("obs_var_init", np.var(y_resid) * 0.1)
+        obs_var = config.get("obs_var_init") or np.var(y_resid) * 0.1
         V = np.array([[obs_var]])
 
         m = np.array([y_resid[0], 0.0])

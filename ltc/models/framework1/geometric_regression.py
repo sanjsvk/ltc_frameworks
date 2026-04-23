@@ -76,7 +76,7 @@ class GeometricAdstockOLS(BaseLTCModel):
         The search minimises in-sample residual sum of squares over the
         `decay_grid` values, fitting a separate optimal decay for each channel.
         """
-        decay_grid = config.get("decay_grid", [round(x * 0.1, 1) for x in range(1, 10)])
+        decay_grid_cfg = config.get("decay_grid", [round(x * 0.1, 1) for x in range(1, 10)])
         self._feature = config.get("feature", "impressions")
         self._channels = config.get("channels", ["tv", "search", "social", "display", "video"])
         self._fit_intercept = config.get("fit_intercept", True)
@@ -92,9 +92,10 @@ class GeometricAdstockOLS(BaseLTCModel):
                 self._channel_decays[ch] = 0.5
                 continue
             x_raw = df[col].to_numpy(dtype=float)
+            ch_grid = decay_grid_cfg.get(ch, [0.5]) if isinstance(decay_grid_cfg, dict) else decay_grid_cfg
 
             best_decay, best_r2 = 0.5, -np.inf
-            for d in decay_grid:
+            for d in ch_grid:
                 adstocked = geometric_adstock(x_raw, d)
                 # Quick univariate R² (controls not included at this stage)
                 corr = np.corrcoef(adstocked, y)[0, 1]

@@ -1,28 +1,57 @@
 # Framework 2 — Dynamic Time-Series Distributed Lag
-# Hyperparameter defaults for each model.
+# Parameters calibrated to data generating process (Position 1 — best-case)
+# True STC decay: tv=0.55, search=0.20, social=0.45, display=0.50, video=0.60
+# True LTC delta: tv=0.90, search=0.30, social=0.82, display=0.65, video=0.88
 
 koyck:
-  # Lambda grid — shared decay across all channels
-  lambda_grid: [0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50,
-                0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90]
   feature: impressions
   channels: [tv, search, social, display, video]
+  include_lagged_sales: true
+  ar_order: 2
+  selection_metric: aic
+  lambda_grid:
+    tv:      [0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90]
+    search:  [0.20, 0.25, 0.30]
+    social:  [0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.82]
+    display: [0.50, 0.55, 0.60, 0.65]
+    video:   [0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.88]
 
 ardl:
-  ar_order: 4              # AR lags p (number of lagged y terms)
-  media_lags: 8            # distributed lag depth q per channel (2 months)
-  stc_cutoff: 4            # lags 0-4 attributed to STC, 5+ to LTC
   feature: impressions
   channels: [tv, search, social, display, video]
+  ar_order: 2
+  stc_cutoff: 6
+  ltc_lag_shape: almon
+  ltc_degree: 2
+  selection_metric: aic
+  fit_intercept: true
+  ltc_max_lag_override:
+    tv:      52
+    search:  4
+    social:  26
+    display: 12
+    video:   52
 
 finite_dl:
-  lag_shape: weibull       # "weibull" or "almon"
-  max_lag: 13
-  stc_cutoff: 4
+  lag_shape: weibull
   feature: impressions
   channels: [tv, search, social, display, video]
-  # Weibull initialisation
-  shape_init: 1.5
-  scale_init: 4.0
-  # Almon fallback (used when lag_shape: almon)
-  degree: 3
+  stc_cutoff: 6
+  max_lag_override:
+    tv:      52
+    search:  6
+    social:  26
+    display: 12
+    video:   52
+  shape_init:
+    tv:      1.0
+    search:  1.0
+    social:  1.0
+    display: 1.0
+    video:   1.0
+  scale_init:
+    tv:      10.0
+    search:  1.4
+    social:  5.6
+    display: 2.9
+    video:   8.3

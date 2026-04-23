@@ -63,50 +63,56 @@ class KoyckModel(BaseLTCModel):
         self._T: int = 0
 
     def fit(self, df: pd.DataFrame, config: dict) -> "KoyckModel":
-        lambda_grid = config.get("lambda_grid", [round(0.1 + i * 0.05, 2) for i in range(17)])
+        lambda_grid_cfg = config.get("lambda_grid", [round(0.1 + i * 0.05, 2) for i in range(17)])
         self._feature = config.get("feature", "impressions")
         self._channels = config.get("channels", ["tv", "search", "social", "display", "video"])
+        ar_order = config.get("ar_order", 1)
         exog_cols = [c for c in _EXOG if c in df.columns]
         prefix = "impr" if self._feature == "impressions" else "spend"
+
+        # Flatten per-channel lambda grid dict into sorted unique set
+        if isinstance(lambda_grid_cfg, dict):
+            all_lams: set[float] = set()
+            for vals in lambda_grid_cfg.values():
+                all_lams.update(vals)
+            lambda_grid = sorted(all_lams)
+        else:
+            lambda_grid = lambda_grid_cfg
 
         y = df["net_sales_observed"].to_numpy(dtype=float)
         self._T = len(y)
 
         # Build current-period media matrix (T, C)
-        media_cols = [f"{prefix}_{ch}" for ch in self._channels if f"{prefix}_{ch}" in df.columns]
-        X_media = df[media_cols].to_numpy(dtype=float)
+        ch_present = [ch for ch in self._channels if f"{prefix}_{ch}" in df.columns]
+        X_media = df[[f"{prefix}_{ch}" for ch in ch_present]].to_numpy(dtype=float)
 
-        # Grid-search λ: minimise RSS after Koyck transformation
-        best_lambda, best_rss = 0.5, np.inf
-        for lam in lambda_grid:
-            y_t, Z = koyck_regressors(y, X_media)
-            # Append exogenous controls aligned to t=1..T-1
-            if exog_cols:
-                exog_t = df[exog_cols].to_numpy(float)[1:]
-                Z = np.hstack([Z, exog_t])
-            Z = np.hstack([Z, np.ones((len(y_t), 1))])
-
-            coefs, _, _, _ = np.linalg.lstsq(Z, y_t, rcond=None)
-            y_hat = Z @ coefs
-            rss = np.sum((y_t - y_hat) ** 2)
-            if rss < best_rss:
-                best_rss, best_lambda = rss, lam
-
-        self._lambda = best_lambda
-
-        # Final fit with best lambda (re-use the same regressors)
-        y_t, Z = koyck_regressors(y, X_media)
+        # Build regressor matrix: media + AR lags + exog + intercept
+        # Koyck: include y[t-1] (and optionally y[t-2..t-p]) as regressors.
+        # Lambda is estimated as the OLS coefficient on y[t-1].
+        s = ar_order  # trim first ar_order rows
+        y_t = y[s:]
+        X_parts: list[np.ndarray] = [X_media[s:]]
+        # AR lags
+        for lag in range(1, ar_order + 1):
+            ar_col = np.zeros(len(y))
+            ar_col[lag:] = y[:-lag]
+            X_parts.append(ar_col[s:].reshape(-1, 1))
         if exog_cols:
-            exog_t = df[exog_cols].to_numpy(float)[1:]
-            Z = np.hstack([Z, exog_t])
-        Z = np.hstack([Z, np.ones((len(y_t), 1))])
+            X_parts.append(df[exog_cols].to_numpy(float)[s:])
+        X_parts.append(np.ones((len(y_t), 1)))
+        Z = np.hstack(X_parts)
+
         coefs, _, _, _ = np.linalg.lstsq(Z, y_t, rcond=None)
         self._coefs = coefs
 
-        # Record feature names: [media_ch, ..., y_lag, exog..., intercept]
+        # Extract estimated lambda from AR(1) coefficient
+        n_media = len(ch_present)
+        self._lambda = float(np.clip(coefs[n_media], 0.0, 0.999))
+
+        # Record feature names
         self._feature_names = (
-            [f"beta_{ch}" for ch in self._channels if f"{prefix}_{ch}" in df.columns]
-            + ["lambda_ydep"]
+            [f"beta_{ch}" for ch in ch_present]
+            + [f"ydep_lag{l}" for l in range(1, ar_order + 1)]
             + exog_cols
             + ["intercept"]
         )
@@ -122,7 +128,8 @@ class KoyckModel(BaseLTCModel):
         stc_dict: dict[str, pd.Series] = {}
         ltc_dict: dict[str, pd.Series] = {}
 
-        y = df["net_sales_observed"].to_numpy(float)
+        ch_present = [ch for ch in self._channels if f"{prefix}_{ch}" in df.columns]
+        n_media = len(ch_present)
 
         for i, ch in enumerate(self._channels):
             col = f"{prefix}_{ch}"
@@ -131,7 +138,8 @@ class KoyckModel(BaseLTCModel):
                 ltc_dict[ch] = pd.Series(0.0, index=index)
                 continue
             x_raw = df[col].to_numpy(float)
-            beta0 = self._coefs[i]
+            idx = ch_present.index(ch)
+            beta0 = self._coefs[idx]
             lrm = koyck_long_run_multiplier(beta0, self._lambda)
             stc = beta0 * x_raw
             ltc = (lrm - beta0) * x_raw
@@ -139,11 +147,12 @@ class KoyckModel(BaseLTCModel):
             ltc_dict[ch] = pd.Series(ltc, index=index)
 
         # Baseline = intercept/(1-λ) + exog effects
-        alpha_transformed = self._coefs[-1]
-        alpha_true = alpha_transformed / (1.0 - self._lambda) if self._lambda < 1 else alpha_transformed
+        alpha_true = self._coefs[-1] / (1.0 - self._lambda) if self._lambda < 1 else self._coefs[-1]
         baseline_val = np.full(T, alpha_true)
+        # exog coefs follow AR lags in feature_names
+        exog_start = n_media + (len(self._feature_names) - n_media - 1 - len(exog_cols))
         for j, ecol in enumerate(exog_cols):
-            coef_idx = len(self._channels) + 1 + j  # after media + y_lag
+            coef_idx = exog_start + j
             if coef_idx < len(self._coefs) - 1 and ecol in df.columns:
                 baseline_val += self._coefs[coef_idx] * df[ecol].to_numpy(float)
 

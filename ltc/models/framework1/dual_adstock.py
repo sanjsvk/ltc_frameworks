@@ -63,8 +63,9 @@ class DualAdstockOLS(BaseLTCModel):
         self._feature: str = "impressions"
 
     def fit(self, df: pd.DataFrame, config: dict) -> "DualAdstockOLS":
-        stc_grid = config.get("stc_decay_grid", [0.1, 0.2, 0.3, 0.4, 0.5])
-        ltc_grid = config.get("ltc_decay_grid", [0.5, 0.6, 0.7, 0.8, 0.9])
+        stc_grid_cfg = config.get("stc_decay_grid", [0.1, 0.2, 0.3, 0.4, 0.5])
+        ltc_grid_cfg = config.get("ltc_decay_grid", [0.5, 0.6, 0.7, 0.8, 0.9])
+        enforce_ltc_gt_stc = config.get("enforce_ltc_gt_stc", True)
         self._feature = config.get("feature", "impressions")
         self._channels = config.get("channels", ["tv", "search", "social", "display", "video"])
         exog_cols = [c for c in _EXOG if c in df.columns]
@@ -80,10 +81,12 @@ class DualAdstockOLS(BaseLTCModel):
                 continue
 
             x_raw = df[col].to_numpy(dtype=float)
-            best_pair, best_r2 = (0.3, 0.7), -np.inf
+            stc_grid = stc_grid_cfg.get(ch, [0.3]) if isinstance(stc_grid_cfg, dict) else stc_grid_cfg
+            ltc_grid = ltc_grid_cfg.get(ch, [0.7]) if isinstance(ltc_grid_cfg, dict) else ltc_grid_cfg
+            best_pair, best_r2 = (stc_grid[0], ltc_grid[-1]), -np.inf
 
             for d_stc, d_ltc in product(stc_grid, ltc_grid):
-                if d_stc >= d_ltc:
+                if enforce_ltc_gt_stc and d_stc >= d_ltc:
                     continue
                 a_stc = geometric_adstock(x_raw, d_stc)
                 a_ltc = geometric_adstock(x_raw, d_ltc)

@@ -52,21 +52,25 @@ class AlmonPDL(BaseLTCModel):
 
     def __init__(self) -> None:
         super().__init__()
-        self._max_lag: int = 13
-        self._degree: int = 3
-        self._stc_cutoff: int = 4
+        self._stc_max_lag: int = 6
+        self._stc_degree: int = 2
+        self._ltc_degree: int = 3
+        self._stc_cutoff: int = 6
+        self._ltc_max_lag_override: dict[str, int] = {}
         self._feature: str = "impressions"
         self._channels: list[str] = []
         self._channel_weights: dict[str, np.ndarray] = {}  # recovered lag weights per ch
-        self._channel_coefs: dict[str, np.ndarray] = {}    # polynomial coefs per ch
+        self._channel_max_lag: dict[str, int] = {}         # per-channel actual max_lag
         self._exog_coefs: np.ndarray | None = None
         self._intercept: float = 0.0
         self._exog_names: list[str] = []
 
     def fit(self, df: pd.DataFrame, config: dict) -> "AlmonPDL":
-        self._max_lag = config.get("max_lag", 13)
-        self._degree = config.get("degree", 3)
+        self._stc_max_lag = config.get("stc_max_lag", config.get("max_lag", 6))
+        self._stc_degree = config.get("stc_degree", config.get("degree", 2))
+        self._ltc_degree = config.get("ltc_degree", config.get("degree", 3))
         self._stc_cutoff = config.get("stc_cutoff", 4)
+        self._ltc_max_lag_override = config.get("ltc_max_lag_override", {})
         self._feature = config.get("feature", "impressions")
         self._channels = config.get("channels", ["tv", "search", "social", "display", "video"])
         exog_cols = [c for c in _EXOG if c in df.columns]
@@ -83,7 +87,9 @@ class AlmonPDL(BaseLTCModel):
             if col not in df.columns:
                 continue
             x_raw = df[col].to_numpy(dtype=float)
-            Z, A = almon_compressed_regressors(x_raw, self._max_lag, self._degree)
+            max_lag_ch = self._ltc_max_lag_override.get(ch, self._stc_max_lag)
+            self._channel_max_lag[ch] = max_lag_ch
+            Z, A = almon_compressed_regressors(x_raw, max_lag_ch, self._ltc_degree)
             X_parts.append(Z)
             channel_A[ch] = A
 
@@ -96,13 +102,12 @@ class AlmonPDL(BaseLTCModel):
         X = np.hstack(X_parts)
         coefs, _, _, _ = np.linalg.lstsq(X, y, rcond=None)
 
-        # Recover per-channel lag weights and polynomial coefs
+        # Recover per-channel lag weights from polynomial coefs
         idx = 0
-        d1 = self._degree + 1
+        d1 = self._ltc_degree + 1
         for ch in self._channels:
             if ch in channel_A:
                 beta_ch = coefs[idx: idx + d1]
-                self._channel_coefs[ch] = beta_ch
                 self._channel_weights[ch] = channel_A[ch] @ beta_ch
                 idx += d1
 
@@ -128,9 +133,10 @@ class AlmonPDL(BaseLTCModel):
                 continue
 
             x_raw = df[col].to_numpy(dtype=float)
-            w = self._channel_weights[ch]  # shape (max_lag+1,)
-            X_lag = build_lag_matrix(x_raw, self._max_lag)  # (T, max_lag+1)
-            contrib_per_lag = X_lag * w[np.newaxis, :]       # (T, max_lag+1)
+            w = self._channel_weights[ch]
+            max_lag_ch = self._channel_max_lag.get(ch, self._stc_max_lag)
+            X_lag = build_lag_matrix(x_raw, max_lag_ch)          # (T, max_lag+1)
+            contrib_per_lag = X_lag * w[np.newaxis, :]           # (T, max_lag+1)
 
             stc = contrib_per_lag[:, : self._stc_cutoff + 1].sum(axis=1)
             ltc = contrib_per_lag[:, self._stc_cutoff + 1 :].sum(axis=1)
@@ -149,9 +155,10 @@ class AlmonPDL(BaseLTCModel):
         self._check_fitted()
         return {
             "model": self.name,
-            "max_lag": self._max_lag,
-            "degree": self._degree,
+            "stc_max_lag": self._stc_max_lag,
+            "ltc_degree": self._ltc_degree,
             "stc_cutoff": self._stc_cutoff,
+            "channel_max_lag": self._channel_max_lag,
             "channel_weights": {ch: w.tolist() for ch, w in self._channel_weights.items()},
             "intercept": float(self._intercept),
         }
