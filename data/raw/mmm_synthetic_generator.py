@@ -988,7 +988,7 @@ def plot_scenario(df, scenario_id, output_dir):
     plot_path = output_dir / f"plots_{scenario_id}.png"
     fig.savefig(plot_path, dpi=130, bbox_inches="tight", facecolor="white")
     plt.close(fig)
-    print(f"  plots saved → {plot_path.name}")
+    print(f"  plots saved: {plot_path.name}")
 
 
 # ─────────────────────────────────────────────
