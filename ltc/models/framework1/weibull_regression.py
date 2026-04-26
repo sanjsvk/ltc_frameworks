@@ -64,6 +64,7 @@ class WeibullAdstockNLS(BaseLTCModel):
         self._feature = config.get("feature", "impressions")
         self._channels = config.get("channels", ["tv", "search", "social", "display", "video"])
         self._max_lag = config.get("max_lag", 52)
+        max_lag_override = config.get("max_lag_override", {})
         shape_bounds_cfg = config.get("shape_bounds", (0.8, 3.0))
         scale_bounds_cfg = config.get("scale_bounds", (1.0, 15.0))
         exog_cols = [c for c in _EXOG if c in df.columns]
@@ -71,14 +72,21 @@ class WeibullAdstockNLS(BaseLTCModel):
         y = df["net_sales_observed"].to_numpy(dtype=float)
         prefix = "impr" if self._feature == "impressions" else "spend"
 
+        # Log max_lag per channel for debugging
+        print("[weibull_adstock] max_lag configuration:")
+        for ch in self._channels:
+            ch_max_lag = max_lag_override.get(ch, self._max_lag)
+            print(f"  {ch}: {ch_max_lag} weeks")
+
         # Optimise shape + scale per channel via profile likelihood
         for ch in self._channels:
             col = f"{prefix}_{ch}"
             if col not in df.columns:
-                self._channel_params[ch] = {"shape": 1.0, "scale": 4.0}
+                self._channel_params[ch] = {"shape": 1.0, "scale": 4.0, "max_lag": self._max_lag}
                 continue
 
             x_raw = df[col].to_numpy(dtype=float)
+            ch_max_lag = max_lag_override.get(ch, self._max_lag)
             ch_shape_bounds = shape_bounds_cfg.get(ch, (0.8, 3.0)) if isinstance(shape_bounds_cfg, dict) else shape_bounds_cfg
             ch_scale_bounds = scale_bounds_cfg.get(ch, (1.0, 15.0)) if isinstance(scale_bounds_cfg, dict) else scale_bounds_cfg
             ch_shape_init = float(sum(ch_shape_bounds)) / 2
@@ -87,7 +95,7 @@ class WeibullAdstockNLS(BaseLTCModel):
             def neg_r2(params: list[float]) -> float:
                 shape, scale = params
                 try:
-                    adstocked = weibull_adstock(x_raw, shape, scale, self._max_lag)
+                    adstocked = weibull_adstock(x_raw, shape, scale, ch_max_lag)
                 except Exception:
                     return 1e6
                 corr = np.corrcoef(adstocked, y)[0, 1]
@@ -99,7 +107,7 @@ class WeibullAdstockNLS(BaseLTCModel):
                 bounds=[ch_shape_bounds, ch_scale_bounds],
                 method="L-BFGS-B",
             )
-            self._channel_params[ch] = {"shape": result.x[0], "scale": result.x[1]}
+            self._channel_params[ch] = {"shape": result.x[0], "scale": result.x[1], "max_lag": ch_max_lag}
 
         # Build full regressor matrix and fit OLS
         X_parts: list[np.ndarray] = []
@@ -144,14 +152,15 @@ class WeibullAdstockNLS(BaseLTCModel):
                 ltc_dict[ch] = pd.Series(0.0, index=index)
                 continue
             p = self._channel_params[ch]
+            ch_max_lag = p.get("max_lag", self._max_lag)
             x_raw = df[col].to_numpy(dtype=float)
-            adstocked = weibull_adstock(x_raw, p["shape"], p["scale"], self._max_lag)
+            adstocked = weibull_adstock(x_raw, p["shape"], p["scale"], ch_max_lag)
             coef = self._coefs[i]
             total = coef * adstocked
             # STC = peak-week response (weight[0] × x[t] × coef)
             # Approximate: weight[0] is the first Weibull CDF weight
             from ltc.transforms.weibull import weibull_cdf_weights
-            w = weibull_cdf_weights(p["shape"], p["scale"], self._max_lag)
+            w = weibull_cdf_weights(p["shape"], p["scale"], ch_max_lag)
             stc = coef * w[0] * x_raw
             ltc = total - stc
             stc_dict[ch] = pd.Series(stc, index=index)

@@ -5,11 +5,11 @@
 
 geo_adstock:
   decay_grid:
-    tv:      [0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90]
+    tv:      [0.55, 0.70, 0.85, 0.90]
     search:  [0.20, 0.25, 0.30]
-    social:  [0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80]
-    display: [0.50, 0.55, 0.60, 0.65]
-    video:   [0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.88]
+    social:  [0.45, 0.60, 0.75, 0.82]
+    display: [0.50, 0.58, 0.65]
+    video:   [0.60, 0.75, 0.88]
   feature: impressions
   channels: [tv, search, social, display, video]
   fit_intercept: true
@@ -19,6 +19,12 @@ weibull_adstock:
   max_lag: 52
   feature: impressions
   channels: [tv, search, social, display, video]
+  max_lag_override:
+    tv:      52
+    search:  8
+    social:  26
+    display: 16
+    video:   52
   shape_bounds:
     tv:      [0.8, 2.0]
     search:  [0.8, 1.5]

@@ -242,7 +242,7 @@ class MCMCLatentStock(BaseLTCModel):
 
         draws = config.get("draws", 1000)
         tune = config.get("tune", 1000)
-        chains = config.get("chains", 2)
+        chains = config.get("chains", 4)  # Increased from 2 → 4 for better convergence diagnostics
         target_accept = config.get("target_accept", 0.95)
 
         # Prior hyperparameters (set in framework3.yaml via parameter estimation)
@@ -317,11 +317,28 @@ class MCMCLatentStock(BaseLTCModel):
                 build_rate = pm.HalfNormal(f"build_rate_{ch}", sigma=build_rate_sigma)
                 ltc_coef = pm.HalfNormal(f"ltc_coef_{ch}", sigma=ltc_coef_sigma)
 
+                # Joint plausibility constraint: implied LTC should be < 50% of observed sales
+                # Penalty if build_rate × ltc_coef product is too large (overfitting risk)
+                avg_spend = float(np.mean(spend[spend > 0]) if np.any(spend > 0) else 1.0)
+                avg_stock_approx = build_rate * pt.sqrt(avg_spend) / (1.0 - delta + 1e-6)
+                implied_ltc_contribution = build_rate * ltc_coef * avg_stock_approx / 10.0  # scale to $M
+                max_plausible_ltc = 0.5 * y_net.mean()  # max 50% of average observed signal
+                pm.Potential(
+                    f"plausibility_{ch}",
+                    pt.switch(
+                        implied_ltc_contribution > max_plausible_ltc,
+                        -100.0 * (implied_ltc_contribution - max_plausible_ltc) ** 2,
+                        0.0
+                    )
+                )
+
                 # Latent stock recurrence via pytensor.scan (JAX-compatible)
+                # Steady-state initialization: stock_ss = build_rate · √spend[0] / (1 - δ)
                 stock_init = (
                     build_rate * pt.sqrt(pt.maximum(spend_pt[0], 0.0))
                     / (1.0 - delta + 1e-6)
                 )
+                print(f"[mcmc_stock] {ch} steady-state init: stock_init = build_rate * sqrt(spend[0]) / (1 - delta)")
 
                 def _stock_step(sp_t, s_prev, d, br):
                     return d * s_prev + br * pt.sqrt(pt.maximum(sp_t, 0.0))
@@ -355,6 +372,18 @@ class MCMCLatentStock(BaseLTCModel):
         # ── Step 4: extract posterior means → channel_params ─────────────────
         self._posterior = trace
         self._intercept = float(trace.posterior["intercept"].mean().item())
+
+        # Log R-hat diagnostics to check convergence
+        print("[mcmc_stock] R-hat convergence diagnostics (< 1.05 is good):")
+        try:
+            import arviz as az
+            rhat = az.rhat(trace)
+            for var_name in rhat.data_vars:
+                rhat_val = float(rhat[var_name].values)
+                status = "✓" if rhat_val < 1.05 else "⚠"
+                print(f"  {status} {var_name}: {rhat_val:.4f}")
+        except Exception as e:
+            print(f"  [warn] Could not compute R-hat: {e}")
 
         for ch in channels_with_spend:
             self._channel_params.setdefault(ch, {}).update(

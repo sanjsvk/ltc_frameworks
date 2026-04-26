@@ -192,3 +192,84 @@ run_experiment.py --model geo_adstock --scenario S1
   → outputs/results/geo_adstock_S1.json
   → outputs/figures/geo_adstock_S1_decomp.png
 ```
+
+---
+
+## Experimental Results (2026-04-26)
+
+### S1 Baseline Results — 10 Models Evaluated
+
+| Model | Framework | MAPE | Recovery | Status |
+|-------|-----------|------|----------|--------|
+| **bsts** | F3 | 17.6% | 82.4% | ✓ Best overall |
+| **kalman_dlm** | F3 | 18.0% | 82.0% | ✓ State-space dominant |
+| **geo_adstock** | F1 | 30.1% | 69.9% | ✓ Acceptable static baseline |
+| **mcmc_stock** | F3 | 27.4% | 72.6% | ✓ R-hat<1.05 convergence |
+| **finite_dl** | F2 | 49.7% | 50.3% | ✓ Mid-range |
+| **koyck** | F2 | 53.6% | 46.4% | ✓ Mid-range |
+| **almon_pdl** | F1 | 57.4% | 42.6% | ✓ Weak |
+| **weibull_adstock** | F1 | 89.5% | 10.5% | ⚠ Architectural limitation |
+| **ardl** | F2 | 316.8% | 0.0% | ✗ Critical failure (S1) |
+| **dual_adstock** | F1 | 789.9% | 0.0% | ✗ Sign-flip failure |
+
+**Key Finding:** Framework 3 (state-space) models significantly outperform F1 & F2 on baseline scenario.
+
+### S2 Spend-Pause Results — Frozen S1 Parameters
+
+**Scenario 2:** TV + Video spend = 0 for weeks 104–112; tests latent stock persistence.
+
+| Model | S1 Recovery | S2 Recovery | Δ Recovery | Impact |
+|-------|-------------|-------------|------------|--------|
+| **geo_adstock** | 69.9% | 83.1% | +13.2pp | ✓ Improves; spend pause reveals LTC |
+| **weibull_adstock** | 10.5% | 30.5% | +20.0pp | ✓ Lag shapes finally useful |
+| **ardl** | 0.0% | 68.8% | +68.8pp | 🔥 S1 failure → S2 works (prior misspec) |
+| **finite_dl** | 50.3% | 54.6% | +4.3pp | ✓ Slight improvement |
+| **koyck** | 46.4% | 43.0% | -3.4pp | ≈ Stable |
+| **kalman_dlm** | 82.0% | 83.1% | +1.1pp | ✓✓ Excellent stability |
+| **bsts** | 82.4% | 81.0% | -1.4pp | ✓✓ Excellent stability |
+| **almon_pdl** | 42.6% | 18.7% | -23.9pp | ✗ Polynomial lags fail on discontinuities |
+| **mcmc_stock** | 72.6% | 61.4% | -11.1pp | ⚠ Degrades; divergences 8→1 |
+| **dual_adstock** | 0.0% | 0.0% | +0.0pp | ✗ Catastrophic both scenarios |
+
+**Critical Insights:**
+1. **Scenario as diagnostic:** Spend pause reveals whether models can identify latent structure; ardl S1 failure was prior misspecification, not structural flaw
+2. **Framework robustness:** F3 ±1–11pp range; F1/F2 highly scenario-dependent (±4–69pp range)
+3. **Structural breaks:** Simple models (geo_adstock) benefit from clean signals; complex models (almon_pdl) fail on discontinuities
+4. **MCMC convergence:** Spend pause improves MCMC (fewer divergences) but can over-constrain inference (recovery degradation)
+
+---
+
+## Debugging & Code Improvements (2026-04-26)
+
+### Issues Fixed
+
+1. **Weibull max_lag_override** — per-channel lag windows now enforced (was being ignored)
+2. **MCMC chains** — increased 2→4 for convergence diagnostics
+3. **MCMC R-hat logging** — all 19 parameters show R-hat<1.05 (excellent convergence)
+4. **Stock initialization** — confirmed steady-state formula applied correctly
+5. **Joint prior constraint** — added PyMC Potential for build_rate×ltc_coef plausibility
+
+### Configuration Frozen (S1 Optimized)
+
+See `S1 Frozen Parameter Set` in `RUN_LOG.md` for full hyperparameter grids:
+- **Framework 1:** Tightened decay grids; max_lag_override (TV/Video 52w, Search 8w, Display 16w, Social 26w)
+- **Framework 2:** ardl ltc_degree 2→3; lag shape constraints per model
+- **Framework 3:** Logit-normal δ priors; 4 MCMC chains; steady-state stock initialization
+
+---
+
+## Next Steps
+
+1. **Optimize S2-specific parameters** — quantify calibration impact (expect F1/F2 to gain 5–15pp)
+2. **Run S3–S5 scenarios** with frozen S1 params — profile full sensitivity landscape
+3. **Analyze calibration vs. structure trade-off** — compare S1-frozen vs. S2-optimized results
+4. **Paper write-up** — framework comparison, scenario sensitivity, methodological insights
+
+---
+
+## References
+
+- **Run Log:** `RUN_LOG.md` (detailed experiment tracking, config changes, fixes)
+- **Analysis:** `S1_vs_S2_ANALYSIS.md` (model-by-model impact breakdown with insights)
+- **Data:** `outputs/results/{model}_{scenario}.json` (metrics per model×scenario)
+- **Figures:** `outputs/figures/{model}_{scenario}_decomp.png` (LTC decomposition visualizations)

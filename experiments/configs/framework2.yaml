@@ -22,7 +22,7 @@ ardl:
   ar_order: 2
   stc_cutoff: 6
   ltc_lag_shape: almon
-  ltc_degree: 2
+  ltc_degree: 3
   selection_metric: aic
   fit_intercept: true
   ltc_max_lag_override:
