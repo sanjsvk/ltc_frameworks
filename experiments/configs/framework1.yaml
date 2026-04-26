@@ -21,9 +21,9 @@ weibull_adstock:
   channels: [tv, search, social, display, video]
   max_lag_override:
     tv:      52
-    search:  8
+    search:  6
     social:  26
-    display: 16
+    display: 12
     video:   52
   shape_bounds:
     tv:      [0.8, 2.0]
