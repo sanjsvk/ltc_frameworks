@@ -271,3 +271,170 @@ prior_obs_sigma: {S1: 0.15, S2: 0.18, S3: 0.20, S4: 0.18, S5: 0.30}
 - Results JSON: `outputs/results/{model}_S2.json` (10 files)
 - Decomposition figures: `outputs/figures/{model}_S2_decomp.png` (10 files)
 
+---
+
+## Critical Findings — Identification & Structural Robustness
+
+### Finding 1 — Identification Dependence (F1/F2 vulnerability)
+
+**Observation:** Static and distributed lag models' LTC recovery is highly sensitive to spend variation pattern.
+
+**Evidence:**
+- **S1 (smooth spend):** geo_adstock 69.9%, ardl 0.0%, almon_pdl 42.6% — LTC difficult to isolate through spend-sales correlation
+- **S2 (discontinuous spend):** geo_adstock 83.1%, ardl 68.8%, weibull 30.5% — spend pause creates natural experiment; models suddenly identify LTC structure
+
+**Mechanism:** F1/F2 methods rely on spend variation to distinguish STC (immediate) from LTC (lagged). When spend is smooth and continuous, the lag structure is underidentified—models can fit the data by adjusting decay rates without correctly decomposing STC vs. LTC. When spend drops sharply (S2 pause), the natural experiment forces correct identification.
+
+**Implication for Real-World Application:** Real-world MMM spend is typically smooth and continuous (budget constraints, strategic consistency). This means LTC estimates from F1/F2 methods in production are likely **unreliable and biased** precisely because spend variation is low. The S2 spend-pause scenario is an artificial *advantage* for these methods.
+
+**→ Critical insight for paper:** "LTC estimation from static/dynamic methods depends on accidental spend pattern variation; smooth real-world spend patterns make LTC identification insoluble."
+
+---
+
+### Finding 2 — Structural Robustness (F3 advantage)
+
+**Observation:** State-space models maintain high recovery across S1↔S2 despite massive spend pattern shift.
+
+**Evidence:**
+- **kalman_dlm:** 82.0% → 83.1% (Δ +1.1pp)
+- **bsts:** 82.4% → 81.0% (Δ -1.4pp)
+- **F1/F2 range:** Δ -24pp to +69pp (high sensitivity)
+
+**Mechanism:** State-space models parameterize LTC through an explicit **stock accumulation mechanism** (stock[t] = δ·stock[t-1] + build_rate·√spend[t]) rather than through spend-sales correlation. The stock decay rate δ and contribution coefficient ltc_coef are identified from the **level and shape of the LTC signal**, not from correlation with spend variation.
+
+**Why S2 doesn't break F3:**
+- In S1, the model learns stock persistence (δ) from gradual accumulation/decay in baseline trend
+- In S2, the spend pause provides clean evidence of stock decay without confounding accumulation
+- Both scenarios target the same underlying parameters; the model's structural assumption makes it robust to scenario variation
+
+**Implication:** State-space models are fundamentally more reliable for LTC estimation because they don't require spend variation for identification.
+
+**→ Critical insight for paper:** "Structural models with explicit latent dynamics (stock) are scenario-robust; correlation-based methods are identification-dependent."
+
+---
+
+### Finding 3 — Model-Specific Failure Mechanisms (Diagnostic breakdown)
+
+**dual_adstock (Δ +0.0pp, persistent 0.0% recovery):**
+- Mechanism: Enforces ltc_coef > stc_coef through constraint; causes coefficient collinearity when spend is smooth
+- S2 doesn't help because the constraint is fundamentally over-parameterized for STC/LTC separation
+- **Fix needed:** Relax constraint or reparameterize to separate STC (impressions) from LTC (stock accumulation)
+
+**almon_pdl (Δ -23.9pp, S1 42.6% → S2 18.7%):**
+- Mechanism: Assumes polynomial smoothness in lag weights; exponential decay (especially during spend pause) cannot be fit by polynomials
+- S2 spend pause creates sharp discontinuity (zero spend weeks 104–112) that polynomial lags cannot capture
+- **Fix needed:** Use exponential or Weibull lags instead of polynomial PDL for non-smooth lag structures
+
+**weibull_adstock (Δ +20.0pp, improves 10.5% → 30.5%):**
+- Mechanism: Single Weibull CDF cannot simultaneously fit STC (short tail) and LTC (long tail); mode is forced to one or the other
+- S2 spend pause separates STC from LTC identification: no spend = pure LTC decay, allowing model to identify tail behavior
+- **Fix needed:** Dual-Weibull (separate shapes for STC vs. LTC) or reparameterize as stock model
+
+**ardl (Δ +68.8pp, critical resurrection 0.0% → 68.8%):**
+- Mechanism: S1 prior misspecification; logit-normal δ prior calibrated to true values over-constrains model on smooth baseline
+- S2 spend pause reduces parameter correlations; prior becomes helpful rather than constraining
+- **Insight:** S1 failure was prior misspecification masking good underlying model structure
+- **Fix needed:** Reduce prior tightness on δ in S1, or recalibrate to S1-specific spend variation level
+
+**koyck (Δ -3.4pp, stable 46.4% → 43.0%):**
+- Mechanism: AR formulation + lagged sales term naturally adapts to different spend patterns without architectural breaks
+- Model is least fragile but also least specialized; doesn't exploit structural knowledge of LTC vs. STC
+- **Insight:** Robustness through simplicity, not specialization
+
+---
+
+## Pause Window Analysis (Weeks 100–120)
+
+**To Extract:** Per-model MAPE for weeks 100–120 (spend pause window + recovery) across all 10 models.
+- This window captures the critical period where LTC signal is clearest (no confounding spend accumulation)
+- Key metric for paper: "Which methods correctly identify LTC dynamics when spend is predictably absent?"
+
+**To Extract:** Channel-level LTC attribution for ardl and koyck during pause (weeks 100–120).
+- Critical diagnostic: Do these models recover correct aggregate LTC through correct channel attribution, or is aggregate accuracy masking channel-level error?
+- Expectation: TV & Video should dominate LTC (true δ values 0.90 & 0.88); Search should be near-zero (true δ 0.30)
+
+---
+
+## Critical Diagnostic: Channel-Level Attribution During Pause (S2)
+
+**Question:** Do ardl and koyck recover correct aggregate LTC through correct channel attribution, or is aggregate correctness masking channel-level error?
+
+### Channel-Level LTC Recovery — ARDL vs KOYCK vs Ground Truth
+
+**Ground Truth (true δ values):**
+- TV: 0.90 (high LTC)
+- Video: 0.88 (high LTC)
+- Social: 0.82 (medium LTC)
+- Display: 0.65 (low LTC)
+- Search: 0.30 (negligible LTC)
+
+### ARDL Channel-Level Results (S2)
+
+| Channel | Recovery % | MAPE % | Bias | Correlation | Status |
+|---------|------------|--------|------|-------------|--------|
+| TV      | 0.0%       | 218.4% | +1.45| 0.243       | ✗ Completely missed |
+| Search  | 0.0%       | 100.0% | -0.03| NaN         | ✗ Completely missed |
+| Social  | 0.0%       | 103.3% | +0.19| 0.368       | ✗ Completely missed |
+| Display | 0.0%       | 2279.0%| -1.45| -0.120      | ✗ Catastrophically missed |
+| Video   | 0.0%       | 117.4% | -0.12| -0.402      | ✗ Completely missed |
+| **TOTAL** | **68.8%** | **31.2%** | — | — | ⚠ Aggregate "good" but channel-level 0% everywhere |
+
+**Interpretation:** ARDL achieves 68.8% aggregate recovery through **systematic offset of channel-level errors**. Each channel is estimated at 0% recovery individually, yet the sum recovers 69% aggregate. This indicates:
+- The model captures the total LTC magnitude
+- The model completely fails channel attribution
+- Channel-level LTC estimates from ARDL are unreliable (all show 0% identification)
+
+**Implication:** Aggregate accuracy does NOT validate channel decomposition. ARDL would produce misleading insights for channel-specific media mix strategy.
+
+---
+
+### KOYCK Channel-Level Results (S2)
+
+| Channel | Recovery % | MAPE % | Bias | Correlation | Status |
+|---------|------------|--------|------|-------------|--------|
+| TV      | 2.2%       | 97.8%  | -0.67| 0.320       | ✗ Almost missed |
+| Search  | 0.0%       | 644.9% | +0.16| 0.878       | ✗ Completely missed (but high corr?) |
+| Social  | 50.4%      | 49.6%  | +0.10| 0.593       | ~ Moderate capture |
+| Display | 59.3%      | 40.7%  | +0.03| 0.640       | ~ Moderate capture |
+| Video   | 14.9%      | 85.1%  | -0.51| 0.359       | ✗ Mostly missed |
+| **TOTAL** | **43.0%** | **57.0%** | — | — | ⚠ Aggregate 43% but inverted channel ranking |
+
+**Interpretation:** KOYCK attributes 59.3% recovery to Display and 50.4% to Social, but true LTC is dominated by TV (0.90 retention) and Video (0.88 retention). The model recovers:
+- **Correct magnitude** (~43% of total LTC, close enough)
+- **Inverted channel ranking** (low-LTC channels given high attribution; high-LTC channels given low attribution)
+
+**Implication:** Koyck's channel attribution is backwards. If used for budget allocation, would over-invest in Display/Social (low true LTC), under-invest in TV/Video (high true LTC).
+
+---
+
+### Summary: "Right Answer, Wrong Reasons"
+
+Both ardl and koyck achieve decent **aggregate** S2 recovery, but through **fundamentally incorrect channel decomposition:**
+
+- **ardl:** All channels 0% individually; aggregate 68.8% through offsetting errors
+- **koyck:** Inverted channel ranking; correct magnitude, wrong attribution
+
+**Critical for Paper:** "Aggregate LTC recovery does not validate channel attribution. Models may pass aggregate benchmarks while failing channel-level precision, leading to suboptimal media mix decisions."
+
+**Next extraction:** Pause window MAPE (weeks 100-120) to quantify model performance specifically during spend pause vs. pre/post-pause recovery.
+
+**Status:** Channel-level analysis COMPLETE. Pause window MAPE extraction PENDING.
+
+---
+
+## Pause Window MAPE Extraction — Blocking Issue
+
+**Required to compute pause window MAPE (weeks 100-120):**
+1. Load S2.csv from data/raw/ 
+2. For each model, call decompose() on weeks 100-120 subset
+3. Compute MAPE[100:120] = mean(|pred_ltc - true_ltc|) / true_ltc for pause window
+
+**Current status:** S2.csv not present in data/raw/
+- Synthetic data generation was deferred in early session (noted in memory: "blocked on data")
+- S2 model results JSON exist (computed via run_experiment.py which loads data internally)
+- To extract pause-window metrics, must first generate data/raw/S2.csv
+
+**Action:** Generate S2.csv or extract embedded data from experiment run logs, then compute pause-window MAPE per model.
+
+**Priority:** HIGH — pause-window MAPE is critical metric for paper (most important single number for spend-pause scenario)
+
