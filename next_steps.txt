@@ -1,0 +1,121 @@
+Step 1 — S5 supplementary run (MCMC with scenario priors)
+Step 2 — S3/S4/S5 channel attribution validation (we did this for S2)
+Step 3 — Anomaly resolution (your item 2)
+Step 4 — Parameter optimisation across all models (your item 1)
+Step 5 — Paper drafting begins
+
+Steps 1 and 2 are fast, inform Step 3, and provide cleaner inputs to Step 4. Doing optimisation before knowing whether anomalies are genuine findings or bugs means you might optimise toward the wrong objective.
+
+----------------------------------------
+
+Notes for step 3 -
+
+Likely bugs — investigate and fix if possible
+MCMC divergences (8 remaining in S1, 1 in S2) — the logit-normal reparameterisation reduced but didn't eliminate them. Worth one more diagnostic pass — specifically check whether the remaining divergences are concentrated in specific chains, specific parameters, or specific time periods. If they cluster in the first 50 tuning steps they're a warm-up issue fixable by increasing adapt_delta further to 0.97.
+Kalman DLM degradation in S3 (35% pause window concentration) — this should not happen if the seasonal state is correctly specified. Check whether the seasonal_periods=52 is being applied to Kalman DLM as well as BSTS. If Kalman is running without a seasonal state component it will misattribute seasonal innovations to the stock, explaining the S3 degradation.
+WEIBULL consistently near-zero recovery — already confirmed as architectural but worth one check: are the per-channel shape_bounds being applied in the optimiser or is the shape defaulting to a shared value? If shape is shared across channels the model has one distribution trying to fit five different lag structures simultaneously.
+Likely structural findings — document and keep
+ARDL S2→S4 reversal (68.8% → −19.8%) — mechanism is clear and documented. This is a paper finding not a bug. Keep.
+Dual adstock sign-flip across all scenarios — OLS collinearity between fast and slow adstock terms. Structural. Keep.
+Almon PDL S3/S4 pattern — polynomial smoothness assumption interacting differently with seasonal vs level-shift scenarios. Structural. Keep.
+MCMC non-monotonic S1→S2→S3 trajectory — mechanism documented (build_rate unidentifiable during zero-spend, seasonal regularity aids S3 identification). Structural. Keep.
+Ambiguous — needs investigation
+Geo adstock improving in S2 (69.9% → 83.1%) — is this genuinely the identification paradox mechanism or is it a grid search artifact where the channel-specific decay grids coincidentally found better values for S2's spend pattern? Check which decay values were selected in S1 vs S2. If the selected decays are different between scenarios, the improvement is partly a grid search artifact.
+ARDL S1 zero then S2 resurrection — is this the natural experiment identification mechanism or is the Almon polynomial constraint interacting differently with S2's spend structure in a way that's not theoretically motivated? This needs the channel attribution check from Step 2 to confirm.
+BSTS S3 pause window ratio 1.37 — BSTS was 1.02 in S2 and 1.37 in S3. That's a meaningful degradation specifically in the seasonal collinearity scenario. Is the seasonal state (seasonal_periods=52) causing the model to over-attribute seasonal variation to the stock state? Worth checking posterior seasonal component variance in S3 vs S2.
+
+-----------------------------------------
+
+Notes for step 4 -
+Maximise recovery rate per scenario per model. Simple, interpretable, directly maps to the paper's metric. Optimise each model independently per scenario.
+
+F1 — Static Adstock (4 models)
+Strategy: Grid search + cross-validation
+Reason: F1 models are fast to fit, few parameters, grid search is exhaustive and reproducible
+
+For geo_adstock and dual_adstock:
+  - Expand decay grids to full range [0.10, 0.95] in 0.05 steps
+  - Per channel, per scenario
+  - Select decay that maximises recovery rate
+  - Log selected values — these become the scenario-specific optimal parameters
+
+For weibull_adstock:
+  - Scipy optimize (L-BFGS-B) on shape and scale per channel per scenario
+  - Objective: minimise LTC MAPE with channel ranking constraint
+  - Multiple random restarts (5-10) to avoid local minima
+  - Bounded: shape [0.5, 3.0], scale [1.0, 20.0]
+
+For almon_pdl:
+  - Grid search on degree [2, 3, 4] and max_lag [13, 26, 39, 52] per channel
+  - Separate STC and LTC polynomial degrees
+  - Select combination maximising recovery
+
+F2 — Dynamic Distributed Lag (3 models)
+Strategy: AIC-guided search + regularisation tuning
+Reason: F2 models have more parameters, AIC selection is appropriate
+
+For koyck:
+  - Grid search on lambda per channel (same as F1 approach)
+  - Additionally tune AR order [1, 2, 3, 4]
+  - Select lambda + AR order combination minimising AIC subject to recovery constraint
+
+For ardl:
+  - Tune ltc_degree [2, 3, 4] and ltc_max_lag per channel
+  - Tune AR order [1, 2, 3]
+  - Key: add L2 regularisation on lag coefficients to prevent sign-flip
+  - Regularisation strength tuned via cross-validation on held-out weeks
+
+For finite_dl:
+  - Scipy optimize on shape and scale per channel per scenario
+  - Same approach as weibull_adstock
+  - Additionally tune stc_cutoff [4, 6, 8]
+
+F3 — State-Space (3 models)
+Strategy: Empirical Bayes + MLE profile likelihood
+Reason: F3 models are expensive — need targeted search not brute force
+
+For kalman_dlm:
+  - Profile likelihood over delta [0.80, 0.85, 0.88, 0.90, 0.92, 0.95]
+  - For each delta value, MLE estimates remaining parameters
+  - Select delta maximising log-likelihood subject to recovery constraint
+  - Additionally tune level_var [0.001, 0.005, 0.01, 0.05] — this is under-explored
+
+For bsts:
+  - Same profile likelihood approach on delta
+  - Additionally tune seasonal_var [0.0001, 0.001, 0.01]
+  - Tune slope_var [0.00001, 0.0001, 0.001]
+  - These variance parameters control baseline flexibility — key for S3/S4
+
+For mcmc_stock:
+  - Empirical Bayes: use MAP estimates from S1 as starting priors
+  - Per scenario, update prior means based on scenario characteristics
+    S2: widen build_rate prior (spend pause makes it less identifiable)
+    S3: tighten seasonal component (rich seasonal signal available)
+    S4: update obs_sigma to post-break spend level
+  - Tune target_accept [0.90, 0.95, 0.97] and tune steps [500, 1000, 2000]
+
+--------------------------------------------------------------
+
+Logging structure for optimisation results
+Keep optimised parameters completely separate from the original frozen parameters. This is critical for the paper — the frozen parameter results are your main results, the optimised results are the sensitivity analysis.
+
+Recommended structure - 
+optimised_parameter_log.csv
+  exp_id, scenario, model, parameter, optimised_value, original_value,
+  recovery_improvement_pp, mape_improvement_pp, channel_ranking_correct
+
+optimised_results_summary.csv
+  scenario, model, original_recovery, optimised_recovery, improvement_pp,
+  original_mape, optimised_mape, key_parameter_changed
+
+The gap between frozen-parameter recovery and optimised-parameter recovery is the paper's calibration sensitivity finding. A large gap means the model is highly sensitive to parameter choice — risky for practitioners. A small gap means the model is robust to calibration — reliable for practitioners
+
+Expected pattern:
+
+F3 methods: small gap (5–15pp improvement) — structurally robust, calibration helps modestly
+F2 methods: medium gap (10–25pp improvement) — moderate calibration sensitivity
+F1 methods: large gap or no improvement (0–30pp) — either highly calibration-sensitive or structurally incapable regardless of calibration
+
+This pattern, if confirmed, adds a fifth dimension to the paper's framework comparison: not just which framework performs best, but which framework is most robust to sub-optimal calibration — which is always the practitioner's real-world condition.
+
+--------------------------------------------------------------

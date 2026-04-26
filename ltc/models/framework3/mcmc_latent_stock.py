@@ -253,10 +253,17 @@ class MCMCLatentStock(BaseLTCModel):
         delta_std_logit: float = config.get("delta_prior_std_logit", 0.30)
         build_rate_sigma = config.get("prior_build_rate_sigma", 0.5)
         ltc_coef_sigma = config.get("prior_ltc_coef_sigma", 0.2)
+        stock_init_mode = config.get("stock_init_mode", "steady_state")
+        stock_init_block: dict = config.get("stock_init", {})
         obs_sigma_prior = config.get("prior_obs_sigma", 0.3)
-        # prior_obs_sigma may be a dict (per-scenario) resolved by orchestrator to float
+        # Resolve scenario-specific prior_obs_sigma from dict
+        scenario_name = "unknown"
         if isinstance(obs_sigma_prior, dict):
-            obs_sigma_prior = 0.3
+            scenario_name = df["scenario"].iloc[0] if "scenario" in df.columns else "S1"
+            obs_sigma_prior = obs_sigma_prior.get(scenario_name, 0.3)
+            print(f"[mcmc_stock] Resolved prior_obs_sigma for {scenario_name}: {obs_sigma_prior}")
+        else:
+            print(f"[mcmc_stock] Using scalar prior_obs_sigma: {obs_sigma_prior}")
 
         y = df["net_sales_observed"].to_numpy(float)
         T = len(y)
@@ -333,12 +340,16 @@ class MCMCLatentStock(BaseLTCModel):
                 )
 
                 # Latent stock recurrence via pytensor.scan (JAX-compatible)
-                # Steady-state initialization: stock_ss = build_rate · √spend[0] / (1 - δ)
-                stock_init = (
-                    build_rate * pt.sqrt(pt.maximum(spend_pt[0], 0.0))
-                    / (1.0 - delta + 1e-6)
-                )
-                print(f"[mcmc_stock] {ch} steady-state init: stock_init = build_rate * sqrt(spend[0]) / (1 - delta)")
+                # Stock initialization: either manual (from config) or steady-state formula
+                if stock_init_mode == "manual" and ch in stock_init_block:
+                    stock_init = pt.as_tensor_variable(float(stock_init_block[ch]))
+                    print(f"[mcmc_stock] {ch} manual init: stock_init = {stock_init_block[ch]}")
+                else:
+                    stock_init = (
+                        build_rate * pt.sqrt(pt.maximum(spend_pt[0], 0.0))
+                        / (1.0 - delta + 1e-6)
+                    )
+                    print(f"[mcmc_stock] {ch} steady-state init: stock_init = build_rate * sqrt(spend[0]) / (1 - delta)")
 
                 def _stock_step(sp_t, s_prev, d, br):
                     return d * s_prev + br * pt.sqrt(pt.maximum(sp_t, 0.0))
