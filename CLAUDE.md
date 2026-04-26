@@ -267,9 +267,152 @@ See `S1 Frozen Parameter Set` in `RUN_LOG.md` for full hyperparameter grids:
 
 ---
 
-## References
+## Standard Metrics Reporting Workflow
 
-- **Run Log:** `RUN_LOG.md` (detailed experiment tracking, config changes, fixes)
-- **Analysis:** `S1_vs_S2_ANALYSIS.md` (model-by-model impact breakdown with insights)
-- **Data:** `outputs/results/{model}_{scenario}.json` (metrics per model×scenario)
-- **Figures:** `outputs/figures/{model}_{scenario}_decomp.png` (LTC decomposition visualizations)
+**Every experiment run must produce a metrics summary in this format. Log results to RUN_LOG.md immediately after running experiments.**
+
+### Metrics to Extract (per model × scenario)
+
+1. **Full-Series Metrics** (261 weeks)
+   - LTC recovery_accuracy (%)
+   - LTC MAPE (%)
+   - Channel-level recovery per channel
+
+2. **Pause-Window Metrics** (weeks 100–120 subset, if applicable)
+   - Pause-window MAPE (%)
+   - Ratio = pause_MAPE / full_series_MAPE
+   - Interpretation: ratio ~1.0 = robust; ratio >1.3 = fragile to discontinuities
+
+3. **Channel-Level Attribution** (diagnostic for ardl, koyck, dual_adstock)
+   - Per-channel recovery_accuracy, MAPE, bias, correlation
+   - Verify channel ranking matches ground truth (TV/Video should dominate LTC)
+   - Flag if aggregate recovery hides channel-level misattribution
+
+### Standard Output Format
+
+#### Table 1: Full-Series Metrics
+```
+| Model | Framework | MAPE | Recovery | Notes |
+|-------|-----------|------|----------|-------|
+| model_name | F1/F2/F3 | X.X% | Y.Y% | ✓/⚠/✗ status |
+```
+
+#### Table 2: Pause-Window Robustness (if scenario includes structural break)
+```
+| Model | Framework | Full MAPE | Pause MAPE | Ratio | Robustness |
+|-------|-----------|-----------|------------|-------|------------|
+| model_name | F1/F2/F3 | X.X% | Y.Y% | Z.ZZx | Interpretation |
+```
+
+#### Table 3: Channel-Level Attribution (for diagnostic models)
+```
+| Channel | Recovery % | MAPE % | Bias | Correlation | Status |
+|---------|------------|--------|------|-------------|--------|
+| tv | X.X% | Y.Y% | ±Z.ZZ | 0.ABC | ✓/✗ |
+```
+
+### Logging Workflow (per session, per experiment)
+
+1. **Run experiment(s):** `python experiments/run_experiment.py --framework F{1,2,3} --scenario S{N}`
+2. **Extract metrics:** Use `extract_pause_window_metrics.py` or inline extraction
+3. **Log to RUN_LOG.md:**
+   - Header: `## Run #{N} — YYYY-MM-DD: {scenario} {description}`
+   - Subsections: Config changes, Results tables, Key findings, Next steps
+4. **Log to CLAUDE.md:** Update "Experimental Results" section with latest findings
+5. **Commit:** Create atomic commit with consistent message: `"feat/fix/docs: {scenario} — {10 models} benchmark"` + results table in commit body
+
+### Example Commit Message (after running S1 baseline)
+
+```
+feat: S1 baseline benchmark — 10 models evaluated
+
+Summary
+-------
+Framework 1 (4 models): geo_adstock 69.9%, weibull 10.5%, almon_pdl 42.6%, dual 0.0%
+Framework 2 (3 models): koyck 46.4%, ardl 0.0%, finite_dl 50.3%
+Framework 3 (3 models): kalman_dlm 82.0%, mcmc_stock 72.6%, bsts 82.4%
+
+Key Findings
+------------
+- F3 dominates: 72-82% recovery vs 10-70% for F1/F2
+- Critical failures: ardl (0.0%), dual_adstock (0.0%) — investigate next
+- MCMC convergence excellent: R-hat < 1.05 across 19 parameters
+
+Config Changes
+--------------
+None (S1 baseline frozen for comparison)
+
+Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>
+```
+
+### Critical Metrics for Paper
+
+**The three metrics that matter most for the paper:**
+
+1. **Full-Series Recovery Accuracy** — Does the framework recover true LTC?
+   - Primary metric for model ranking
+   - Report per framework and per scenario
+
+2. **Pause-Window Ratio** — How robust is the method to structural breaks?
+   - Ratio ~1.0 = scenario-invariant (F3 strength)
+   - Ratio >1.3 = fragile to discontinuities (F1/F2 weakness)
+   - **Paper insight:** "Spend-pattern dependence of LTC identification"
+
+3. **Channel-Level Attribution** — Does aggregate recovery hide wrong channel decomposition?
+   - Diagnostic: ardl & koyck may achieve good aggregate through channel misattribution
+   - **Paper risk:** "Aggregate benchmarks do not validate channel-level precision"
+
+### Per-Scenario Workflow (REQUIRED)
+
+**Every scenario run (S1, S2, S3, S4, S5) must follow this exact sequence:**
+
+1. **Run Experiment**
+   ```bash
+   PYTHONIOENCODING=utf-8 python experiments/run_experiment.py --scenario SN --all-models
+   ```
+   Wait for completion; monitor MCMC convergence diagnostics
+
+2. **Extract Pause-Window Metrics** (immediately after run completes)
+   ```bash
+   python extract_sN_pause_window_metrics.py
+   ```
+   Produces robustness ratio (pause_MAPE / full_series_MAPE) for all 10 models
+
+3. **Extract Channel-Level Attribution** (if scenario has diagnostic value)
+   - For S2 (spend pause): Extract ARDL and Koyck channel-level recovery
+   - For S3+ (collinearity): Extract top-2 models' channel recovery
+   - Use `extract_channel_attribution_sN.py`
+
+4. **Log Results to RUN_LOG.md** (BEFORE moving to next scenario)
+   - Full-series metrics table (Recovery, MAPE, Δ vs prior scenario)
+   - Pause-window robustness table (Ratio, interpretation)
+   - Channel-level attribution table (if applicable)
+   - Key observations (5–7 bullet points per model type)
+   - Scenario-specific findings and next steps
+
+5. **Print Metrics Summary to Console**
+   - Copy `S3_S4_S5_METRICS_SUMMARY.txt` template
+   - Fill in current scenario's results
+   - Ensure human-readable format for quick scanning
+
+6. **Create Git Commit**
+   - Include full metrics tables in commit body
+   - One commit per scenario (not batched)
+   - Format: `feat: {scenario} — {10 models} benchmark + pause-window analysis`
+
+**WHY THIS MATTERS:**
+- Metrics extraction DURING run allows immediate investigation of failures
+- Pause-window ratio identifies robustness issues before moving forward
+- Channel-level validation prevents aggregate-accuracy illusions
+- Logging per-scenario prevents memory overload and context loss
+- Individual commits enable easy bisection if later scenarios show issues
+
+### References
+
+- **Run Log:** `RUN_LOG.md` (detailed experiment tracking, config changes, metrics per run)
+- **Analysis Documents:** `S1_vs_S2_ANALYSIS.md`, etc. (model-by-model insights)
+- **Paper Notes:** `paper_notes.md` (five key insights for publication)
+- **Metrics Summary:** `S3_S4_S5_METRICS_SUMMARY.txt` (template for comprehensive scenario summaries)
+- **Extraction Scripts:** `extract_s{N}_pause_window_metrics.py` (pause-window MAPE computation)
+- **Data:** `outputs/results/{model}_{scenario}.json` (raw metrics, fitted params)
+- **Figures:** `outputs/figures/{model}_{scenario}_decomp.png` (LTC decomposition plots)
