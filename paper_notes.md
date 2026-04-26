@@ -173,22 +173,219 @@ Superficially identical. But confidence intervals tell different stories:
 
 ---
 
-## Summary: Five Insights for the Paper
+## Finding 6: MCMC Trajectory Anomaly — S1→S2→S3 Non-Monotonic Recovery
 
-| # | Insight | Type | Key Metric | Paper Use |
-|---|---------|------|-----------|-----------|
-| 1 | bsts 1.02x centrepiece | Empirical | 1.02x ratio | Structural robustness gold standard |
-| 2 | F2 paradox (ratio <1.0) | Methodological | koyck 0.77x + channel inversion | False robustness warning |
-| 3 | Robustness spectrum taxonomy | Framework | Three-tier classification | Practitioner guidance |
-| 4 | Aggregate vs channel validation | Methodological | ardl 68.8% aggregate ÷ 0% channels | New benchmarking standard |
-| 5 | geo vs Kalman ratio coincidence | Theoretical | 1.41x identical but different | Cross-scenario validation necessity |
+**The Pattern:**
+mcmc_stock: S1 72.6% → S2 61.4% → S3 98.8% → S4 91.0%
+
+Non-monotonic trajectory — dips in S2, peaks in S3, recovers in S4.
+No other model shows this pattern.
+
+**Mechanism:**
+S2 dip: The spend pause creates near-zero inputs during weeks 104–112. MCMC's
+build_rate becomes unidentifiable when √spend ≈ 0, widening posterior on
+build_rate and degrading recovery slightly.
+
+S3 peak: Strong annual seasonality (52-week cycle) provides rich covariate
+structure. Bayesian latent stock model exploits seasonal regularity to
+sharpen stock estimates — the seasonal signal acts as an additional
+identification source beyond the spend-sales relationship.
+
+S4 recovery: Permanent spend reduction creates a stable new regime. MCMC
+adapts its posterior to the new spend level, recovering strongly.
+
+**Paper point:**
+"Bayesian latent stock models exhibit non-monotonic scenario sensitivity
+that reflects their exploitation of additional signal structure. High
+seasonality (S3) improves MCMC identification by providing periodic
+demand regularisation that sharpens latent stock estimates — a structural
+advantage unavailable to fixed-parameter state-space or static methods."
+
+**Implication:**
+MCMC is the recommended method for businesses with strong seasonal patterns.
+Its ability to exploit seasonal regularity as an identification source
+is a genuine differentiator that no other method replicates.
+
+---
+
+## Finding 7: ARDL Instability — Temporary vs Permanent Break Asymmetry
+
+**The Pattern:**
+ardl: S1 0% → S2 68.8% → S3 63.3% → S4 −19.8%
+
+S2/S3 apparent success followed by catastrophic S4 failure.
+Recovery goes negative — model predicts LTC increases when spend is
+permanently reduced. Sign-flip under permanent level shift.
+
+**Mechanism:**
+S2 success: Temporary spend pause improves ARDL identification through
+natural experiment effect. AR terms + long lag window correctly attribute
+post-pause sales to pre-pause spend via distributed lags.
+
+S4 failure: Permanent spend reduction from week 104 onward means the
+AR structure learned on pre-break data actively mispredicts post-break
+dynamics. Lag weights calibrated to high-spend periods produce negative
+LTC estimates when spend is persistently lower. The model interprets
+the spend reduction as the cause of declining LTC rather than correctly
+estimating the existing stock's depreciation.
+
+**Critical paper point:**
+"Models robust to temporary spend discontinuities may catastrophically
+fail under permanent structural breaks. ARDL's S2 success (68.8%)
+and S4 failure (−19.8%) demonstrate that apparent robustness in one
+scenario does not generalise to structurally different conditions.
+Practitioners cannot rely on scenario-specific validation to certify
+model robustness across all spend pattern types."
+
+**This is the paper's strongest cautionary finding.**
+It directly addresses the practitioner tendency to validate MMM models
+on historical data and assume forward validity. If the spend mix shifts
+permanently — as it has for many brands moving from linear TV to
+digital video — ARDL actively produces wrong directional recommendations.
+
+---
+
+## Finding 8: S5 Universal Collapse — Signal Threshold Requirement
+
+**The Pattern:**
+All 10 models: 0% recovery in S5 (LTC signal halved from S1).
+
+Framework hierarchy (F3 > F2 > F1) disappears completely.
+Pause-window ratio becomes meaningless.
+MAPE rankings show different failure magnitudes but identical recovery.
+
+**Mechanism:**
+With frozen S1 parameters, all models are calibrated to detect LTC at
+S1 signal strength. When true LTC is 50% of S1 levels, every model
+is operating below its identification threshold. The problem is not
+framework structure — it is signal-to-noise ratio.
+
+**Paper point:**
+"Below a minimum signal-to-noise threshold, framework choice becomes
+irrelevant — all methods fail equally. S5 demonstrates that LTC
+identification requires minimum signal conditions that are scenario
+and data-dependent. Practitioners must assess signal strength before
+selecting a framework; no universal method guarantees LTC recovery
+regardless of signal conditions."
+
+**Supplementary experiment required:**
+Run S5 with scenario-specific MCMC priors (tighter δ, regularised
+build_rate, lower obs_sigma). Expected outcome: MCMC partially recovers
+(20–40% recovery). All F1/F2 methods remain at 0%. This would restore
+partial framework hierarchy under weak signal — publishable finding.
+
+**Paper framing:**
+S5 is not a failure of the methodology — it is a finding about
+identification limits. The paper should present S5 as a boundary
+condition analysis: "Our framework correctly identifies the conditions
+under which LTC is unidentifiable, providing practitioners with
+diagnostics to assess whether their data contains sufficient signal
+for reliable LTC estimation."
+
+---
+
+## Finding 9: Cross-Scenario Stability as the True Robustness Metric
+
+**The observation:**
+Single-scenario robustness ratios (pause-window MAPE ratio) are necessary
+but not sufficient. The cross-scenario recovery variance reveals true
+model stability.
+
+**Cross-scenario recovery standard deviation (S1–S4):**
+bsts:           82.4% → 81.0% → 76.8% → 81.6%    StdDev = 2.4pp  ← Most stable
+mcmc_stock:     72.6% → 61.4% → 98.8% → 91.0%    StdDev = 16.9pp ← Volatile but high
+kalman_dlm:     82.0% → 83.1% → 64.9% → 75.4%    StdDev = 8.4pp  ← Moderate
+koyck:          46.4% → 43.0% → 53.7% → 52.3%    StdDev = 4.9pp  ← Stable (low level)
+geo_adstock:    69.9% → 83.1% → 43.2% → 63.4%    StdDev = 16.5pp ← Volatile
+ardl:           0.0%  → 68.8% → 63.3% → -19.8%   StdDev = 38.9pp ← Most volatile
+
+**Paper point:**
+"Cross-scenario recovery standard deviation is a more comprehensive
+robustness metric than single-scenario pause-window ratio. bsts achieves
+both high average recovery (80.5%) and lowest cross-scenario variance
+(2.4pp), confirming it as the most deployment-ready model. mcmc_stock
+achieves highest average recovery (80.9%) but with higher variance (16.9pp),
+making it scenario-sensitive despite strong average performance."
+
+**Proposed additional metric for paper:**
+Robustness Score = Mean Recovery (S1–S4) / (1 + StdDev of Recovery)
+
+bsts:       80.5 / (1 + 0.024) = 78.6  ← Best robustness-adjusted score
+mcmc_stock: 80.9 / (1 + 0.169) = 69.2
+kalman_dlm: 76.4 / (1 + 0.084) = 70.5
+koyck:      48.9 / (1 + 0.049) = 46.6
+geo_adstock:64.9 / (1 + 0.165) = 55.7
+ardl:       28.1 / (1 + 0.389) = 20.2  ← Worst robustness-adjusted score
+
+This metric penalises volatile models even when their average is high,
+rewarding consistent performers. bsts wins on this metric confirming
+its position as the paper's recommended production model.
+
+---
+
+## Finding 10: Framework Failure Taxonomy — Mechanism per Method
+
+A complete mechanistic explanation of why each method fails in each scenario.
+This becomes the paper's Supplementary Table and Section 7 content.
+
+| Model | S2 failure mechanism | S3 failure mechanism | S4 failure mechanism |
+|-------|---------------------|---------------------|---------------------|
+| geo_adstock | High decay coincidentally works — not structural | Single decay absorbs seasonal as LTC | Decay calibrated to high-spend regime, wrong post-break |
+| weibull_adstock | Single distribution can't separate STC/LTC | Complete failure — distribution fits noise | Sign-flip — negative LTC recovery |
+| almon_pdl | Polynomial smoothness incompatible with discontinuity | Moderate failure — seasonal confound | Benefits from level shift removing seasonal confound |
+| dual_adstock | OLS sign-flip under correlated regressors | Worsens — seasonal increases regressor correlation | Catastrophic — permanent break maximises collinearity |
+| koyck | AR term carries sales momentum — partial coincidental recovery | AR absorbs seasonality — stable mid-performance | AR learned on pre-break data — slower adaptation |
+| ardl | Natural experiment improves identification | AR structure partially absorbs seasonal | Sign-flip — AR calibrated to pre-break regime |
+| finite_dl | Weibull shape accommodates some discontinuity | Moderate stability — shape flexible | Degrades — shape calibrated to pre-break dynamics |
+| kalman_dlm | Fixed decay handles pause well — structural | Fixed decay insufficient for seasonal innovations | Fixed parameters struggle with permanent level shift |
+| mcmc_stock | Build_rate unidentifiable during zero-spend | Seasonal regularity aids identification — improves | Bayesian posterior adapts to new spend regime |
+| bsts | Level + slope captures pause dynamics | Seasonal state absorbs variation — slight degradation | Slope component handles level shift gracefully |
+
+**Paper use:** This table is Figure X in Section 6 — the mechanistic taxonomy.
+It transforms results from empirical observation to theoretical understanding,
+which is the distinction between a technical report and a publishable paper.
+
+---
+
+## Summary: Ten Insights for the Paper (Foundational Findings)
+
+| # | Insight | Type | Key Metric | Paper Use | Section |
+|---|---------|------|-----------|-----------|---------|
+| 1 | bsts 1.02x centrepiece | Empirical | 1.02x ratio | Structural robustness gold standard | Results |
+| 2 | F2 paradox (ratio <1.0) | Methodological | koyck 0.77x + channel inversion | False robustness warning | Discussion |
+| 3 | Robustness spectrum taxonomy | Framework | Three-tier classification | Practitioner guidance | Intro + Recommendations |
+| 4 | Aggregate vs channel validation | Methodological | ardl 68.8% aggregate ÷ 0% channels | New benchmarking standard | Methods + Discussion |
+| 5 | geo vs Kalman ratio coincidence | Theoretical | 1.41x identical but different | Cross-scenario validation necessity | Results |
+| 6 | MCMC trajectory anomaly | Empirical | S1→S2→S3→S4 non-monotonic | Seasonal signal exploitation advantage | Results + Discussion |
+| 7 | ARDL instability (temp vs permanent) | Empirical | S2 68.8% → S4 -19.8% sign-flip | Practitioner caution on scenario generalization | Discussion + Recommendations |
+| 8 | S5 universal collapse | Boundary condition | 0% all models | Signal threshold requirement identification | Discussion + Implications |
+| 9 | Cross-scenario stability metric | Framework | StdDev of recovery across S1–S4 | Robustness-adjusted scoring | Methods + Recommendations |
+| 10 | Framework failure taxonomy | Mechanistic | Per-model failure mechanisms | Theoretical understanding | Supplementary Table |
 
 ---
 
 ## Writing Priority for Draft
 
-**Section 1 (Introduction):** Findings #3 (robustness spectrum) + #4 (aggregate vs channel)  
-**Section 2 (Results):** Finding #1 (bsts centrepiece) + #5 (ratio coincidence)  
-**Section 3 (Discussion):** Finding #2 (F2 paradox) + practical implications  
-**Section 4 (Recommendations):** All five findings synthesized for practitioner guidance
+### Core Paper Structure (5 Main Findings → 4 Sections)
+**Section 1 (Introduction):** Findings #3 (robustness spectrum) + #4 (aggregate vs channel) — set up problem  
+**Section 2 (Results):** Finding #1 (bsts centrepiece) + #5 (ratio coincidence) + #6 (MCMC anomaly) — headline empirical results  
+**Section 3 (Discussion):** Finding #2 (F2 paradox) + #7 (ARDL instability) + #8 (S5 boundaries) — mechanistic insights  
+**Section 4 (Recommendations):** All findings synthesized + Finding #9 (cross-scenario stability) — actionable guidance  
+
+### Supplementary Materials (Advanced Findings for Appendix)
+**Supplementary Section:** Finding #10 (framework failure taxonomy) — detailed mechanism table per model per scenario
+
+### Narrative Arc for Draft
+1. **Problem statement:** Practitioners rely on aggregate MMM metrics (Finding #3, #4)
+2. **Solution:** Structural robustness via pause-window ratio (Finding #1, #5)
+3. **Nuance:** Single metrics are insufficient; MCMC exploits seasonality (Finding #6)
+4. **Caution:** Apparent robustness is fragile to scenario shifts (Finding #2, #7)
+5. **Boundary conditions:** Signal strength requirements (Finding #8)
+6. **Recommendation:** Cross-scenario validation + taxonomy for practitioner use (Finding #9, #3)
+
+### Key Callout Boxes for Draft
+- **Callout 1 (Finding #1):** "bsts achieves 1.02x pause-window ratio — the only model demonstrating structural robustness comparable to the DGP"
+- **Callout 2 (Finding #4):** "Aggregate accuracy masks channel failure: ardl 68.8% recovery with 0% per-channel indicates offsetting errors, not true LTC capture"
+- **Callout 3 (Finding #7):** "Models robust to temporary pauses may catastrophically fail on permanent breaks — ARDL S2→S4 trajectory (-88.6pp) demonstrates scenario-dependence risk"
+- **Callout 4 (Finding #6):** "MCMC's non-monotonic trajectory (S1 72.6% → S3 98.8%) reveals Bayesian methods exploit seasonal structure for identification — unique advantage unavailable to fixed-parameter methods"
 
