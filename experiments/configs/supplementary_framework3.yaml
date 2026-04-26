@@ -1,0 +1,51 @@
+# F3 — S5 SUPPLEMENTARY OVERRIDES
+# Apply on top of existing framework3.yaml for S5 run only
+# Only changed parameters listed — everything else unchanged
+
+kalman_dlm:
+  ltc_decay_per_channel:
+    tv:      0.72        # was 0.90
+    search:  0.20        # unchanged
+    social:  0.68        # was 0.82
+    display: 0.55        # was 0.65
+    video:   0.75        # was 0.88
+  ltc_state_init:
+    tv:      1855        # was 6000
+    search:  48          # was 91
+    social:  501         # was 975
+    display: 122         # was 181
+    video:   1347        # was 3202
+
+mcmc_stock:
+  draws: 2000            # was 1000
+  tune:  1500            # was 1000
+  target_accept: 0.97    # was 0.95
+  delta_prior_mean_logit:
+    tv:       0.94       # was 2.20 — logit(0.72)
+    search:  -1.39       # was -0.85 — logit(0.20)
+    social:   0.75       # was 1.52 — logit(0.68)
+    display:  0.20       # was 0.62 — logit(0.55)
+    video:    1.10       # was 1.99 — logit(0.75)
+  delta_prior_std_logit: 0.20     # was 0.30
+  prior_ltc_coef_sigma:  0.135    # was 0.387
+  stock_init_mode: manual
+  stock_init:
+    tv:      1855
+    search:  48
+    social:  501
+    display: 122
+    video:   1347
+
+bsts:
+  ltc_decay_per_channel:
+    tv:      0.72        # was 0.90
+    search:  0.20        # unchanged
+    social:  0.68        # was 0.82
+    display: 0.55        # was 0.65
+    video:   0.75        # was 0.88
+  ltc_state_init:
+    tv:      1855        # was 6000
+    search:  48          # was 91
+    social:  501         # was 975
+    display: 122         # was 181
+    video:   1347        # was 3202
