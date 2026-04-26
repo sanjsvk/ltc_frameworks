@@ -258,12 +258,41 @@ See `S1 Frozen Parameter Set` in `RUN_LOG.md` for full hyperparameter grids:
 
 ---
 
-## Next Steps
+## Workflow: 5-Step Research Pipeline
 
-1. **Optimize S2-specific parameters** — quantify calibration impact (expect F1/F2 to gain 5–15pp)
-2. **Run S3–S5 scenarios** with frozen S1 params — profile full sensitivity landscape
-3. **Analyze calibration vs. structure trade-off** — compare S1-frozen vs. S2-optimized results
-4. **Paper write-up** — framework comparison, scenario sensitivity, methodological insights
+**See @next_steps.txt for detailed diagnostic and optimization specifications.**
+
+✅ **Step 1 — S5 Supplementary Run** (MCMC with scenario priors)
+- Result: MCMC 88.5% recovery (was 0% frozen); fixed-decay models still 0%
+- Outcome: Confirmed MCMC Bayesian flexibility, fixed-decay structural limitation
+
+✅ **Step 2 — S3/S4/S5 Channel Attribution Validation**
+- Result: MCMC preserves TV dominance; F2 inverts rankings; F1 fails on confounding
+- Outcome: Aggregate metrics insufficient; channel-level validation mandatory
+
+⏭️ **Step 3 — Anomaly Resolution** (CONTINUE HERE NEXT SESSION)
+- **Likely bugs to investigate:**
+  - MCMC divergences (8 in S1, 1 in S2) — concentrated in chains/parameters/warm-up?
+  - Kalman DLM S3 degradation (35% pause window) — seasonal state component missing?
+  - Weibull near-zero recovery — shape parameter shared vs per-channel?
+- **Likely structural findings to document:**
+  - ARDL S2→S4 reversal (finding, not bug)
+  - Dual adstock sign-flip (collinearity, structural)
+  - Almon PDL seasonality interaction (structural)
+  - MCMC non-monotonic trajectory (documented; structural)
+- **Ambiguous findings requiring investigation:**
+  - Geo adstock S2 improvement (grid search artifact vs genuine mechanism?)
+  - ARDL S1 zero then S2 resurrection (natural experiment vs almon constraint interaction?)
+  - BSTS S3 pause window ratio degradation (seasonal state over-attribution?)
+
+⏭️ **Step 4 — Per-Model Parameter Optimization** (after Step 3 clarity)
+- F1: Grid search + cross-validation (decay, shape, degree ranges)
+- F2: AIC-guided search + regularization (lambda, AR order, polynomial constraints)
+- F3: Empirical Bayes + MLE profile likelihood (delta profiles, variance tuning)
+- Output: Separate optimized_parameter_log.csv tracking calibration sensitivity gap
+
+⏭️ **Step 5 — Paper Drafting** (with frozen vs optimized comparison)
+- Narrative arc: Framework comparison (F3 dominates) → Scenario sensitivity (S3/S4/S5 stress tests) → Practitioner guidance (calibration robustness)
 
 ---
 
