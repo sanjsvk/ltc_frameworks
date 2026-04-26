@@ -1,0 +1,89 @@
+# Framework 3 — State-Space / Latent Stock
+# Parameters calibrated to data generating process (Position 1 — best-case)
+# True STC decay: tv=0.55, search=0.20, social=0.45, display=0.50, video=0.60
+# True LTC delta: tv=0.90, search=0.30, social=0.82, display=0.65, video=0.88
+# Steady-state stock init: tv=6000, search=91, social=975, display=181, video=3202
+
+kalman_dlm:
+  feature: impressions
+  channels: [tv, search, social, display, video]
+  stc_cutoff_weeks: 6
+  stc_decay_per_channel:
+    tv:      0.55
+    search:  0.20
+    social:  0.45
+    display: 0.50
+    video:   0.60
+  ltc_decay_per_channel:
+    tv:      0.90
+    search:  0.30
+    social:  0.82
+    display: 0.65
+    video:   0.88
+  level_var:  0.01
+  slope_var:  0.0001
+  obs_var:    null
+  ltc_state_init:
+    tv:      6000
+    search:  91
+    social:  975
+    display: 181
+    video:   3202
+
+mcmc_stock:
+  backend: mcmc
+  feature: spend
+  channels: [tv, search, social, display, video]
+  draws: 1000
+  tune: 1000
+  chains: 4
+  target_accept: 0.95
+  # Logit-normal prior on delta: logit(delta) ~ Normal(mu_logit, std_logit)
+  # mu_logit values back-transform exactly to true delta values (best-case calibration)
+  delta_prior_type: logit_normal
+  delta_prior_mean_logit:
+    tv:       2.20
+    search:  -0.85
+    social:   1.52
+    display:  0.62
+    video:    1.99
+  delta_prior_std_logit: 0.30
+  prior_build_rate_sigma: 0.7
+  prior_ltc_coef_sigma: 0.387
+  # per-scenario obs noise: matches true noise std in DGP
+  prior_obs_sigma:
+    S1: 0.15
+    S2: 0.18
+    S3: 0.20
+    S4: 0.18
+    S5: 0.30
+  stock_init_mode: steady_state
+
+bsts:
+  backend: custom
+  feature: impressions
+  channels: [tv, search, social, display, video]
+  stc_cutoff: 6
+  stc_decay_per_channel:
+    tv:      0.55
+    search:  0.20
+    social:  0.45
+    display: 0.50
+    video:   0.60
+  ltc_decay_per_channel:
+    tv:      0.90
+    search:  0.30
+    social:  0.82
+    display: 0.65
+    video:   0.88
+  level_var:    0.01
+  slope_var:    0.0001
+  seasonal_periods: 52
+  seasonal_var: 0.001
+  obs_var_init: null
+  ltc_state_init:
+    tv:      6000
+    search:  91
+    social:  975
+    display: 181
+    video:   3202

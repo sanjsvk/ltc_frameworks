@@ -15,6 +15,7 @@ kalman_dlm:
     social:  501         # was 975
     display: 122         # was 181
     video:   1347        # was 3202
+  obs_var: 0.09          # was null; S5 true noise std = 0.30, var = 0.09
 
 mcmc_stock:
   draws: 2000            # was 1000
@@ -49,3 +50,4 @@ bsts:
     social:  501         # was 975
     display: 122         # was 181
     video:   1347        # was 3202
+  obs_var_init: 0.09     # was null; S5 true noise std = 0.30, var = 0.09

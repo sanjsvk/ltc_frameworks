@@ -63,20 +63,30 @@ WHY SUPPLEMENTARY CONFIG WORKS: Mechanistic Explanation
    Solution: Extra draws + tune (1500 steps) improve sampler efficiency
    Effect: Better exploration of weak-signal posterior; reduced MC error
 
+5. Why obs_var Specification Doesn't Help kalman_dlm & bsts
+   Attempted Fix: Set obs_var = 0.09 (true S5 noise variance)
+   Result: No improvement (still 0% recovery)
+   Explanation: The bottleneck is NOT noise variance estimation, but rather the inability to jointly
+   optimize decay & initialization. kalman_dlm uses fixed decay per channel; bsts uses fixed decay +
+   fixed seasonal variance. These structural constraints cannot be relaxed at runtime, unlike MCMC's
+   Bayesian posterior which adapts all parameters jointly to data likelihood.
+
 ════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 CROSS-MODEL COMPARISON: Why Only MCMC Succeeds on S5
 
-Model                  | S1 Frozen | S5 Frozen | S5 Suppl  | Can Tune? | Mechanism
+Model                  | S1 Frozen | S5 Frozen | S5 Suppl  | S5+ObsVar | Can Tune? | Mechanism
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────
-mcmc_stock             | 72.4%     | 0.0%      | 88.5%     | YES       | Bayesian joint optimization
-kalman_dlm             | 82.0%     | 0.0%      | 0.0%      | NO        | Fixed decay + fixed level var
-bsts                   | 82.4%     | 0.0%      | 0.0%      | NO        | Fixed decay + fixed seasonal var
-geo_adstock (F1)       | 69.9%     | 0.0%      | N/A       | NO        | Static adstock inflexible
-ardl (F2)              | 0.0%      | 0.0%      | N/A       | NO        | AR structure doesn't help
+mcmc_stock             | 72.4%     | 0.0%      | 88.5%     | 88.5%     | YES       | Bayesian joint optimization
+kalman_dlm             | 82.0%     | 0.0%      | 0.0%      | 0.0%      | NO        | Fixed decay structure (obs_var doesn't help)
+bsts                   | 82.4%     | 0.0%      | 0.0%      | 0.0%      | NO        | Fixed decay structure (obs_var doesn't help)
+geo_adstock (F1)       | 69.9%     | 0.0%      | N/A       | N/A       | NO        | Static adstock inflexible
+ardl (F2)              | 0.0%      | 0.0%      | N/A       | N/A       | NO        | AR structure doesn't help
 
-KEY: kalman_dlm & bsts fail even with weakened decay config because level_var and seasonal_var are
-fixed. MCMC succeeds because it optimizes decay, ltc_coef, and stock_init jointly via posterior inference.
+KEY INSIGHT: Even providing true observation noise (obs_var = 0.09 = 0.30^2) to kalman_dlm & bsts
+does NOT improve S5 recovery (stays 0%). The problem is NOT observation noise misspecification, but
+rather the FIXED decay structure itself. These models cannot adapt decay to weak-signal regime.
+Only MCMC, which jointly optimizes decay + coefficient + initialization, can recover S5 signal.
 
 ════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
@@ -95,6 +105,14 @@ prior_obs_sigma Dict Resolution (FIXED in prior commit)
   ✓ S3: 0.30 → 0.20 (was broken; code ignored dict)
   ✓ S4: 0.30 → 0.18 (was broken; code ignored dict)
   ✓ S5: 0.30 → 0.30 (correct; was working by coincidence)
+
+obs_var Specification (ATTEMPTED but ineffective)
+  Hypothesis: kalman_dlm & bsts fail on S5 because obs_var/obs_var_init are null (default)
+  Test: Set obs_var = 0.09 (true S5 noise variance = 0.30^2) in supplementary config
+  Result: ✗ NO IMPROVEMENT
+    - kalman_dlm: 0.0% (before) → 0.0% (with obs_var = 0.09)
+    - bsts: 0.0% (before) → 0.0% (with obs_var_init = 0.09)
+  Conclusion: Problem is NOT observation noise; is FIXED decay structure that cannot adapt to weak signal
 
 ════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
