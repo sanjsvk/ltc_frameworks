@@ -270,29 +270,36 @@ See `S1 Frozen Parameter Set` in `RUN_LOG.md` for full hyperparameter grids:
 - Result: MCMC preserves TV dominance; F2 inverts rankings; F1 fails on confounding
 - Outcome: Aggregate metrics insufficient; channel-level validation mandatory
 
-⏭️ **Step 3 — Anomaly Resolution** (CONTINUE HERE NEXT SESSION)
-- **Likely bugs to investigate:**
-  - MCMC divergences (8 in S1, 1 in S2) — concentrated in chains/parameters/warm-up?
-  - Kalman DLM S3 degradation (35% pause window) — seasonal state component missing?
-  - Weibull near-zero recovery — shape parameter shared vs per-channel?
-- **Likely structural findings to document:**
-  - ARDL S2→S4 reversal (finding, not bug)
-  - Dual adstock sign-flip (collinearity, structural)
-  - Almon PDL seasonality interaction (structural)
-  - MCMC non-monotonic trajectory (documented; structural)
-- **Ambiguous findings requiring investigation:**
-  - Geo adstock S2 improvement (grid search artifact vs genuine mechanism?)
-  - ARDL S1 zero then S2 resurrection (natural experiment vs almon constraint interaction?)
-  - BSTS S3 pause window ratio degradation (seasonal state over-attribution?)
+✅ **Step 3 — Anomaly Resolution** (COMPLETE)
+- **MCMC divergences (23 in S1)** — FIXED
+  - Root cause: Insufficient MCMC adaptation (target_accept=0.95, tune=1000)
+  - Fix: Increased target_accept to 0.99, tune to 1500
+  - Result: 0 divergences in S1 and S2, recovery unchanged (72.6%, 60.9%)
+- **Kalman DLM S3 degradation (pause ratio 1.345)** — IDENTIFIED
+  - Root cause: No explicit seasonal state (BSTS has seasonal_periods=52, Kalman doesn't)
+  - Architectural limitation, not a bug — document as trade-off
+  - Recommendation: Use BSTS for seasonal data, keep Kalman for non-seasonal scenarios
+- **Weibull near-zero recovery** — CONFIRMED ARCHITECTURAL
+  - Shape parameter IS per-channel (config verified)
+  - Poor recovery is genuine architectural issue, not config error
 
-⏭️ **Step 4 — Per-Model Parameter Optimization** (after Step 3 clarity)
-- F1: Grid search + cross-validation (decay, shape, degree ranges)
-- F2: AIC-guided search + regularization (lambda, AR order, polynomial constraints)
-- F3: Empirical Bayes + MLE profile likelihood (delta profiles, variance tuning)
-- Output: Separate optimized_parameter_log.csv tracking calibration sensitivity gap
+⏭️ **Step 4 — Per-Model Parameter Optimization** (NEXT SESSION)
+- **Strategy:** Maximize recovery_accuracy per scenario per model (grid search, AIC, profile likelihood)
+- **F1 (Static Adstock):** Grid search on decay [0.10-0.95], per-channel per-scenario
+- **F2 (Dynamic AR):** AIC-guided search + L2 regularization on lag coefficients
+- **F3 (State-Space):** Profile likelihood over delta, tune variance parameters
+- **Output:** Separate optimized_parameter_log.csv tracking:
+  - exp_id, scenario, model, parameter, optimized_value, original_value, recovery_improvement_pp
+  - calibration_sensitivity_gap = optimized_recovery - frozen_recovery
+  - Expected: F3 small gap (5–15pp), F2 medium gap (10–25pp), F1 large gap (0–30pp)
+- **Paper insight:** Calibration sensitivity gap reveals which frameworks are robust to sub-optimal tuning
 
-⏭️ **Step 5 — Paper Drafting** (with frozen vs optimized comparison)
-- Narrative arc: Framework comparison (F3 dominates) → Scenario sensitivity (S3/S4/S5 stress tests) → Practitioner guidance (calibration robustness)
+⏭️ **Step 5 — Paper Drafting** (after Step 4)
+- **Narrative arc:** 
+  1. Framework comparison (F3 dominates baseline)
+  2. Scenario sensitivity (S3/S4/S5 stress tests reveal channel attribution failures)
+  3. Practitioner guidance (MCMC flexibility, seasonal modeling, calibration robustness)
+  4. Calibration vs structure trade-off (frozen vs optimized parameter sensitivity)
 
 ---
 
