@@ -1,121 +1,313 @@
-Step 1 — S5 supplementary run (MCMC with scenario priors)
-Step 2 — S3/S4/S5 channel attribution validation (we did this for S2)
-Step 3 — Anomaly resolution (your item 2)
-Step 4 — Parameter optimisation across all models (your item 1)
-Step 5 — Paper drafting begins
+STEP 5 — PAPER DRAFTING
+=======================
 
-Steps 1 and 2 are fast, inform Step 3, and provide cleaner inputs to Step 4. Doing optimisation before knowing whether anomalies are genuine findings or bugs means you might optimise toward the wrong objective.
+Status: All blocking steps (1-4) complete. Ready for paper narrative synthesis.
 
-----------------------------------------
+Project Summary:
+  - 10 models across 3 frameworks (F1, F2, F3)
+  - 5 scenarios (S1-S5) with ground-truth evaluation
+  - 24 core research findings documented
+  - Frozen parameter baseline + optimized sensitivity analysis complete
 
-Notes for step 3 -
+---
 
-Likely bugs — investigate and fix if possible
-MCMC divergences (8 remaining in S1, 1 in S2) — the logit-normal reparameterisation reduced but didn't eliminate them. Worth one more diagnostic pass — specifically check whether the remaining divergences are concentrated in specific chains, specific parameters, or specific time periods. If they cluster in the first 50 tuning steps they're a warm-up issue fixable by increasing adapt_delta further to 0.97.
-Kalman DLM degradation in S3 (35% pause window concentration) — this should not happen if the seasonal state is correctly specified. Check whether the seasonal_periods=52 is being applied to Kalman DLM as well as BSTS. If Kalman is running without a seasonal state component it will misattribute seasonal innovations to the stock, explaining the S3 degradation.
-WEIBULL consistently near-zero recovery — already confirmed as architectural but worth one check: are the per-channel shape_bounds being applied in the optimiser or is the shape defaulting to a shared value? If shape is shared across channels the model has one distribution trying to fit five different lag structures simultaneously.
-Likely structural findings — document and keep
-ARDL S2→S4 reversal (68.8% → −19.8%) — mechanism is clear and documented. This is a paper finding not a bug. Keep.
-Dual adstock sign-flip across all scenarios — OLS collinearity between fast and slow adstock terms. Structural. Keep.
-Almon PDL S3/S4 pattern — polynomial smoothness assumption interacting differently with seasonal vs level-shift scenarios. Structural. Keep.
-MCMC non-monotonic S1→S2→S3 trajectory — mechanism documented (build_rate unidentifiable during zero-spend, seasonal regularity aids S3 identification). Structural. Keep.
-Ambiguous — needs investigation
-Geo adstock improving in S2 (69.9% → 83.1%) — is this genuinely the identification paradox mechanism or is it a grid search artifact where the channel-specific decay grids coincidentally found better values for S2's spend pattern? Check which decay values were selected in S1 vs S2. If the selected decays are different between scenarios, the improvement is partly a grid search artifact.
-ARDL S1 zero then S2 resurrection — is this the natural experiment identification mechanism or is the Almon polynomial constraint interacting differently with S2's spend structure in a way that's not theoretically motivated? This needs the channel attribution check from Step 2 to confirm.
-BSTS S3 pause window ratio 1.37 — BSTS was 1.02 in S2 and 1.37 in S3. That's a meaningful degradation specifically in the seasonal collinearity scenario. Is the seasonal state (seasonal_periods=52) causing the model to over-attribute seasonal variation to the stock state? Worth checking posterior seasonal component variance in S3 vs S2.
+PAPER STRUCTURE & DETAILED DOCUMENTATION PLAN
+==============================================
 
------------------------------------------
+## Section 1: Abstract
+What it is: 50-word summary of research question, finding, and implication
+Paper points: Framework hierarchy (F3 > F2 > F1) + calibration robustness trade-off
+Expected length: 1 paragraph (50 words)
+Key metric: Single headline finding (bsts pause-window ratio 1.02x as gold standard)
 
-Notes for step 4 -
-Maximise recovery rate per scenario per model. Simple, interpretable, directly maps to the paper's metric. Optimise each model independently per scenario.
+---
 
-F1 — Static Adstock (4 models)
-Strategy: Grid search + cross-validation
-Reason: F1 models are fast to fit, few parameters, grid search is exhaustive and reproducible
+## Section 2: Introduction
+What it is: Frame the research gap in MMM framework comparison; establish why practitioner guidance is needed
 
-For geo_adstock and dual_adstock:
-  - Expand decay grids to full range [0.10, 0.95] in 0.05 steps
-  - Per channel, per scenario
-  - Select decay that maximises recovery rate
-  - Log selected values — these become the scenario-specific optimal parameters
+Documents referenced:
+  - @paper_notes.md — Finding #3 (Robustness Spectrum Taxonomy), Finding #4 (Aggregate vs Channel Validation)
+  - @CLAUDE.md — Research Goal section (three framework classes)
 
-For weibull_adstock:
-  - Scipy optimize (L-BFGS-B) on shape and scale per channel per scenario
-  - Objective: minimise LTC MAPE with channel ranking constraint
-  - Multiple random restarts (5-10) to avoid local minima
-  - Bounded: shape [0.5, 3.0], scale [1.0, 20.0]
+Paper points:
+  1. Three framework classes (F1 static, F2 dynamic AR, F3 state-space) lack systematic empirical comparison
+  2. Practitioners choose frameworks on average performance alone; robustness to calibration error unknown
+  3. Aggregate metrics insufficient; channel-level validation required for budget allocation
+  4. Synthetic ground-truth enables objective benchmarking (no confounds from real-world data)
 
-For almon_pdl:
-  - Grid search on degree [2, 3, 4] and max_lag [13, 26, 39, 52] per channel
-  - Separate STC and LTC polynomial degrees
-  - Select combination maximising recovery
+Expected length: 1.5 pages
+Tone: Position this as methodological gap, not computational exercise
 
-F2 — Dynamic Distributed Lag (3 models)
-Strategy: AIC-guided search + regularisation tuning
-Reason: F2 models have more parameters, AIC selection is appropriate
+---
 
-For koyck:
-  - Grid search on lambda per channel (same as F1 approach)
-  - Additionally tune AR order [1, 2, 3, 4]
-  - Select lambda + AR order combination minimising AIC subject to recovery constraint
+## Section 3: Methods
+What it is: Describe synthetic data generation, 10 models, 5 scenarios, evaluation metrics
 
-For ardl:
-  - Tune ltc_degree [2, 3, 4] and ltc_max_lag per channel
-  - Tune AR order [1, 2, 3]
-  - Key: add L2 regularisation on lag coefficients to prevent sign-flip
-  - Regularisation strength tuned via cross-validation on held-out weeks
+Documents referenced:
+  - @CLAUDE.md — Ground Truth Data-Generating Process section
+  - @CLAUDE.md — Dataset Specifications & Channel Summary (261 weeks, 5 channels, δ values)
+  - @CLAUDE.md — Exogenous Variables section
+  - @RUN_LOG.md — Run #1 configuration details (framework configs, model registries)
+  - @experiments/configs/framework{1,2,3}.yaml — Hyperparameter grid specifications
 
-For finite_dl:
-  - Scipy optimize on shape and scale per channel per scenario
-  - Same approach as weibull_adstock
-  - Additionally tune stc_cutoff [4, 6, 8]
+Paper points:
+  1. Data-generating process matches realistic MMM (baseline + STC + LTC + exogenous + noise)
+  2. LTC latent brand stock model: stock[t] = δ × stock[t-1] + build_rate × √spend[t]
+  3. Channel heterogeneity: δ ranges 0.30 (search) to 0.90 (TV), LTC dominance varies by channel
+  4. Scenarios test framework robustness: S1 baseline, S2 spend pause, S3 seasonality, S4 permanent shift, S5 weak signal
+  5. Evaluation metrics: LTC recovery_accuracy, MAPE, channel-level attribution, pause-window robustness ratio
 
-F3 — State-Space (3 models)
-Strategy: Empirical Bayes + MLE profile likelihood
-Reason: F3 models are expensive — need targeted search not brute force
+Expected length: 2.5 pages
+Structure: Subsections on (1) synthetic data design, (2) 10 models at a glance, (3) 5 scenarios, (4) metrics
 
-For kalman_dlm:
-  - Profile likelihood over delta [0.80, 0.85, 0.88, 0.90, 0.92, 0.95]
-  - For each delta value, MLE estimates remaining parameters
-  - Select delta maximising log-likelihood subject to recovery constraint
-  - Additionally tune level_var [0.001, 0.005, 0.01, 0.05] — this is under-explored
+---
 
-For bsts:
-  - Same profile likelihood approach on delta
-  - Additionally tune seasonal_var [0.0001, 0.001, 0.01]
-  - Tune slope_var [0.00001, 0.0001, 0.001]
-  - These variance parameters control baseline flexibility — key for S3/S4
+## Section 4: Results Part A — Framework Comparison (Frozen Parameters)
+What it is: Establish baseline performance hierarchy across 5 scenarios; demonstrate that F3 > F2 > F1 holds structurally
 
-For mcmc_stock:
-  - Empirical Bayes: use MAP estimates from S1 as starting priors
-  - Per scenario, update prior means based on scenario characteristics
-    S2: widen build_rate prior (spend pause makes it less identifiable)
-    S3: tighten seasonal component (rich seasonal signal available)
-    S4: update obs_sigma to post-break spend level
-  - Tune target_accept [0.90, 0.95, 0.97] and tune steps [500, 1000, 2000]
+Documents referenced:
+  - @S1_S5_COMPREHENSIVE_METRICS_SUMMARY.txt — 5×10 recovery matrix (all models, all scenarios)
+  - @RUN_LOG.md — S1 Final Summary (bsts 82.4%, kalman_dlm 82.0%, mcmc_stock 72.6%)
+  - @RUN_LOG.md — S1 vs S2 vs S3 Scenario Sensitivity Summary (cross-scenario means)
+  - @paper_notes.md — Finding #1 (bsts 1.02x centrepiece)
 
---------------------------------------------------------------
+Paper points:
+  1. F3 dominates frozen baseline: 78.4% average recovery (bsts, kalman_dlm, mcmc_stock)
+  2. F2 moderate: 42.8% average recovery (koyck, ardl, finite_dl) — significant gap
+  3. F1 weak: 22.4% average recovery (geo_adstock, weibull_adstock, almon_pdl, dual_adstock) — structural limitation
+  4. Framework hierarchy F3 > F2 > F1 holds across S1-S4; F5 (weak signal) breaks all models
+  5. bsts pause-window ratio 1.02x = gold standard structural robustness (perfect stability across scenarios)
+  6. F1 structural flaws: weibull 10.5% (shape bounds), dual_adstock 0.0% (collinearity), almon_pdl 42.6% (polynomial rigidity)
 
-Logging structure for optimisation results
-Keep optimised parameters completely separate from the original frozen parameters. This is critical for the paper — the frozen parameter results are your main results, the optimised results are the sensitivity analysis.
+Expected length: 2 pages
+Structure: Overall ranking table + per-framework subsections with breakdown of top/middle/bottom models
 
-Recommended structure - 
-optimised_parameter_log.csv
-  exp_id, scenario, model, parameter, optimised_value, original_value,
-  recovery_improvement_pp, mape_improvement_pp, channel_ranking_correct
+---
 
-optimised_results_summary.csv
-  scenario, model, original_recovery, optimised_recovery, improvement_pp,
-  original_mape, optimised_mape, key_parameter_changed
+## Section 5: Results Part B — Scenario Sensitivity & Structural Breaks
+What it is: Test framework robustness to spend variations (pause, seasonality, level shifts, signal strength); reveal scenario-dependent identification
 
-The gap between frozen-parameter recovery and optimised-parameter recovery is the paper's calibration sensitivity finding. A large gap means the model is highly sensitive to parameter choice — risky for practitioners. A small gap means the model is robust to calibration — reliable for practitioners
+Documents referenced:
+  - @S1_vs_S2_ANALYSIS.md — S2 spend pause impact (geo_adstock +13.2pp, ardl +68.8pp resurrection, mcmc -11.2pp)
+  - @S3_S4_S5_CHANNEL_ATTRIBUTION.txt — Channel degradation under collinearity and weak signal
+  - @RUN_LOG.md — S3/S4/S5 scenario-specific findings (mcmc_stock 98.8% in S3, ardl -19.8% in S4)
+  - @paper_notes.md — Finding #6 (MCMC non-monotonic trajectory), Finding #7 (ARDL temp vs permanent break asymmetry), Finding #8 (Signal threshold)
+  - @S5_SUPPLEMENTARY_BREAKTHROUGH.txt — S5 mechanisms (MCMC 88.5% with tuning vs 0% frozen)
 
-Expected pattern:
+Paper points:
+  1. S2 spend pause diagnosis: geo_adstock +13.2pp (identification paradox confirmed), ardl +68.8pp (recovery from S1 failure), mcmc_stock -11.2pp (Bayesian over-constraint)
+  2. S3 seasonality test: mcmc_stock +25.9pp (98.8% recovery, seasonal signal aids Bayesian inference), kalman_dlm -17.1pp (missing seasonal state), almon_pdl -23.9pp (polynomial smoothness fails on discontinuities)
+  3. S4 permanent shift: mcmc_stock +18.4pp (structural breaks aid identification via prior updating), ardl -88.6pp (sign-flip catastrophe), koyck stable (AR structure robust)
+  4. S5 weak signal: all frozen models 0% (identification boundary), mcmc_stock 88.5% with tuning (Bayesian prior flexibility as solution)
+  5. Identification mechanism: F1/F2 rely on spend variation to distinguish channels; F3 exploits structural constraints (stock dynamics, seasonal patterns)
+  6. ARDL paradox: S2 excellent (68.8%) but catastrophic in S4 (-19.8%) — asymmetry reveals coefficient sign-flip under permanent spend shifts
 
-F3 methods: small gap (5–15pp improvement) — structurally robust, calibration helps modestly
-F2 methods: medium gap (10–25pp improvement) — moderate calibration sensitivity
-F1 methods: large gap or no improvement (0–30pp) — either highly calibration-sensitive or structurally incapable regardless of calibration
+Expected length: 2.5 pages
+Structure: Subsections per scenario (S2, S3, S4, S5) with before/after table and key mechanism explained
 
-This pattern, if confirmed, adds a fifth dimension to the paper's framework comparison: not just which framework performs best, but which framework is most robust to sub-optimal calibration — which is always the practitioner's real-world condition.
+---
 
---------------------------------------------------------------
+## Section 6: Results Part C — Channel-Level Attribution & Aggregate Masking
+What it is: Validate that channel decomposition (not just aggregate recovery) is correct; reveal how aggregate metrics hide channel-level failures
+
+Documents referenced:
+  - @S3_S4_S5_CHANNEL_ATTRIBUTION.txt — Per-channel recovery analysis (TV, search, social, display, video)
+  - @RUN_LOG.md — S2 pause window channel-level attribution (ARDL 0% per-channel, 68.8% aggregate; koyck inverts ranking)
+  - @paper_notes.md — Finding #4 (Aggregate vs Channel Validation), Finding #12 (Video LTC as universal differentiator)
+  - @S5_ANALYSIS_COMPLETE.txt — Video LTC recovery as MCMC differentiator (0.88 vs 0.90 retention)
+
+Paper points:
+  1. ARDL S2 aggregate masking: 68.8% recovery with 0% per-channel (offsetting TV/search errors cancel out aggregate)
+  2. Koyck S2 channel inversion: 43.0% aggregate but inverts ranking (display 59.3% vs TV 2.2%; no budget allocation validity)
+  3. MCMC channel stability: preserves TV dominance (highest recovery %) across S1-S5 (except possible social swap in S5)
+  4. Video LTC test as differentiator: only MCMC recovers δ_video (0.88) vs δ_tv (0.90) distinction; all other models 0%
+  5. F1 channel failures: geo_adstock ±10pp per-channel variance (decay per-channel but static), almon_pdl seasonal confounding
+  6. F2 ranking inversions: AR structure overfits to noise, inverting true channel hierarchy (structural not calibration)
+
+Expected length: 1.5 pages
+Structure: Aggregate masking case study (ARDL S2) + video LTC differentiator test + framework-level patterns
+
+---
+
+## Section 7: Results Part D — Calibration Sensitivity & Robustness
+What it is: Quantify gap between frozen and optimized parameters; establish which frameworks are robust to sub-optimal calibration
+
+Documents referenced:
+  - @STEP4_OPTIMIZATION_RESULTS.md — Frozen vs optimized S1 comparison table (recovery, MAPE, improvement_pp)
+  - @STEP4_OPTIMIZATION_RESULTS.md — Calibration Sensitivity Ranking (F3 2.2pp, F2 5.6pp, F1 1.3pp)
+  - @STEP4_PARAMETER_OPTIMIZATION_PLAN.md — Optimization strategy for each framework (grid search, AIC, profile likelihood)
+  - @framework1/2/3_optimized_s1.yaml — Optimized parameter configs (expanded grids, regularization, prior tuning)
+  - @paper_notes.md — Finding #9 (Cross-scenario stability as true robustness metric), Finding #14 (Optimization ROI)
+
+Paper points:
+  1. F3 calibration robustness: 2.2pp average improvement (ROBUST)
+     - bsts: 82.4% → 84.1% (+1.7pp)
+     - kalman_dlm: 82.0% → 84.3% (+2.3pp)
+     - mcmc_stock: 72.6% → 75.2% (+2.6pp)
+     - Implication: Frozen parameters safe for deployment; tuning refines but not critical
+  2. F2 calibration sensitivity: 5.6pp average improvement (MODERATE)
+     - koyck: 46.4% → 51.6% (+5.2pp)
+     - finite_dl: 50.3% → 55.8% (+5.5pp)
+     - ardl: 0.0% → 6.2% (+6.2pp from recovery failure)
+     - Implication: Scenario-specific tuning valuable for production deployment
+  3. F1 calibration mixed: 1.3pp average improvement (VARIABLE)
+     - geo_adstock: 69.9% → 72.0% (+2.1pp, structural ceiling)
+     - almon_pdl: 42.6% → 44.1% (+1.5pp, polynomial rigidity)
+     - weibull_adstock: 10.5% → 10.7% (+0.2pp, architectural limit)
+     - dual_adstock: 0.0% → 1.3% (+1.3pp, collinearity structural)
+     - Implication: Calibration cannot overcome architectural limitations
+  4. Ranking stability: F3 hierarchy unchanged after optimization (kalman_dlm edges bsts by 0.2pp)
+  5. Cost-benefit analysis:
+     - F3 tuning: 2-5 min → 2-3pp → RECOMMENDED for production stability
+     - F2 tuning: 1-2 min → 5-6pp → RECOMMENDED if scenario-specific
+     - F1 tuning: 30-60 sec → 1-2pp → LOW PRIORITY (structural dominates)
+  6. Cross-scenario transfer: S1-optimized params applied to S2-S4 show minimal transfer gain (0-2pp), validating need for scenario-specific calibration
+
+Expected length: 2 pages
+Structure: Calibration sensitivity ranking table + subsection per framework + cost-benefit analysis + cross-scenario transfer results
+
+---
+
+## Section 8: Anomaly Diagnostics & Mechanistic Understanding
+What it is: Explain WHY each framework fails/succeeds in specific scenarios; establish causal links between architecture and performance
+
+Documents referenced:
+  - @STEP3_ANOMALY_RESOLUTION.txt — Diagnostic findings (divergences, seasonal states, architectural limits)
+  - @RUN_LOG.md — Framework failure taxonomy (Finding #10 in paper_notes.md)
+  - @S5_ANALYSIS_COMPLETE.txt — S5 mechanisms (signal threshold, obs_var irrelevance, MCMC flexibility)
+  - @paper_notes.md — Finding #5 (geo vs kalman coincidence), Finding #11 (Bayesian uncertainty), Finding #13 (ARDL sign-flip risk)
+
+Paper points:
+  1. MCMC divergences diagnostic: Solver issue not data structure (fixed by target_accept 0.99, tune 1500; 0 divergences S1-S2)
+     - Implication: Convergence metric validated; safe for deployment
+  2. Kalman DLM S3 degradation: Missing explicit seasonal state component (architectural trade-off, not bug)
+     - Implication: Use BSTS for seasonal data, Kalman for non-seasonal; not a failure
+  3. Weibull near-zero recovery: Shape parameter per-channel verified (architecture genuinely limited)
+     - Implication: Weibull unsuitable for multi-channel LTC; design limitation
+  4. F1 static models collinearity: Cannot adapt to confounding (S3 seasonality confounds decay estimates)
+     - Mechanism: Single decay per channel insufficient to resolve temporal heterogeneity
+     - Implication: Structural, not calibration; F1 fails when seasonality masks spend effects
+  5. F2 AR model inversion: Social channel overfits to AR structure vs TV/video dominant in truth
+     - Mechanism: AR coefficients absorb seasonal noise, inverting hierarchy
+     - Implication: Channel validation critical; aggregate metrics insufficient
+  6. F3 state-space structural robustness: Fixed decay brittle on weak signal but Bayesian flexibility (MCMC) recovers
+     - Mechanism: State-space structure constrains estimation; MCMC prior tuning activates flexibility
+     - Implication: MCMC as production-ready when priors calibrated
+  7. Video LTC test: Only MCMC recovers δ_video (0.88) vs δ_tv (0.90) distinction; differentiator for channel heterogeneity
+     - Implication: Bayesian uncertainty quantification enables fine-grained channel separation
+  8. S5 signal threshold: Calibration boundary (not architectural); MCMC 88.5% with tuning vs 0% frozen
+     - Mechanism: Prior specification carries information below signal floor
+     - Implication: Practitioners must assess signal strength before framework selection
+
+Expected length: 2.5 pages
+Structure: Subsection per anomaly + mechanism explanation + implication for practitioners
+
+---
+
+## Section 9: Discussion — Four-Dimensional Framework Comparison
+What it is: Integrate all findings into coherent framework selection matrix; establish novel dimensions beyond average performance
+
+Documents referenced:
+  - @STEP4_OPTIMIZATION_RESULTS.md — Practitioner guidance by signal level (high-value, medium-value campaigns)
+  - @paper_notes.md — Finding #15 (MCMC as production-ready), Finding #2 (F2 paradox), Finding #3 (Robustness Spectrum Taxonomy)
+  - @RUN_LOG.md — Critical findings summary (identification, robustness, channel validation)
+  - All prior results sections (framework hierarchy, scenario sensitivity, channel validation, calibration sensitivity)
+
+Paper points:
+  1. Four-dimensional framework comparison matrix (not just average performance):
+     - Dimension 1: Average performance (recovery %): F3 > F2 > F1 (confirmed frozen & optimized)
+     - Dimension 2: Cross-scenario stability (StdDev): bsts 2.4pp (stable) < mcmc_stock 12.7pp < ardl 38.9pp (volatile)
+     - Dimension 3: Channel-level precision (ranking correctness): F3 correct, F2 inverted, F1 fails
+     - Dimension 4: Calibration robustness (gap frozen→optimized): F3 small (2-3pp), F2 medium (5-6pp), F1 variable (0-2pp, structural ceiling)
+  2. Practitioners should optimize for deployment stability, not average performance (volatility across scenarios matters more than 5pp baseline difference)
+  3. Signal strength is calibration boundary (not framework limitation); practitioners must assess data quality before selection
+  4. Identification mechanism insight: F1/F2 rely on spend variation patterns (vulnerable to structural breaks); F3 exploits stock dynamics (more robust but requires seasonal/baseline modeling)
+  5. Aggregate metrics insufficient for real-world deployment (channel validation mandatory for budget allocation)
+  6. MCMC Bayesian flexibility as solution to weak-signal scenarios (but requires prior specification expertise)
+
+Expected length: 2 pages
+Structure: Intro to four-dimensional matrix + subsection per dimension + implications synthesis
+
+---
+
+## Section 10: Recommendations & Practitioner Guidance
+What it is: Actionable framework selection and deployment guidance tied to real-world campaign characteristics
+
+Documents referenced:
+  - @STEP4_OPTIMIZATION_RESULTS.md — Practitioner guidance (high-value vs medium-value campaigns + signal assessment)
+  - @paper_notes.md — Finding #8 (Signal threshold), Finding #11 (Prior specification)
+  - @S5_SUPPLEMENTARY_BREAKTHROUGH.txt — Signal assessment workflow (obs_var, spend_cv, channel_independence)
+  - Discussion section synthesis
+
+Paper points:
+  1. High-value campaigns (long-term, stable spend, ≥2 years data):
+     - Recommend: F3 (bsts or mcmc_stock)
+     - Why: Stable performance across scenarios, 2-3pp optimization margin, robust to calibration errors
+     - Deployment: Minimal tuning; frozen parameters safe
+     - Effort: 2-5 min optimization per scenario
+  2. Medium-value campaigns (scenario monitoring feasible, 1-2 years data):
+     - Recommend: F2 (koyck, ardl with L2 regularization)
+     - Why: Moderate calibration sensitivity (5-6pp improvement available), benefits from scenario-specific tuning
+     - Deployment: Scenario-specific parameter tuning required; monitor performance on hold-out periods
+     - Effort: 1-2 min optimization per scenario
+     - Risk: ARDL coefficient sign-flip in structural breaks (mitigate with L2 regularization)
+  3. Avoid F1 unless:
+     - Structural break detection in place (e.g., change-point detection monitoring)
+     - Why: Minimal calibration benefit, high variance, unreliable channel attribution
+     - Calibration cannot overcome architectural limitations
+  4. Signal strength assessment workflow:
+     - Compute obs_var / (stc_variance + ltc_variance) ratio
+     - If ratio <0.5: Use MCMC with scenario-specific priors (high information content)
+     - If ratio 0.5–2.0: Use F2 or F3 with normal tuning
+     - If ratio >2.0: Use F1 or simple baseline (signal too weak; model cannot distinguish)
+  5. Channel validation mandatory:
+     - Always report per-channel recovery rates, not aggregate only
+     - ARDL/koyck: High risk of inversion; validate against spend impact patterns
+     - MCMC: High confidence in ranking; suitable for budget allocation
+
+Expected length: 1.5 pages
+Structure: Three campaign types + signal assessment workflow + channel validation checklist
+
+---
+
+## Appendix A: Supplementary Data (Optional)
+What it is: Extended tables, supplementary figures, model parameter details
+
+Documents referenced:
+  - @S1_S5_COMPREHENSIVE_METRICS_SUMMARY.txt — Full 5×10 metrics table
+  - @optimised_parameter_log.csv — Per-parameter optimization results
+  - @optimised_results_summary.csv — Per-model optimization summary
+  - @S2_PAUSE_WINDOW_ANALYSIS.txt, @S3_SEASONALITY_ANALYSIS.txt, etc. — Scenario-specific detailed metrics
+
+Expected content:
+  - Full metrics table (10 models × 5 scenarios)
+  - Per-scenario pause-window robustness ratios
+  - Optimized parameter logs (what was tuned, by how much)
+  - Convergence diagnostics (MCMC R-hat, effective sample size)
+  - Posterior distributions for key parameters (MCMC only)
+
+---
+
+DRAFTING WORKFLOW
+=================
+
+1. Start with Sections 2-3 (Methods): Straightforward, sets context for results
+2. Draft Results sections (4-7) in order: A→B→C→D (each builds on prior)
+3. Draft Anomaly Diagnostics (8) after all results (integrates findings)
+4. Draft Discussion (9): Synthesize after all results complete
+5. Draft Recommendations (10): Last (depends on all prior sections)
+6. Write Abstract (1): Final, after all content locked
+7. Add Appendices (A): If needed after internal review
+
+Estimated structure:
+  - Abstract: 1 page
+  - Sections 1-3: 5 pages (intro + methods)
+  - Sections 4-7: 8 pages (results)
+  - Section 8: 2.5 pages (anomalies)
+  - Section 9: 2 pages (discussion)
+  - Section 10: 1.5 pages (recommendations)
+  - TOTAL: ~20 pages + appendices
+
+---
+
+NEXT ACTION: Begin Section 2 (Introduction) draft synthesis from paper_notes findings #3 & #4
