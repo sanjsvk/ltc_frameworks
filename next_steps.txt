@@ -11,6 +11,40 @@ Project Summary:
 
 ---
 
+WRITING SKILLS FRAMEWORK — START HERE
+======================================
+
+**IMPORTANT**: Before drafting, read the skills folder to understand writing standards and section guidance.
+
+Location: `/skills/` — contains all writing guidance for the paper
+
+Start by reading:
+  1. @skills/INDEX.md — Overview of skills structure and recommended workflow
+  2. @skills/writing_skill.md — Global writing standards (applies to every section)
+  3. @skills/evaluation.md — Quality checklist (know the bar before writing)
+
+Then for each section:
+  1. Read the relevant section guidance file (e.g., @skills/methodology.md for Methods)
+  2. Read @skills/visuals.md if section includes tables/figures
+  3. Draft the section following guidance
+  4. Run @skills/evaluation.md quality checks before moving on
+
+Recommended writing order (per skills/INDEX.md):
+  1. Methodology     → establishes what was done
+  2. Results         → reports what was found
+  3. Discussion      → interprets findings
+  4. Introduction    → frames paper around known findings
+  5. Literature      → positioned against known findings
+  6. Abstract        → summarizes complete paper
+  7. Conclusion      → closes the arc
+  8. References      → compiled last
+
+Target journals: Journal of Marketing Research (JMR) primary, Marketing Science secondary
+Paper type: Quantitative methodology + empirical benchmarking
+Core claim: Static adstock fails; latent stock state-space is structurally robust
+
+---
+
 PAPER STRUCTURE & DETAILED DOCUMENTATION PLAN
 ==============================================
 
