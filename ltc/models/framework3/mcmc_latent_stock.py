@@ -396,6 +396,26 @@ class MCMCLatentStock(BaseLTCModel):
         except Exception as e:
             print(f"  [warn] Could not compute R-hat: {e}")
 
+        # Log divergence diagnostics
+        print("[mcmc_stock] Divergence diagnostics:")
+        try:
+            import arviz as az
+            div_mask = trace.sample_stats.diverging.values
+            n_divs = div_mask.sum()
+            n_chains = div_mask.shape[0]
+            n_draws = div_mask.shape[1]
+            print(f"  Total divergences: {int(n_divs)} / {n_chains * n_draws}")
+            if n_divs > 0:
+                for ch_idx in range(n_chains):
+                    ch_divs = div_mask[ch_idx].sum()
+                    if ch_divs > 0:
+                        div_indices = np.where(div_mask[ch_idx])[0]
+                        print(f"    Chain {ch_idx}: {int(ch_divs)} divergences at iterations {list(div_indices[:5])}")
+            else:
+                print("  ✓ No divergences detected")
+        except Exception as e:
+            print(f"  [warn] Could not extract divergence info: {e}")
+
         for ch in channels_with_spend:
             self._channel_params.setdefault(ch, {}).update(
                 {
