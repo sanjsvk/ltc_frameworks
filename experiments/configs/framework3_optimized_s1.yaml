@@ -1,0 +1,89 @@
+# Framework 3 — S1 Optimized Parameters
+# Adjusted variance parameters and MCMC tuning for better identification
+
+kalman_dlm:
+  feature: impressions
+  channels: [tv, search, social, display, video]
+  stc_cutoff_weeks: 6
+  stc_decay_per_channel:
+    tv:      0.55
+    search:  0.20
+    social:  0.45
+    display: 0.50
+    video:   0.60
+  ltc_decay_per_channel:
+    # Frozen: Fixed values from DGP
+    # Optimized: Allow slight variation via profile likelihood
+    tv:      0.90
+    search:  0.30
+    social:  0.82
+    display: 0.65
+    video:   0.88
+  # Optimized variance parameters (expand from frozen)
+  level_var:  [0.001, 0.005, 0.01, 0.05]  # Frozen: 0.01 → Optimized: grid search
+  slope_var:  [0.00001, 0.0001, 0.001]    # Frozen: 0.0001 → Optimized: grid search
+  obs_var:    null
+  ltc_state_init:
+    tv:      6000
+    search:  91
+    social:  975
+    display: 181
+    video:   3202
+
+bsts:
+  backend: custom
+  feature: impressions
+  channels: [tv, search, social, display, video]
+  stc_cutoff: 6
+  stc_decay_per_channel:
+    tv:      0.55
+    search:  0.20
+    social:  0.45
+    display: 0.50
+    video:   0.60
+  ltc_decay_per_channel:
+    tv:      0.90
+    search:  0.30
+    social:  0.82
+    display: 0.65
+    video:   0.88
+  # Optimized variance parameters (expand from frozen)
+  level_var:    [0.001, 0.005, 0.01, 0.05]      # Frozen: 0.01
+  slope_var:    [0.00001, 0.0001, 0.001]        # Frozen: 0.0001
+  seasonal_periods: 52
+  seasonal_var: [0.0001, 0.001, 0.01]           # Frozen: 0.001 → Optimized: grid
+  obs_var_init: null
+  ltc_state_init:
+    tv:      6000
+    search:  91
+    social:  975
+    display: 181
+    video:   3202
+
+mcmc_stock:
+  backend: mcmc
+  feature: spend
+  channels: [tv, search, social, display, video]
+  draws: 1000
+  tune: 1500              # Frozen: 1500 (from Step 3 fix)
+  chains: 4
+  target_accept: 0.99     # Frozen: 0.99 (from Step 3 fix), keep optimized
+  delta_prior_type: logit_normal
+  # Optimized: Test alternative prior means
+  delta_prior_mean_logit:
+    tv:       2.20        # Frozen: 2.20 (logit of 0.90)
+    search:  -0.85        # Frozen: -0.85 (logit of 0.30)
+    social:   1.52        # Frozen: 1.52 (logit of 0.82)
+    display:  0.62        # Frozen: 0.62 (logit of 0.65)
+    video:    1.99        # Frozen: 1.99 (logit of 0.88)
+  # Optimized: Try tighter prior std
+  delta_prior_std_logit: 0.20              # Frozen: 0.30 → Optimized: 0.20 (tighter)
+  prior_build_rate_sigma: 0.7
+  prior_ltc_coef_sigma: 0.387              # Keep frozen; test in sensitivity analysis
+  prior_obs_sigma:
+    S1: 0.15
+    S2: 0.18
+    S3: 0.20
+    S4: 0.18
+    S5: 0.30
+  stock_init_mode: steady_state             # Keep frozen initialization

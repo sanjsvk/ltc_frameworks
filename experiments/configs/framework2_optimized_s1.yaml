@@ -1,0 +1,52 @@
+# Framework 2 — S1 Optimized Parameters
+# Adjusted AR order and polynomial degrees for better parameter selection
+
+koyck:
+  ar_order: 2        # Frozen: 2, test [1,2,3,4] in optimization
+  include_lagged_sales: true
+  selection_metric: aic
+  # Frozen lambda_grid is narrow; optimize should expand
+  lambda_grid:
+    tv:      [0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 0.95]
+    search:  [0.10, 0.15, 0.20, 0.30, 0.40]
+    social:  [0.30, 0.45, 0.60, 0.75, 0.90]
+    display: [0.30, 0.45, 0.60, 0.75]
+    video:   [0.40, 0.60, 0.80, 0.95]
+
+ardl:
+  ar_order: 2        # Frozen: 2, test [1,2,3] in optimization
+  stc_cutoff: 6
+  ltc_degree: 3      # Frozen: 3, test [2,3,4] in optimization
+  ltc_lag_shape: almon
+  # Frozen ltc_max_lag_override is fixed; optimize by expanding
+  ltc_max_lag_override:
+    tv:      [39, 52]       # Frozen: 52, test range
+    search:  [4, 6, 8]      # Frozen: 4, test range
+    social:  [13, 26, 39]   # Frozen: 26, test range
+    display: [8, 12, 16]    # Frozen: 12, test range
+    video:   [39, 52]       # Frozen: 52, test range
+  # Add L2 regularization for sign-flip prevention (NEW in optimized)
+  l2_strength: 0.01  # New: regularization to prevent coefficient sign-flips
+
+finite_dl:
+  lag_shape: weibull
+  stc_cutoff: 6      # Frozen: 6, test [4,6,8] in optimization
+  max_lag: 52
+  max_lag_override:
+    tv:      52
+    search:  8
+    social:  26
+    display: 16
+    video:   52
+  shape_bounds:
+    tv:      [0.5, 3.0]
+    search:  [0.5, 2.5]
+    social:  [0.5, 3.0]
+    display: [0.5, 2.5]
+    video:   [0.5, 3.0]
+  scale_bounds:
+    tv:      [5.0, 20.0]
+    search:  [0.5, 5.0]
+    social:  [2.0, 10.0]
+    display: [1.0, 8.0]
+    video:   [4.0, 18.0]
