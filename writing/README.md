@@ -119,22 +119,26 @@ Per `instructions/INDEX.md` (differs from final paper order):
 | Section | Draft | Evaluation | Status |
 |---------|-------|------------|--------|
 | Abstract (1) | ⏳ | ⏳ | Written LAST |
-| Introduction (2) | ✅ | ✅ | Complete, citations pending verification |
-| Methodology (3) | ⏳ | ⏳ | Next to draft |
-| Results A (4) | ⏳ | ⏳ | Pending Methodology |
-| Results B (5) | ⏳ | ⏳ | Pending Methodology |
-| Results C (6) | ⏳ | ⏳ | Pending Methodology |
-| Results D (7) | ⏳ | ⏳ | Pending Methodology |
+| Introduction (2) | ✅ | ✅ | Complete, citations verified (Clarke 1976, Nerlove & Arrow 1962, Hanssels & Pauwels 2016) |
+| Methodology (3) | ✅ | ✅ | Complete — 1932 words, all 8 equations, 2 tables, replicability ✓ |
+| Results A (4) | ⏳ | ⏳ | Framework Comparison (Frozen Parameters) |
+| Results B (5) | ⏳ | ⏳ | Scenario Sensitivity & Structural Breaks |
+| Results C (6) | ⏳ | ⏳ | Channel-Level Attribution & Aggregate Masking |
+| Results D (7) | ⏳ | ⏳ | Calibration Sensitivity & Robustness |
 | Discussion (9) | ⏳ | ⏳ | Pending Results |
 | Recommendations (10) | ⏳ | ⏳ | Pending Discussion |
 | Conclusion (11) | ⏳ | ⏳ | Pending Recommendations |
-| References | ⏳ | ⏳ | Compiled at end |
+| References | ⏳ | ⏳ | Skeleton complete, will expand |
 
 ---
 
 ## Next Steps
 
 1. ✅ Create folder structure (DONE)
-2. ⏳ Verify citations in Introduction (Paragraph 2: Clarke 1976, Nerlove & Arrow 1962; Paragraph 3: additional MMM benchmark papers)
-3. ⏳ Draft Methodology Section 3
-4. ⏳ Continue with Results sections
+2. ✅ Verify citations in Introduction (DONE — Clarke 1976, Nerlove & Arrow 1962, Hanssels & Pauwels 2016)
+3. ✅ Draft Methodology Section 3 (DONE — 1932 words, all checks passed)
+4. ⏳ Draft Results Sections 4–7 (next priority)
+   - Section 4: Framework Comparison (Frozen Parameters) — 2 pages
+   - Section 5: Scenario Sensitivity & Structural Breaks — 2.5 pages
+   - Section 6: Channel Attribution & Aggregate Masking — 1.5 pages
+   - Section 7: Calibration Sensitivity & Robustness — 2 pages
