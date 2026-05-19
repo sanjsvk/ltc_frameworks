@@ -100,7 +100,7 @@ Structure: Subsections on (1) synthetic data design, (2) 10 models at a glance, 
 What it is: Establish baseline performance hierarchy across 5 scenarios; demonstrate that F3 > F2 > F1 holds structurally
 
 Documents referenced:
-  - @S1_S5_COMPREHENSIVE_METRICS_SUMMARY.txt — 5×10 recovery matrix (all models, all scenarios)
+  - @comprehensive_analysis/S1_S5_COMPREHENSIVE_METRICS_SUMMARY.txt — 5×10 recovery matrix (all models, all scenarios)
   - @RUN_LOG.md — S1 Final Summary (bsts 82.4%, kalman_dlm 82.0%, mcmc_stock 72.6%)
   - @RUN_LOG.md — S1 vs S2 vs S3 Scenario Sensitivity Summary (cross-scenario means)
   - @paper_notes.md — Finding #1 (bsts 1.02x centrepiece)
@@ -122,11 +122,11 @@ Structure: Overall ranking table + per-framework subsections with breakdown of t
 What it is: Test framework robustness to spend variations (pause, seasonality, level shifts, signal strength); reveal scenario-dependent identification
 
 Documents referenced:
-  - @S1_vs_S2_ANALYSIS.md — S2 spend pause impact (geo_adstock +13.2pp, ardl +68.8pp resurrection, mcmc -11.2pp)
-  - @S3_S4_S5_CHANNEL_ATTRIBUTION.txt — Channel degradation under collinearity and weak signal
+  - @comprehensive_analysis/S1_vs_S2_ANALYSIS.md — S2 spend pause impact (geo_adstock +13.2pp, ardl +68.8pp resurrection, mcmc -11.2pp)
+  - @comprehensive_analysis/S3_S4_S5_CHANNEL_ATTRIBUTION.txt — Channel degradation under collinearity and weak signal
   - @RUN_LOG.md — S3/S4/S5 scenario-specific findings (mcmc_stock 98.8% in S3, ardl -19.8% in S4)
   - @paper_notes.md — Finding #6 (MCMC non-monotonic trajectory), Finding #7 (ARDL temp vs permanent break asymmetry), Finding #8 (Signal threshold)
-  - @S5_SUPPLEMENTARY_BREAKTHROUGH.txt — S5 mechanisms (MCMC 88.5% with tuning vs 0% frozen)
+  - @comprehensive_analysis/S5_SUPPLEMENTARY_BREAKTHROUGH.txt — S5 mechanisms (MCMC 88.5% with tuning vs 0% frozen)
 
 Paper points:
   1. S2 spend pause diagnosis: geo_adstock +13.2pp (identification paradox confirmed), ardl +68.8pp (recovery from S1 failure), mcmc_stock -11.2pp (Bayesian over-constraint)
@@ -148,7 +148,7 @@ Documents referenced:
   - @S3_S4_S5_CHANNEL_ATTRIBUTION.txt — Per-channel recovery analysis (TV, search, social, display, video)
   - @RUN_LOG.md — S2 pause window channel-level attribution (ARDL 0% per-channel, 68.8% aggregate; koyck inverts ranking)
   - @paper_notes.md — Finding #4 (Aggregate vs Channel Validation), Finding #12 (Video LTC as universal differentiator)
-  - @S5_ANALYSIS_COMPLETE.txt — Video LTC recovery as MCMC differentiator (0.88 vs 0.90 retention)
+  - @comprehensive_analysis/S5_ANALYSIS_COMPLETE.txt — Video LTC recovery as MCMC differentiator (0.88 vs 0.90 retention)
 
 Paper points:
   1. ARDL S2 aggregate masking: 68.8% recovery with 0% per-channel (offsetting TV/search errors cancel out aggregate)
@@ -208,7 +208,7 @@ What it is: Explain WHY each framework fails/succeeds in specific scenarios; est
 Documents referenced:
   - @STEP3_ANOMALY_RESOLUTION.txt — Diagnostic findings (divergences, seasonal states, architectural limits)
   - @RUN_LOG.md — Framework failure taxonomy (Finding #10 in paper_notes.md)
-  - @S5_ANALYSIS_COMPLETE.txt — S5 mechanisms (signal threshold, obs_var irrelevance, MCMC flexibility)
+  - @comprehensive_analysis/S5_ANALYSIS_COMPLETE.txt — S5 mechanisms (signal threshold, obs_var irrelevance, MCMC flexibility)
   - @paper_notes.md — Finding #5 (geo vs kalman coincidence), Finding #11 (Bayesian uncertainty), Finding #13 (ARDL sign-flip risk)
 
 Paper points:
@@ -270,7 +270,7 @@ What it is: Actionable framework selection and deployment guidance tied to real-
 Documents referenced:
   - @STEP4_OPTIMIZATION_RESULTS.md — Practitioner guidance (high-value vs medium-value campaigns + signal assessment)
   - @paper_notes.md — Finding #8 (Signal threshold), Finding #11 (Prior specification)
-  - @S5_SUPPLEMENTARY_BREAKTHROUGH.txt — Signal assessment workflow (obs_var, spend_cv, channel_independence)
+  - @comprehensive_analysis/S5_SUPPLEMENTARY_BREAKTHROUGH.txt — Signal assessment workflow (obs_var, spend_cv, channel_independence)
   - Discussion section synthesis
 
 Paper points:
@@ -308,7 +308,7 @@ Structure: Three campaign types + signal assessment workflow + channel validatio
 What it is: Extended tables, supplementary figures, model parameter details
 
 Documents referenced:
-  - @S1_S5_COMPREHENSIVE_METRICS_SUMMARY.txt — Full 5×10 metrics table
+  - @comprehensive_analysis/S1_S5_COMPREHENSIVE_METRICS_SUMMARY.txt — Full 5×10 metrics table
   - @optimised_parameter_log.csv — Per-parameter optimization results
   - @optimised_results_summary.csv — Per-model optimization summary
   - @S2_PAUSE_WINDOW_ANALYSIS.txt, @S3_SEASONALITY_ANALYSIS.txt, etc. — Scenario-specific detailed metrics

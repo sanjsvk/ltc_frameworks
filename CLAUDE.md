@@ -446,7 +446,7 @@ Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>
 ### References
 
 - **Run Log:** `RUN_LOG.md` (detailed experiment tracking, config changes, metrics per run)
-- **Analysis Documents:** `S1_vs_S2_ANALYSIS.md`, etc. (model-by-model insights)
+- **Analysis Documents:** `comprehensive_analysis/S1_vs_S2_ANALYSIS.md`, etc. (model-by-model insights)
 - **Paper Notes:** `paper_notes.md` (five key insights for publication)
 - **Metrics Summary:** `S3_S4_S5_METRICS_SUMMARY.txt` (template for comprehensive scenario summaries)
 - **Extraction Scripts:** `extract_s{N}_pause_window_metrics.py` (pause-window MAPE computation)
