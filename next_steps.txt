@@ -167,9 +167,9 @@ Structure: Aggregate masking case study (ARDL S2) + video LTC differentiator tes
 What it is: Quantify gap between frozen and optimized parameters; establish which frameworks are robust to sub-optimal calibration
 
 Documents referenced:
-  - @STEP4_OPTIMIZATION_RESULTS.md — Frozen vs optimized S1 comparison table (recovery, MAPE, improvement_pp)
-  - @STEP4_OPTIMIZATION_RESULTS.md — Calibration Sensitivity Ranking (F3 2.2pp, F2 5.6pp, F1 1.3pp)
-  - @STEP4_PARAMETER_OPTIMIZATION_PLAN.md — Optimization strategy for each framework (grid search, AIC, profile likelihood)
+  - @comprehensive_analysis/STEP4_OPTIMIZATION_RESULTS.md — Frozen vs optimized S1 comparison table (recovery, MAPE, improvement_pp)
+  - @comprehensive_analysis/STEP4_OPTIMIZATION_RESULTS.md — Calibration Sensitivity Ranking (F3 2.2pp, F2 5.6pp, F1 1.3pp)
+  - @comprehensive_analysis/STEP4_PARAMETER_OPTIMIZATION_PLAN.md — Optimization strategy for each framework (grid search, AIC, profile likelihood)
   - @framework1/2/3_optimized_s1.yaml — Optimized parameter configs (expanded grids, regularization, prior tuning)
   - @paper_notes.md — Finding #9 (Cross-scenario stability as true robustness metric), Finding #14 (Optimization ROI)
 
@@ -206,7 +206,7 @@ Structure: Calibration sensitivity ranking table + subsection per framework + co
 What it is: Explain WHY each framework fails/succeeds in specific scenarios; establish causal links between architecture and performance
 
 Documents referenced:
-  - @STEP3_ANOMALY_RESOLUTION.txt — Diagnostic findings (divergences, seasonal states, architectural limits)
+  - @comprehensive_analysis/STEP3_ANOMALY_RESOLUTION.txt — Diagnostic findings (divergences, seasonal states, architectural limits)
   - @RUN_LOG.md — Framework failure taxonomy (Finding #10 in paper_notes.md)
   - @comprehensive_analysis/S5_ANALYSIS_COMPLETE.txt — S5 mechanisms (signal threshold, obs_var irrelevance, MCMC flexibility)
   - @paper_notes.md — Finding #5 (geo vs kalman coincidence), Finding #11 (Bayesian uncertainty), Finding #13 (ARDL sign-flip risk)
@@ -242,7 +242,7 @@ Structure: Subsection per anomaly + mechanism explanation + implication for prac
 What it is: Integrate all findings into coherent framework selection matrix; establish novel dimensions beyond average performance
 
 Documents referenced:
-  - @STEP4_OPTIMIZATION_RESULTS.md — Practitioner guidance by signal level (high-value, medium-value campaigns)
+  - @comprehensive_analysis/STEP4_OPTIMIZATION_RESULTS.md — Practitioner guidance by signal level (high-value, medium-value campaigns)
   - @paper_notes.md — Finding #15 (MCMC as production-ready), Finding #2 (F2 paradox), Finding #3 (Robustness Spectrum Taxonomy)
   - @RUN_LOG.md — Critical findings summary (identification, robustness, channel validation)
   - All prior results sections (framework hierarchy, scenario sensitivity, channel validation, calibration sensitivity)
@@ -268,7 +268,7 @@ Structure: Intro to four-dimensional matrix + subsection per dimension + implica
 What it is: Actionable framework selection and deployment guidance tied to real-world campaign characteristics
 
 Documents referenced:
-  - @STEP4_OPTIMIZATION_RESULTS.md — Practitioner guidance (high-value vs medium-value campaigns + signal assessment)
+  - @comprehensive_analysis/STEP4_OPTIMIZATION_RESULTS.md — Practitioner guidance (high-value vs medium-value campaigns + signal assessment)
   - @paper_notes.md — Finding #8 (Signal threshold), Finding #11 (Prior specification)
   - @comprehensive_analysis/S5_SUPPLEMENTARY_BREAKTHROUGH.txt — Signal assessment workflow (obs_var, spend_cv, channel_independence)
   - Discussion section synthesis
