@@ -36,7 +36,16 @@ REFERENCES STATUS (as of 2026-05-23):
 
 NEXT ACTION:
 1. ✅ COMPLETED: Audit sections 1-10 for all citations
-2. ✅ COMPLETED: Add discovered citations to References
+2. ✅ COMPLETED: Add discovered citations to References (15 papers total)
 3. ✅ COMPLETED: Verify every in-text citation has reference entry
-4. NEXT: Integrate figures into Sections 4-10 (add captions, verify data match)
-5. FINAL: Cross-section verification and paper compilation
+4. ✅ COMPLETED: Map figure placements to all sections (16 placement points, 14 figures)
+   - Section 4: Figures 2, 5
+   - Section 5: Figures 3, 7, A, B
+   - Section 6: Figures 4, 9, 10
+   - Section 7: Figures 6, 12
+   - Section 8: Figures 8, 11, 13
+   - Section 9: Figures 1, C
+   - Section 10: (references earlier figures)
+   - Integration map: writing/FIGURE_INTEGRATION_MAP.md
+5. NEXT: Manually verify figures and write captions
+6. FINAL: Cross-section verification and paper compilation
