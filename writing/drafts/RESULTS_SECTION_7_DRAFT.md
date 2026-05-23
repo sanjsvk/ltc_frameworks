@@ -10,6 +10,8 @@
 
 Frozen parameter design (Sections 4–6) demonstrates structural framework differences. Optimized parameter design (per-model, per-scenario grid search) quantifies calibration impact. The gap reveals which frameworks benefit most from tuning.
 
+*Figure 6 (Calibration Sensitivity) displays a paired bar chart showing frozen recovery vs. optimized recovery for all ten models, with improvement magnitude labeled, color-coded by framework (F1/F2/F3), revealing the minimal gains for BSTS/Kalman (1–2pp), moderate gains for F2 models (5–6pp), and variable gains for F1 (0–6pp).*
+
 | Framework | Frozen Recovery | Optimized Recovery | Improvement | Sensitivity |
 |-----------|-----------------|-------------------|------------|-------------|
 | **bsts** | 82.4% | **84.1%** | +1.7pp | ROBUST |
@@ -100,6 +102,8 @@ In contrast, ARDL's +6.2pp improvement (0.0% → 6.2%) proves that S1 failure wa
 ## Summary: Structure Dominates Calibration
 
 Framework choice determines 80% of performance variance; calibration tunes within structural constraints. BSTS's combination of high average recovery (80.5%) and low cross-scenario variance (2.4pp) establishes it as the production standard. Practitioners should invest optimization effort (2–5 min per scenario) in F3 methods for stability, and scenario-specific tuning for F2 if ARDL is selected. F1 methods should not be deployed without independent structural break detection.
+
+*Figure 12 (Budget Allocation Error) visualizes the magnitude of per-channel budget misallocation (recovered allocation % minus true allocation %) for all ten models in the S1 baseline, sorted by worst-to-best error, showing ARDL and dual_adstock catastrophic misallocation and MCMC/BSTS near-zero error.*
 
 ---
 

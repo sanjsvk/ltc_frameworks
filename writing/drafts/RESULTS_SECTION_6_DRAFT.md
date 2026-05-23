@@ -10,6 +10,8 @@
 
 Standard MMM benchmarking reports aggregate LTC recovery (e.g., "the model achieves 68.8% accuracy"). However, aggregate metric masks channel-level failures with offsetting errors.
 
+*Figure 4 (Channel Attribution) displays the per-channel recovery rates (TV, Video, Social, Display, Search) for four key models (ARDL, Koyck, geo_adstock, MCMC) in the S2 pause scenario, visually exposing the ARDL 0% per-channel recovery despite 68.8% aggregate, and the Koyck ranking inversion (Social/Display > TV/Video).*
+
 **ARDL S2 Pause Window (Weeks 100–120):**
 
 | Channel | True δ | Recovered Recovery % | MAPE % | Status |
@@ -45,6 +47,8 @@ Koyck achieves reasonable 43.0% aggregate recovery in S2 but systematically inve
 
 Video retention (δ=0.88) is nearly identical to TV (δ=0.90), differing by only 0.02. Distinguishing these requires adaptive per-channel decay estimation. Video LTC recovery across S3, S4, S5 scenarios:
 
+*Figure 10 (Video LTC Signal Loss) displays recovery rates for Video (only) across all five scenarios for all ten models, grouped by framework (F1/F2/F3 color-coded), exposing the universal collapse to 0% for fixed-parameter methods and the MCMC advantage across multiple scenarios.*
+
 | Model | S3 | S4 | S5 | Pattern |
 |-------|----|----|----|----|
 | **mcmc_stock** | 56% | 46% | 71% | ✓ Consistent recovery across scenarios |
@@ -73,6 +77,8 @@ MCMC preserves correct channel hierarchy across S1–S4 scenarios despite signal
 ---
 
 ## 6.5 Channel Validation as Mandatory Requirement
+
+*Figure 9 (Channel-Level Detail) shows a 2×2 small multiples display for the four models with most pronounced channel-level behavior (ARDL, Koyck, MCMC, geo_adstock), with each model having a 5-channel bar chart (TV, Video, Social, Display, Search) across S1–S4 scenarios, enabling practitioners to visually verify channel ranking stability.*
 
 **Critical methodology insight:** Aggregate recovery metrics are necessary but insufficient. Practitioners cannot rely solely on aggregate benchmarks for model selection or channel-level budget allocation. Three categories of channel-level failure emerge:
 

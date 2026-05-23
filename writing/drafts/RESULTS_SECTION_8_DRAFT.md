@@ -34,6 +34,8 @@ MCMC latent stock exhibited 23 divergences in S1 (frozen parameters), suggesting
 
 **Fix applied:** Increased target_accept from 0.95 to 0.99 and tuning steps from 1000 to 1500. Result: S1 divergences → 0, all R-hat values <1.05, recovery unchanged at 72.6%. This indicates the divergences were a sampling artifact, not a fundamental identification problem.
 
+*Figure 11 (MCMC Convergence) displays R-hat diagnostic values for all 19 parameters across all five scenarios, confirming all R-hat < 1.05 after tuning adjustment, indicating excellent convergence and stable posterior estimation.*
+
 **Framework implication:** MCMC-based methods are sensitive to tuning but recoverable. The Bayesian framework's flexibility is an asset (posterior mode shifted as scenarios changed), not a liability.
 
 ---
@@ -64,6 +66,8 @@ Almon PDL achieves 42.6% recovery in S1 but collapses to 18.7% in S2, a -23.9pp 
 
 The S2 spend pause (zero inflow weeks 104–112) acts as a natural experiment, revealing latent stock dynamics. The scenario produces divergent model responses that diagnose underlying model quality:
 
+*Figure 8 (Pause-Window Timeline) shows cumulative prediction error over time for four representative models (BSTS, geo_adstock, ARDL, MCMC) from weeks 95–125, highlighting the pause window (104–112) and revealing which models show error stability (BSTS) versus error accumulation (ARDL) during the discontinuity.*
+
 **Geo_adstock +13.2pp improvement:** Simple geometric adstock benefits from the spend pause because it cleanly isolates decay rates. Multicollinearity in S1 (correlated spend across channels) makes STC/LTC decomposition ambiguous; the pause removes this ambiguity.
 
 **MCMC -11.1pp degradation despite improved convergence:** The spend pause provides a clear δ signal, reducing divergences (8→1). However, this same signal over-constrains the joint prior on build_rate and ltc_coef. This reveals a fundamental Bayesian tension: informative priors prevent posterior wandering but restrict the parameter space. In S1, weak signal allows posterior flexibility. In S2, the decay signal tightens prior constraints, exchanging convergence diagnostics for estimation range.
@@ -89,3 +93,5 @@ The S2 spend pause (zero inflow weeks 104–112) acts as a natural experiment, r
 ## Conclusion
 
 Anomalies in the benchmark reveal that framework architecture dominates over calibration choice. Three categories emerge: (1) immutable architectural constraints (Weibull recovery capped at 30.5%, Kalman ratio 1.345 in S3) that require framework switching, (2) fixable technical issues (MCMC divergences 23 → 0 after tuning) that improve with configuration, and (3) scenario-dependent specification errors (ARDL 0% → 68.8%, Almon -23.9pp drop) that reveal which models require scenario-specific adaptation. Spend discontinuities (S2, S4) serve as diagnostic experiments, distinguishing models that improve (geo_adstock +13.2pp, weibull +20pp) from those that degrade (almon_pdl -23.9pp, MCMC -11.1pp).
+
+*Figure 13 (Robustness Taxonomy) plots pause-window robustness ratio (x-axis) against average recovery accuracy (y-axis) for all ten models, with shaded tier zones (Tier 1 <1.10×, Tier 2 1.10–1.35×, Tier 3 >1.35×), positioning BSTS in the high-performance/low-fragility quadrant and flagging ARDL/almon_pdl in the fragile zone despite moderate average performance.*

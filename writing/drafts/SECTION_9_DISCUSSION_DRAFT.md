@@ -8,6 +8,8 @@ The empirical findings in Sections 4–8 establish a clear hierarchy: state-spac
 
 Beyond average performance, a critical secondary dimension emerges: robustness to structural variation. Across the five scenarios, pause-window ratios reveal how error concentrates when spend patterns change (Section 8.5).
 
+*Figure 1 (Robustness Spectrum) displays all ten models positioned on a two-dimensional space: average recovery (y-axis, 0–100%) and pause-window robustness ratio (x-axis, 1.0–1.5×), with BSTS at the ideal position (high recovery, ratio near 1.0) and ARDL/almon_pdl in the fragile zone (moderate recovery, ratio >1.35), establishing the visual foundation for the four-tier taxonomy that follows.*
+
 **Tier 1: Architecturally Robust** (Pause ratio 1.00–1.10)  
 BSTS (pause ratio 1.02) and Kalman DLM in baseline scenarios maintain consistent error rates across spend variations. These models explicitly separate latent stock dynamics from transient shocks, constraining inference to structural components. Recovery degrades modestly (±1–2pp) when scenarios shift.
 
@@ -78,3 +80,5 @@ Computational limits were not tested: portfolios exceeding 50 campaigns or Bayes
 ## Conclusion
 
 Framework architecture dominates over calibration: choosing the right method matters more than tuning the chosen method. The robustness spectrum (Tier 1 architecturally robust, Tier 2 identification-sensitive, Tier 3 data-dependent) provides a clear decision framework. Channel-level validation is mandatory. MCMC emerges as the production standard for high-value portfolios, with clear decision rules for when simpler methods suffice. State-space methods solve the long-term contribution problem that static adstock methods cannot address.
+
+*Figure C (Framework Comparison Matrix) synthesizes the paper's findings into a 3×5 performance matrix (frameworks F1, F2, F3 vs. dimensions: average recovery, pause-window robustness, channel validation, calibration sensitivity, production readiness), enabling practitioners to locate their selection criteria and navigate the method space systematically.*

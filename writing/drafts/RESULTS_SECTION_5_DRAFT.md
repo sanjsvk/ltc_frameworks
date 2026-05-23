@@ -10,6 +10,8 @@
 
 The spend pause (TV + Video = 0 weeks 104–112) creates a natural experiment where LTC persists without new accumulation. Frameworks relying on spend-sales correlation to distinguish STC from LTC face direct identification test: can they detect decay-only dynamics when inflow stops?
 
+*Figure 3 (S2 Pause Window Detail) shows the week-by-week LTC decomposition for the four top-performing models (BSTS, Kalman DLM, MCMC, geo_adstock) during weeks 95–125, highlighting the pause window (104–112) and the error dynamics before, during, and after the discontinuity.*
+
 | Model | S1 Recovery | S2 Recovery | Δ | Mechanism |
 |-------|-------------|-------------|---|-----------|
 | **geo_adstock** | 69.9% | 83.1% | +13.2pp | Spend variation isolates decay; static model benefits |
@@ -84,6 +86,12 @@ LTC halved (50% of S1). All 10 models return 0% recovery with frozen S1 paramete
 ## Summary: Scenario Sensitivity Reveals Identification Dependence
 
 No framework is universally robust. Each excels under specific conditions and fails under others. The paper's core insight emerges: **identification mechanism determines scenario robustness more than average performance.** Static and dynamic models rely on spend variation for identification and fail when variation is confounded or shifts structurally. State-space models exploit latent dynamics but require appropriate parameterization (explicit seasonal state, adaptive decay, or Bayesian flexibility). MCMC alone adapts to multiple challenge types simultaneously, achieving highest S3 recovery (99.0%) and weak-signal recovery (88.5% with tuning).
+
+*Figure 7 (Scenario Difficulty Ranking) ranks S1–S5 by average challenge across all models, showing S5 (weak signal) as most difficult, followed by S3 (seasonal collinearity) and S4 (structural break), with S1 and S2 as more benign baselines.*
+
+*Figure B (Scenario Characteristics) displays the intensity of each scenario's diagnostic features (collinearity strength, spend discontinuity magnitude, seasonality amplitude) on a 0–100 scale, enabling practitioners to recognize which real-world conditions correspond to which scenario.*
+
+*Figure A (Ranking Reversals) reveals how per-channel budget priority ranks change across scenarios for top-4 models (BSTS, MCMC, geo_adstock, ARDL), highlighting which models maintain TV/Video dominance and which invert it under different conditions.*
 
 **Identification dependency table (Framework failure mechanisms):**
 

@@ -34,6 +34,8 @@ The pause-window robustness ratio (pause_MAPE / full_series_MAPE) measures error
 
 The baseline scenario reveals clear separation. State-space models exploit explicit latent brand dynamics to recover true LTC (average 75.7%). Dynamic distributed lag models partially capture LTC through autoregressive terms but remain fundamentally limited by reliance on spend-sales correlation (average 32.2%). Static adstock models achieve the lowest recovery; their single decay assumption is too rigid for realistic data (average 30.8%). Two models fail completely (ARDL and dual_adstock at 0%), indicating architectural or numerical pathologies that must be investigated in subsequent scenarios.
 
+*Figure 5 (Framework Hierarchy) displays the boxplot of recovery rates by framework class (F1, F2, F3), showing the dominance of state-space methods in the baseline scenario.*
+
 ---
 
 ## 4.2 S2 Spend Pause — Natural Experiment
@@ -96,6 +98,8 @@ LTC contributions halved (50% of S1). All 10 models return 0% recovery with froz
 | 10 | **dual_adstock** | F1 | 0.0% | 0.0% | 0.0% | -578% | 0.0% | -144.5% | ✗ Broken |
 
 *Note.* S1–S4 average excludes S5 (all models collapse under weak signal with frozen parameters). BSTS 1.02× pause-window ratio is paper centrepiece.
+
+*Figure 2 (Cross-Scenario Heatmap) visualizes recovery accuracy (0–100%) for all 10 models across S1–S5, revealing the clustering of F3 methods in the 70–100% range, F2 in the 40–70% range, and F1 fragmented 0–80%, with clear ARDL and dual_adstock failure zones.*
 
 ---
 
