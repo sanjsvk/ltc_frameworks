@@ -2,7 +2,9 @@
 
 ## Introduction
 
-The benchmark results in Sections 4–7 revealed systematic performance gaps between frameworks and surprising reversals across scenarios. This section explains the mechanistic roots of three key anomalies: architectural limitations that are immutable, technical issues that are fixable, and prior misspecifications that reveal model quality rather than structural flaws.
+The benchmark results in Sections 4–7 revealed systematic performance gaps between frameworks and surprising reversals across scenarios. This section explains the mechanistic roots of key anomalies: unexpected reversals (ARDL 0%→68.8%), scenario-dependent improvements (geo_adstock +13.2pp), and architectural ceilings (Weibull capped at 30.5%).
+
+Three categories emerge: (1) architectural limitations that are immutable, (2) technical issues that are fixable, and (3) prior misspecifications that reveal model quality rather than structural flaws.
 
 ---
 
@@ -40,7 +42,7 @@ MCMC latent stock exhibited 23 divergences in S1 (frozen parameters), suggesting
 
 ARDL achieves 0.0% recovery in S1 (MAPE 316.8%) but jumps to 68.8% recovery in S2 (MAPE 31.2%), a +68.8pp reversal. This paradoxical resurrection reveals prior misspecification in S1, not structural model failure.
 
-**Mechanism:** The logit-normal prior on decay δ (calibrated to true values) was designed to improve identification in a weak-signal baseline. In S1, however, this prior over-constrains the polynomial lag structure (almon degree-3), causing the model to chase noise in the baseline and misfit LTC. The prior becomes helpful (not constraining) once the S2 spend pause provides a clear decay signal. Channel-level attribution confirms ARDL's S2 success: TV and Video recover 68.8% of their true LTC, matching the aggregate recovery.
+**Mechanism:** The logit-normal prior on δ (calibrated to true values) was designed for weak-signal baselines. In S1, this prior over-constrains the polynomial lag structure (almon degree-3). With δ fixed, the model must explain LTC variation through polynomial overfitting on baseline noise. In S2, the spend pause provides a clear δ signal, releasing the polynomial from this constraint. Channel-level attribution confirms ARDL's S2 success: TV and Video recover 68.8% of their true LTC, matching the aggregate recovery.
 
 **Framework implication:** A single prior tuned for baseline data can misfire on that baseline but succeed on other scenarios. ARDL is viable if priors are scenario-specific or loose. This model should be re-evaluated with S2-optimized priors.
 
@@ -50,7 +52,7 @@ ARDL achieves 0.0% recovery in S1 (MAPE 316.8%) but jumps to 68.8% recovery in S
 
 Almon PDL achieves 42.6% recovery in S1 but collapses to 18.7% in S2, a -23.9pp degradation. The mechanism reveals a fundamental mismatch between model assumption and data structure.
 
-**Root cause:** Almon polynomial distributed lags (PDL) assume smooth polynomial lag weights: w[t] = Σ β_k t^k. When spend drops to zero in S2 weeks 104–112, the true latent stock decays exponentially: stock[t] = δ·stock[t-1], not polynomially. The model cannot fit this discontinuity without severe overfitting, attempting a polynomial approximation to exponential decay.
+**Root cause:** Almon PDL assume smooth polynomial lag weights: w[t] = Σ β_k t^k. When spend drops to zero (weeks 104–112), true stock decays exponentially: stock[t] = δ·stock[t-1]. Polynomials have bounded derivatives; exponential decay is asymptotic with different curvature throughout. The model cannot fit this discontinuity without overfitting, attempting a polynomial approximation to exponential decay—fundamentally incompatible structures.
 
 **Comparison to other models:** Weibull (flexible but underfitted) improves from 10.5% to 30.5% in S2 because the Weibull distribution CAN approximate exponential decay. Geo_adstock (with fixed geometric decay) improves from 69.9% to 83.1% because geometric decay matches the spend-pause dynamics perfectly.
 
@@ -64,7 +66,7 @@ The S2 spend pause (zero inflow weeks 104–112) acts as a natural experiment, r
 
 **Geo_adstock +13.2pp improvement:** Simple geometric adstock benefits from the spend pause because it cleanly isolates decay rates. Multicollinearity in S1 (correlated spend across channels) makes STC/LTC decomposition ambiguous; the pause removes this ambiguity.
 
-**MCMC -11.1pp degradation despite improved convergence:** The spend pause provides a clear δ (decay) signal, reducing MCMC divergences (from 8 to 1). However, this same signal over-constrains the joint prior on build_rate and ltc_coef, reducing recovery. The trade-off is explicit: tighter inference (fewer divergences) at the cost of range restriction.
+**MCMC -11.1pp degradation despite improved convergence:** The spend pause provides a clear δ signal, reducing divergences (8→1). However, this same signal over-constrains the joint prior on build_rate and ltc_coef. This reveals a fundamental Bayesian tension: informative priors prevent posterior wandering but restrict the parameter space. In S1, weak signal allows posterior flexibility. In S2, the decay signal tightens prior constraints, exchanging convergence diagnostics for estimation range.
 
 **Koyck ±3.4pp stability:** Autoregressive models are naturally adaptive because the lagged-sales term (y[t-1]) conditions on realized outcomes rather than parametric assumptions. The model re-estimates coefficients without changing its fundamental structure.
 
@@ -86,4 +88,4 @@ The S2 spend pause (zero inflow weeks 104–112) acts as a natural experiment, r
 
 ## Conclusion
 
-Anomalies in the benchmark reveal that framework choice dominates over calibration. Three categories emerge: (1) immutable architectural constraints (Weibull recovery capped at 30.5%, Kalman ratio 1.345 in S3) that require framework switching, (2) fixable technical issues (MCMC divergences 23 → 0 after tuning) that improve with configuration, and (3) scenario-dependent specification errors (ARDL 0% → 68.8%, Almon -23.9pp drop) that reveal which models require scenario-specific adaptation. Spend discontinuities (S2, S4) serve as diagnostic experiments, distinguishing models that improve (geo_adstock +13.2pp, weibull +20pp) from those that degrade (almon_pdl -23.9pp, MCMC -11.1pp).
+Anomalies in the benchmark reveal that framework architecture dominates over calibration choice. Three categories emerge: (1) immutable architectural constraints (Weibull recovery capped at 30.5%, Kalman ratio 1.345 in S3) that require framework switching, (2) fixable technical issues (MCMC divergences 23 → 0 after tuning) that improve with configuration, and (3) scenario-dependent specification errors (ARDL 0% → 68.8%, Almon -23.9pp drop) that reveal which models require scenario-specific adaptation. Spend discontinuities (S2, S4) serve as diagnostic experiments, distinguishing models that improve (geo_adstock +13.2pp, weibull +20pp) from those that degrade (almon_pdl -23.9pp, MCMC -11.1pp).
