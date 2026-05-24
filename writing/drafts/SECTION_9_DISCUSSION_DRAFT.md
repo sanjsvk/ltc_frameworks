@@ -8,7 +8,13 @@ The empirical findings in Sections 4–8 establish a clear hierarchy: state-spac
 
 Beyond average performance, a critical secondary dimension emerges: robustness to structural variation. Across the five scenarios, pause-window ratios reveal how error concentrates when spend patterns change (Section 8.5).
 
-*Figure 1 (Robustness Spectrum) displays all ten models positioned on a two-dimensional space: average recovery (y-axis, 0–100%) and pause-window robustness ratio (x-axis, 1.0–1.5×), with BSTS at the ideal position (high recovery, ratio near 1.0) and ARDL/almon_pdl in the fragile zone (moderate recovery, ratio >1.35), establishing the visual foundation for the four-tier taxonomy that follows.*
+---
+
+![Figure 1: Robustness Spectrum](../../outputs/figures/Figure_01_Robustness_Spectrum.png)
+
+**Figure 1: Robustness Spectrum.** *Horizontal bar chart ranking all ten models by pause-window robustness ratio (S2 pause-window MAPE / full-series MAPE), with shorter bars indicating superior robustness to structural breaks (BSTS ~1.02, ardl ~1.10, kalman_dlm ~1.11 most robust) and longer bars indicating fragility (dual_adstock ~2.0, almon_pdl ~1.41, geo_adstock ~1.41 most fragile). Vertical dotted lines at ratio=1.10 (yellow, Tier 1 boundary) and ratio=1.35 (purple, Tier 2 boundary) mark architectural classifications. Framework 3 models (BSTS, Kalman, MCMC in green) cluster on left (robust); Framework 1 models (red) cluster on right (fragile); Framework 2 mixed distribution.* Data source: Section 8, "Robustness Taxonomy" (lines 79–98); Section 7, Table "Robustness Score" (lines 39–46).
+
+---
 
 **Tier 1: Architecturally Robust** (Pause ratio 1.00–1.10)  
 BSTS (pause ratio 1.02) and Kalman DLM in baseline scenarios maintain consistent error rates across spend variations. These models explicitly separate latent stock dynamics from transient shocks, constraining inference to structural components. Recovery degrades modestly (±1–2pp) when scenarios shift.
@@ -81,4 +87,10 @@ Computational limits were not tested: portfolios exceeding 50 campaigns or Bayes
 
 Framework architecture dominates over calibration: choosing the right method matters more than tuning the chosen method. The robustness spectrum (Tier 1 architecturally robust, Tier 2 identification-sensitive, Tier 3 data-dependent) provides a clear decision framework. Channel-level validation is mandatory. MCMC emerges as the production standard for high-value portfolios, with clear decision rules for when simpler methods suffice. State-space methods solve the long-term contribution problem that static adstock methods cannot address.
 
-*Figure C (Framework Comparison Matrix) synthesizes the paper's findings into a 3×5 performance matrix (frameworks F1, F2, F3 vs. dimensions: average recovery, pause-window robustness, channel validation, calibration sensitivity, production readiness), enabling practitioners to locate their selection criteria and navigate the method space systematically.*
+---
+
+![Figure C: Framework Comparison Matrix](../../outputs/figures/Figure_C_Framework_Comparison_Matrix.png)
+
+**Figure C: Framework Comparison Matrix (Score 0–100).** *Three-by-five heatmap comparing Framework 1, 2, and 3 across five performance dimensions (Baseline, Robustness, Calibration, Channels, Production): Framework 1 (Static Adstock) scores 20–35 (red/orange) across all dimensions, indicating low performance; Framework 2 (Dynamic Time-Series) scores 32–48 (orange/yellow) with strength in Calibration (48) but weakness in Production (35); Framework 3 (State-Space) dominates all dimensions (72–92, green) with highest performance in Production (92, BSTS and MCMC deployment readiness) and Channel validation (85, correct channel rankings preserved). Synthesis reveals Framework 3 achieves both highest average performance (79.6) and lowest cross-dimension variance (±8.1pp), establishing state-space as unambiguous standard for LTC estimation.* Data source: Section 9, "Framework Comparison" (lines 1–85); Section 7, "Framework-Level Aggregates" (lines 29–31); Section 8, "Anomaly Summary" (lines 79–98).
+
+---

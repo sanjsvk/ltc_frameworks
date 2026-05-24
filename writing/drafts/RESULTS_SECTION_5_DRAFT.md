@@ -10,7 +10,13 @@
 
 The spend pause (TV + Video = 0 weeks 104–112) creates a natural experiment where LTC persists without new accumulation. Frameworks relying on spend-sales correlation to distinguish STC from LTC face direct identification test: can they detect decay-only dynamics when inflow stops?
 
-*Figure 3 (S2 Pause Window Detail) shows the week-by-week LTC decomposition for the four top-performing models (BSTS, Kalman DLM, MCMC, geo_adstock) during weeks 95–125, highlighting the pause window (104–112) and the error dynamics before, during, and after the discontinuity.*
+---
+
+![Figure 3: S2 Pause Window Detail](../../outputs/figures/Figure_03_S2_Pause_Window_Detail.png)
+
+**Figure 3: S2 Spend Pause Improvement Ranges.** *Spend discontinuity (zero spend weeks 104–112) induces divergent model responses: ARDL achieves largest improvement (+68.8pp from 0% to 68.8%, revealing prior misspecification in S1), geo_adstock improves (+13.2pp from 69.9% to 83.1%), while almon_pdl catastrophically degrades (-23.9pp from 42.6% to 18.7% due to polynomial lag incompatibility with exponential decay). Framework 3 models (BSTS, Kalman DLM) show minimal variation (±1.4pp), demonstrating architectural robustness to structural breaks.* Data source: Section 5, "S2 Spend Pause Analysis" (lines 13–18).
+
+---
 
 | Model | S1 Recovery | S2 Recovery | Δ | Mechanism |
 |-------|-------------|-------------|---|-----------|
@@ -87,11 +93,25 @@ LTC halved (50% of S1). All 10 models return 0% recovery with frozen S1 paramete
 
 No framework is universally robust. Each excels under specific conditions and fails under others. The paper's core insight emerges: **identification mechanism determines scenario robustness more than average performance.** Static and dynamic models rely on spend variation for identification and fail when variation is confounded or shifts structurally. State-space models exploit latent dynamics but require appropriate parameterization (explicit seasonal state, adaptive decay, or Bayesian flexibility). MCMC alone adapts to multiple challenge types simultaneously, achieving highest S3 recovery (99.0%) and weak-signal recovery (88.5% with tuning).
 
-*Figure 7 (Scenario Difficulty Ranking) ranks S1–S5 by average challenge across all models, showing S5 (weak signal) as most difficult, followed by S3 (seasonal collinearity) and S4 (structural break), with S1 and S2 as more benign baselines.*
+---
 
-*Figure B (Scenario Characteristics) displays the intensity of each scenario's diagnostic features (collinearity strength, spend discontinuity magnitude, seasonality amplitude) on a 0–100 scale, enabling practitioners to recognize which real-world conditions correspond to which scenario.*
+![Figure 7: Scenario Difficulty Ranking](../../outputs/figures/Figure_07_Scenario_Difficulty_Ranking.png)
 
-*Figure A (Ranking Reversals) reveals how per-channel budget priority ranks change across scenarios for top-4 models (BSTS, MCMC, geo_adstock, ARDL), highlighting which models maintain TV/Video dominance and which invert it under different conditions.*
+**Figure 7: Scenario Difficulty Ranking.** *Horizontal bars rank scenarios by average LTC recovery difficulty across all models: S2 (Spend Pause) shows highest difficulty with recovery range 18–83% (wide dispersion due to prior misspecification in ARDL), S3 (High Seasonality) shows moderate difficulty with recovery range 0–99% (MCMC unique identifier), S1 (Baseline) shows standard difficulty, S4 (Structural Break) shows negative average recovery, and S5 (Weak Signal) shows universal model failure (0% recovery with frozen parameters) due to insufficient variation to identify latent stock parameters.* Data source: Section 5, "Scenario Sensitivity Analysis" (lines 37–94).
+
+---
+
+![Figure B: Scenario Characteristics](../../outputs/figures/Figure_B_Scenario_Characteristics.png)
+
+**Figure B: Scenario Characteristics (Intensity 0–100%).** *Three-by-five heatmap showing diagnostic intensity of collinearity, discontinuity, and seasonality across five scenarios: S1 (Baseline) shows low intensity (10–20%) across all features; S2 (Spend Pause) shows high discontinuity (90%) due to zero-spend weeks 104–112; S3 (High Seasonality) shows high collinearity (80%) and seasonality (85%); S4 (Structural Break) shows high collinearity (50%) and discontinuity (85%) combined; S5 (Weak Signal) shows low intensity (10–20%) across all features. Heatmap reveals that scenarios test complementary model weaknesses: S2 isolates decay identification; S3 tests seasonal confounding; S4 tests regime stability; S5 tests signal identifiability threshold. Design enables comprehensive architectural evaluation.* Data source: Section 5, "Scenario Identification" (lines 88–94); Section 3 Methodology, "S1–S5 Scenario Descriptions" (lines 29–40).
+
+---
+
+![Figure A: Ranking Reversals](../../outputs/figures/Figure_A_Ranking_Reversals.png)
+
+**Figure A: Ranking Reversals: Framework Stability Across Scenarios.** *Line chart showing framework-level average recovery by scenario (S1–S5) reveals stability hierarchy: Framework 3 (green) maintains 75–82% recovery through S1–S4 before sharp degradation at S5 (32%, weak signal failure); Framework 2 (orange) peaks at S2 (57–58%) then declines to 0% at S5; Framework 1 (blue) starts 32% and declines monotonically to 0% at S5. Framework 3 dominance is scenario-invariant except at weak-signal boundary (S5). Reversals demonstrate that framework selection determines performance hierarchy across business conditions; single-framework deployment risks catastrophic failures in particular scenarios (S4: F1 negative recovery; S5: F1/F2 complete failure).* Data source: Section 5, "Scenario Sensitivity Analysis" (lines 37–94); Section 6, "Channel-Level Attribution" (lines 32–38).
+
+---
 
 **Identification dependency table (Framework failure mechanisms):**
 

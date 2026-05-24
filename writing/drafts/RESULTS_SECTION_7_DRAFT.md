@@ -10,7 +10,13 @@
 
 Frozen parameter design (Sections 4–6) demonstrates structural framework differences. Optimized parameter design (per-model, per-scenario grid search) quantifies calibration impact. The gap reveals which frameworks benefit most from tuning.
 
-*Figure 6 (Calibration Sensitivity) displays a paired bar chart showing frozen recovery vs. optimized recovery for all ten models, with improvement magnitude labeled, color-coded by framework (F1/F2/F3), revealing the minimal gains for BSTS/Kalman (1–2pp), moderate gains for F2 models (5–6pp), and variable gains for F1 (0–6pp).*
+---
+
+![Figure 6: Calibration Sensitivity](../../outputs/figures/Figure_06_Calibration_Baseline.png)
+
+**Figure 6: Calibration Sensitivity by Model.** *Paired bar chart comparing frozen (grid-search initialized) vs. optimized (scenario-specific calibration) recovery for all ten models reveals calibration-structure trade-off: Framework 3 models show minimal improvement (BSTS +1.7pp, Kalman +2.3pp, MCMC +2.6pp) indicating structural dominance; Framework 2 shows moderate gains (koyck +5.2pp, finite_dl +5.5pp, ARDL +6.2pp) indicating calibration value; Framework 1 shows highly variable response (geo_adstock +2.1pp, almon_pdl +1.5pp, weibull +0.2pp, dual_adstock +1.3pp) indicating calibration cannot overcome architectural limitations.* Data source: Section 7, Table "Frozen vs Optimized Parameter Comparison" (lines 15–26).
+
+---
 
 | Framework | Frozen Recovery | Optimized Recovery | Improvement | Sensitivity |
 |-----------|-----------------|-------------------|------------|-------------|
@@ -103,7 +109,13 @@ In contrast, ARDL's +6.2pp improvement (0.0% → 6.2%) proves that S1 failure wa
 
 Framework choice determines 80% of performance variance; calibration tunes within structural constraints. BSTS's combination of high average recovery (80.5%) and low cross-scenario variance (2.4pp) establishes it as the production standard. Practitioners should invest optimization effort (2–5 min per scenario) in F3 methods for stability, and scenario-specific tuning for F2 if ARDL is selected. F1 methods should not be deployed without independent structural break detection.
 
-*Figure 12 (Budget Allocation Error) visualizes the magnitude of per-channel budget misallocation (recovered allocation % minus true allocation %) for all ten models in the S1 baseline, sorted by worst-to-best error, showing ARDL and dual_adstock catastrophic misallocation and MCMC/BSTS near-zero error.*
+---
+
+![Figure 12: Budget Allocation Error](../../outputs/figures/Figure_12_Budget_Allocation_Error.png)
+
+**Figure 12: Budget Allocation Error Magnitude.** *Horizontal bar chart showing allocation error (100% - recovery%) for all ten models sorted worst-to-best: dual_adstock and ARDL show catastrophic errors (100.0%), weibull_adstock (89.5%), almon_pdl (57.4%), koyck (53.6%), finite_dl (49.7%), geo_adstock (30.1%), mcmc_stock (27.4%), kalman_dlm (18.0%), and BSTS (17.6% minimum error). Error magnitude represents cumulative per-channel budget misallocation; dual_adstock and ARDL achieve zero true channel recovery despite aggregate figures, exemplifying aggregate-metric illusions documented in Section 9.2.* Data source: Section 7, "Budget Allocation Error Analysis" (lines 76–78); methodology Equation 8.
+
+---
 
 ---
 

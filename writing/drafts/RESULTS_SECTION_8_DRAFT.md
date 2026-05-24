@@ -34,7 +34,13 @@ MCMC latent stock exhibited 23 divergences in S1 (frozen parameters), suggesting
 
 **Fix applied:** Increased target_accept from 0.95 to 0.99 and tuning steps from 1000 to 1500. Result: S1 divergences → 0, all R-hat values <1.05, recovery unchanged at 72.6%. This indicates the divergences were a sampling artifact, not a fundamental identification problem.
 
-*Figure 11 (MCMC Convergence) displays R-hat diagnostic values for all 19 parameters across all five scenarios, confirming all R-hat < 1.05 after tuning adjustment, indicating excellent convergence and stable posterior estimation.*
+---
+
+![Figure 11: MCMC Convergence](../../outputs/figures/Figure_11_MCMC_Convergence_Rhat_by_Scenario.png)
+
+**Figure 11: MCMC Convergence Quality (R-hat) Across Scenarios.** *After tuning adjustment (target_accept: 0.95→0.99, tune: 1000→1500 steps), all five scenarios show excellent MCMC convergence with maximum R-hat well below 1.05 threshold (S1: ~1.020, S2: ~1.010, S3: ~1.030, S4: ~1.010, S5: ~1.040), indicating stable posterior estimation and reliable parameter draws. Initial S1 divergence count (23 divergences, Section 8 line 33) dropped to 0 after tuning, confirming technical fix rather than structural identification failure. All 19 parameters converge successfully across all scenarios.* Data source: Section 8, "MCMC Divergence Resolution" (lines 31–37).
+
+---
 
 **Framework implication:** MCMC-based methods are sensitive to tuning but recoverable. The Bayesian framework's flexibility is an asset (posterior mode shifted as scenarios changed), not a liability.
 
@@ -66,7 +72,13 @@ Almon PDL achieves 42.6% recovery in S1 but collapses to 18.7% in S2, a -23.9pp 
 
 The S2 spend pause (zero inflow weeks 104–112) acts as a natural experiment, revealing latent stock dynamics. The scenario produces divergent model responses that diagnose underlying model quality:
 
-*Figure 8 (Pause-Window Timeline) shows cumulative prediction error over time for four representative models (BSTS, geo_adstock, ARDL, MCMC) from weeks 95–125, highlighting the pause window (104–112) and revealing which models show error stability (BSTS) versus error accumulation (ARDL) during the discontinuity.*
+---
+
+![Figure 8: S3 Seasonality](../../outputs/figures/Figure_08_S3_High_Seasonality_Model_Performance.png)
+
+**Figure 8: S3 High Seasonality Model Performance.** *Scenario 3 (high seasonality, 85% intensity from Section 5) shows MCMC achieving exceptional recovery (99.0%, leveraging Bayesian flexibility to posterior-shift build_rate), followed by BSTS (76.8%, explicit Fourier seasonal component), Kalman DLM (64.9%, degraded from S1 due to lack of explicit seasonal state—architectural limitation documented in Section 8), ARDL (63.3%), and declining performance through geo_adstock (43.2%) to zero recovery for weibull and dual_adstock. MCMC's S3 uniqueness (99% vs. 72.6% S1) demonstrates Bayesian advantage for seasonal confounding.* Data source: Section 5, "S3 High Seasonality Scenario" (lines 58–71).
+
+---
 
 **Geo_adstock +13.2pp improvement:** Simple geometric adstock benefits from the spend pause because it cleanly isolates decay rates. Multicollinearity in S1 (correlated spend across channels) makes STC/LTC decomposition ambiguous; the pause removes this ambiguity.
 
@@ -94,4 +106,10 @@ The S2 spend pause (zero inflow weeks 104–112) acts as a natural experiment, r
 
 Anomalies in the benchmark reveal that framework architecture dominates over calibration choice. Three categories emerge: (1) immutable architectural constraints (Weibull recovery capped at 30.5%, Kalman ratio 1.345 in S3) that require framework switching, (2) fixable technical issues (MCMC divergences 23 → 0 after tuning) that improve with configuration, and (3) scenario-dependent specification errors (ARDL 0% → 68.8%, Almon -23.9pp drop) that reveal which models require scenario-specific adaptation. Spend discontinuities (S2, S4) serve as diagnostic experiments, distinguishing models that improve (geo_adstock +13.2pp, weibull +20pp) from those that degrade (almon_pdl -23.9pp, MCMC -11.1pp).
 
-*Figure 13 (Robustness Taxonomy) plots pause-window robustness ratio (x-axis) against average recovery accuracy (y-axis) for all ten models, with shaded tier zones (Tier 1 <1.10×, Tier 2 1.10–1.35×, Tier 3 >1.35×), positioning BSTS in the high-performance/low-fragility quadrant and flagging ARDL/almon_pdl in the fragile zone despite moderate average performance.*
+---
+
+![Figure 13: Robustness Taxonomy](../../outputs/figures/Figure_13_Robustness_Taxonomy.png)
+
+**Figure 13: Robustness Taxonomy (Tier Classification).** *Two-dimensional scatter plot positioning all ten models by pause-window robustness ratio (x-axis, 1.0–1.5×) and S1 recovery accuracy (y-axis, 0–100%), with four tier zones marked by vertical dotted lines at 1.10× (yellow, Tier 1 boundary) and 1.35× (purple, Tier 2 boundary). Tier 1 (<1.10×, architecturally robust): BSTS (~1.02, 82%) and Kalman DLM (~1.03, 82%); Tier 2 (1.10–1.35×, identification-sensitive): finite_dl, koyck, mcmc_stock; Tier 3 (>1.35×, data-dependent and fragile): almon_pdl, geo_adstock, weibull_adstock, ARDL, dual_adstock. Taxonomy reveals that framework architecture determines robustness, not average recovery alone.* Data source: Section 8, "Robustness Taxonomy" (lines 79–98); Section 7, "Robustness Score Table" (lines 39–46).
+
+---

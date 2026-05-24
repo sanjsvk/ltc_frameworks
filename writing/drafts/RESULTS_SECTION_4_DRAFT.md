@@ -34,7 +34,13 @@ The pause-window robustness ratio (pause_MAPE / full_series_MAPE) measures error
 
 The baseline scenario reveals clear separation. State-space models exploit explicit latent brand dynamics to recover true LTC (average 75.7%). Dynamic distributed lag models partially capture LTC through autoregressive terms but remain fundamentally limited by reliance on spend-sales correlation (average 32.2%). Static adstock models achieve the lowest recovery; their single decay assumption is too rigid for realistic data (average 30.8%). Two models fail completely (ARDL and dual_adstock at 0%), indicating architectural or numerical pathologies that must be investigated in subsequent scenarios.
 
-*Figure 5 (Framework Hierarchy) displays the boxplot of recovery rates by framework class (F1, F2, F3), showing the dominance of state-space methods in the baseline scenario.*
+---
+
+![Figure 5: Framework Hierarchy](../../outputs/figures/Figure_05_Framework_Hierarchy.png)
+
+**Figure 5: Framework Hierarchy — Distribution by Class.** *Boxplot showing baseline (S1) recovery accuracy distributions for three framework classes: Framework 3 (State-Space) dominates with median 82%, IQR [72–82%], showing BSTS (82.4%) and Kalman DLM (82.0%) outperforming Framework 2 (median ~48%, range 46–50%) and Framework 1 (median ~40%, range 0–70% with high variability). Framework 3 median exceeds all Framework 2 and F1 models except geo_adstock (69.9%), establishing state-space as architectural standard for LTC recovery.* Data source: Section 4, Table 3 "Framework Hierarchy" (lines 83–98).
+
+---
 
 ---
 
@@ -99,7 +105,13 @@ LTC contributions halved (50% of S1). All 10 models return 0% recovery with froz
 
 *Note.* S1–S4 average excludes S5 (all models collapse under weak signal with frozen parameters). BSTS 1.02× pause-window ratio is paper centrepiece.
 
-*Figure 2 (Cross-Scenario Heatmap) visualizes recovery accuracy (0–100%) for all 10 models across S1–S5, revealing the clustering of F3 methods in the 70–100% range, F2 in the 40–70% range, and F1 fragmented 0–80%, with clear ARDL and dual_adstock failure zones.*
+---
+
+![Figure 2: Cross-Scenario Heatmap](../../outputs/figures/Figure_02_Cross_Scenario_Heatmap.png)
+
+**Figure 2: Cross-Scenario Recovery Heatmap.** *Ten models (rows) evaluated across five scenarios (S1–S5 columns) with LTC recovery accuracy encoded as color gradient (red 0% to green 100%). BSTS and Kalman DLM (Framework 3) maintain consistent high recovery across scenarios (S1–S4: 76–82%), while ARDL (Framework 2) shows catastrophic S1 failure (0%) followed by S2 recovery (68.8%), and all Framework 1 models degrade sharply in S5 to 0% recovery, highlighting framework-dependent scenario sensitivity.* Data source: Section 4, Table 3 "Full Recovery Matrix" (lines 83–98).
+
+---
 
 ---
 

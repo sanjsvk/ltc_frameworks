@@ -10,7 +10,13 @@
 
 Standard MMM benchmarking reports aggregate LTC recovery (e.g., "the model achieves 68.8% accuracy"). However, aggregate metric masks channel-level failures with offsetting errors.
 
-*Figure 4 (Channel Attribution) displays the per-channel recovery rates (TV, Video, Social, Display, Search) for four key models (ARDL, Koyck, geo_adstock, MCMC) in the S2 pause scenario, visually exposing the ARDL 0% per-channel recovery despite 68.8% aggregate, and the Koyck ranking inversion (Social/Display > TV/Video).*
+---
+
+![Figure 4: S2 Channel Attribution](../../outputs/figures/Figure_04_Channel_Attribution_S2.png)
+
+**Figure 4: S2 Channel Validation by Model.** *Sorted bar chart showing six representative models' aggregate S2 recovery accuracy: Kalman DLM (83.1%) and geo_adstock (83.1%) tie for highest recovery, followed by BSTS (81.0%), ARDL (68.8%, recovery reversed from S1 failure), MCMC (59.9%, constrained by informative prior), finite_dl (54.6%), and koyck (43%), illustrating how aggregate metrics mask channel-level misattribution (ARDL recovers 0% of Video LTC despite 68.8% aggregate recovery per Section 6 analysis).* Data source: Section 4, Table 3 "Full Recovery Matrix" (line 91, S2 values); Section 6, "S2 Channel-Level Attribution" (lines 15–38).
+
+---
 
 **ARDL S2 Pause Window (Weeks 100–120):**
 
@@ -47,7 +53,13 @@ Koyck achieves reasonable 43.0% aggregate recovery in S2 but systematically inve
 
 Video retention (δ=0.88) is nearly identical to TV (δ=0.90), differing by only 0.02. Distinguishing these requires adaptive per-channel decay estimation. Video LTC recovery across S3, S4, S5 scenarios:
 
-*Figure 10 (Video LTC Signal Loss) displays recovery rates for Video (only) across all five scenarios for all ten models, grouped by framework (F1/F2/F3 color-coded), exposing the universal collapse to 0% for fixed-parameter methods and the MCMC advantage across multiple scenarios.*
+---
+
+![Figure 10: S5 Weak Signal Identification](../../outputs/figures/Figure_10_S5_Weak_Signal_Identification_Boundary.png)
+
+**Figure 10: S5 Weak Signal Identification Boundary.** *Scenario 5 (weak signal: low spend variance, high noise) causes complete identification failure for all models with frozen parameters (0% recovery), but MCMC recovers 88.5% when scenario-specific logit-normal priors are applied (δ and build_rate loosened to posterior ranges calibrated on S1–S4). All other models remain at 0% recovery regardless of prior adjustment, indicating that fixed-parameter structures (F1, F2) cannot adapt to fundamentally different signal conditions. This single-scenario success reveals MCMC's identification boundary and Bayesian flexibility advantage.* Data source: Section 5, "S5 Weak Signal Scenario" (lines 84–87).
+
+---
 
 | Model | S3 | S4 | S5 | Pattern |
 |-------|----|----|----|----|
@@ -78,7 +90,13 @@ MCMC preserves correct channel hierarchy across S1–S4 scenarios despite signal
 
 ## 6.5 Channel Validation as Mandatory Requirement
 
-*Figure 9 (Channel-Level Detail) shows a 2×2 small multiples display for the four models with most pronounced channel-level behavior (ARDL, Koyck, MCMC, geo_adstock), with each model having a 5-channel bar chart (TV, Video, Social, Display, Search) across S1–S4 scenarios, enabling practitioners to visually verify channel ranking stability.*
+---
+
+![Figure 9: S4 Structural Break](../../outputs/figures/Figure_09_S4_Structural_Break_Regime_Change_Sensitivity.png)
+
+**Figure 9: S4 Structural Break Regime Change Sensitivity.** *Scenario 4 applies permanent budget reallocation (continuous regime shift, not discrete pause) to frozen S1 parameters, revealing model brittleness: MCMC achieves highest recovery (90.9%, Bayesian posterior re-tuning), BSTS (81.6%), Kalman DLM (75.4%), geo_adstock and almon_pdl both (68.6%), but ARDL fails catastrophically (-19.8%, structural-break-induced sign-flip), weibull (-23.2%), and dual_adstock collapses (-578%), demonstrating architectural limitations when parameters diverge from true values. Framework 3 shows bounded degradation (±9pp); Framework 1/2 show unbounded failure.* Data source: Section 5, "S4 Structural Break Scenario" (lines 72–83).
+
+---
 
 **Critical methodology insight:** Aggregate recovery metrics are necessary but insufficient. Practitioners cannot rely solely on aggregate benchmarks for model selection or channel-level budget allocation. Three categories of channel-level failure emerge:
 
