@@ -140,7 +140,7 @@ def figure_1_robustness_spectrum(df):
     # Add value labels (per checklist) — positioned at end of bar to avoid overlap
     for i, (idx, row) in enumerate(s2_data.iterrows()):
         ax.text(row["Pause_Ratio"] - 0.05, i, f"{row['Pause_Ratio']:.2f}x",
-                va="center", ha="right", fontsize=LABEL_SIZE, fontweight="bold", color="white")
+                va="center", ha="right", fontsize=LABEL_SIZE, fontweight="bold", color="black")
 
     ax.legend(loc="lower right", fontsize=LABEL_SIZE, framealpha=0.95)
     ax.set_xlim(0.95, 2.0)
