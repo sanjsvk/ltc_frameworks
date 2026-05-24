@@ -137,10 +137,12 @@ def figure_1_robustness_spectrum(df):
     ax.axvline(1.10, color="orange", linestyle=":", linewidth=1.5, alpha=0.7, label="Tier 1-2 boundary")
     ax.axvline(1.35, color="red", linestyle=":", linewidth=1.5, alpha=0.7, label="Tier 2-3 boundary")
 
-    # Add value labels (per checklist) — positioned at end of bar to avoid overlap
+    # Add value labels (per checklist) — small font, positioned inside bars
     for i, (idx, row) in enumerate(s2_data.iterrows()):
-        ax.text(row["Pause_Ratio"] - 0.05, i, f"{row['Pause_Ratio']:.2f}x",
-                va="center", ha="right", fontsize=LABEL_SIZE, fontweight="bold", color="black")
+        # Position at bar center for cleaner look
+        label_x = row["Pause_Ratio"] / 2 if row["Pause_Ratio"] > 1.1 else row["Pause_Ratio"] * 0.6
+        ax.text(label_x, i, f"{row['Pause_Ratio']:.2f}x",
+                va="center", ha="center", fontsize=7, fontweight="normal", color="black")
 
     ax.legend(loc="lower right", fontsize=LABEL_SIZE, framealpha=0.95)
     ax.set_xlim(0.95, 2.0)
