@@ -114,9 +114,9 @@ def figure_1_robustness_spectrum(df):
     s2_data = df[df["Scenario"] == "S2"].copy()
     s2_data = s2_data.sort_values("Pause_Ratio")
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(11, 7))
 
-    # Color by tier (evaluation checklist compliance)
+    # Color by tier
     colors = []
     for ratio in s2_data["Pause_Ratio"]:
         if ratio <= 1.10:
@@ -126,22 +126,27 @@ def figure_1_robustness_spectrum(df):
         else:
             colors.append("#d62728")  # Red - Tier 3 (fragile)
 
-    bars = ax.barh(range(len(s2_data)), s2_data["Pause_Ratio"], color=colors, alpha=0.8, edgecolor="black", linewidth=0.5)
-    ax.set_yticks(range(len(s2_data)))
+    # Create horizontal bars
+    y_pos = range(len(s2_data))
+    bars = ax.barh(y_pos, s2_data["Pause_Ratio"], color=colors, alpha=0.8, edgecolor="black", linewidth=1)
+
+    # Set y-axis labels (model names)
+    ax.set_yticks(y_pos)
     ax.set_yticklabels(s2_data["Model"], fontsize=LABEL_SIZE)
+
+    # Set x-axis
     ax.set_xlabel("Pause-Window Robustness Ratio", fontsize=FONT_SIZE)
     ax.set_title("Figure 1: Robustness Spectrum (Tier 1/2/3 Classification)", fontsize=FONT_SIZE, weight=TITLE_WEIGHT, pad=12)
 
-    # Reference lines for tiers (per checklist)
-    ax.axvline(1.0, color="black", linestyle="--", linewidth=1, alpha=0.5, label="Baseline (no pause effect)")
-    ax.axvline(1.10, color="orange", linestyle=":", linewidth=1.5, alpha=0.7, label="Tier 1-2 boundary")
-    ax.axvline(1.35, color="red", linestyle=":", linewidth=1.5, alpha=0.7, label="Tier 2-3 boundary")
+    # Reference lines for tiers
+    ax.axvline(1.0, color="black", linestyle="--", linewidth=1, alpha=0.5, label="Baseline (1.0×)")
+    ax.axvline(1.10, color="orange", linestyle=":", linewidth=1.5, alpha=0.7, label="Tier 1-2 (1.10×)")
+    ax.axvline(1.35, color="red", linestyle=":", linewidth=1.5, alpha=0.7, label="Tier 2-3 (1.35×)")
 
-    # Add value labels (per checklist) — small font, simple placement at bar start
+    # Add value labels NEXT TO bars (right side)
     for i, (idx, row) in enumerate(s2_data.iterrows()):
-        # Simple: position near start of bar, 5% of x-axis range
-        ax.text(0.05, i, f"{row['Pause_Ratio']:.2f}x",
-                va="center", ha="left", fontsize=6, fontweight="normal", color="black")
+        ax.text(row["Pause_Ratio"] + 0.02, i, f"{row['Pause_Ratio']:.2f}x",
+                va="center", ha="left", fontsize=7, color="black")
 
     ax.legend(loc="lower right", fontsize=LABEL_SIZE, framealpha=0.95)
     ax.set_xlim(0.95, 2.0)
