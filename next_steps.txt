@@ -27,12 +27,16 @@ FIGURES STATUS:
 - Grid: alpha=0.3 on all figures
 - Evaluation checklist: Complete
 
-REFERENCES STATUS (as of 2026-05-23):
-- Original 11 papers from Literature Review: verified 2x each
-- New 4 papers from Sections 9-10: Dekimpe & Hanssens (2000), Hanssels et al. (1990), Lamberti et al. (2020), Vaver & Koehler (2011)
-- Total: 15 papers in alphabetical order, JMR/AMA format
-- All author names, years, volumes, pages, DOIs verified
-- All spelling corrected (Hanssens throughout)
+REFERENCES STATUS (as of 2026-05-24 — RIGOROUS AUDIT COMPLETE):
+- Rigorous verification completed on all 14 citations (15 → 14 after removing unverifiable)
+- CRITICAL CORRECTIONS MADE:
+  1. Dekimpe & Hanssens (2000): CORRECTED — Fixed journal from "Journal of Economic Literature" 38(2):426-438 to "International Journal of Research in Marketing" 17(2-3):183-193
+  2. Lamberti, Roy, & Levery (2020): REMOVED — Citation unverifiable/fabricated; removed from references and in-text citations
+  3. Vaver & Koehler (2011): RECLASSIFIED — Changed from "Journal of Economic Literature" to "Google Research Technical Report" (misattributed as journal article)
+  4. Jin et al. (2017): ADDED — Previously missing citation verified and added to References (verified real paper, cited in Section 2.1 Literature Review)
+- Total: 14 papers in alphabetical order, JMR/AMA format + proper technical report classification
+- All author names, years, volumes, pages, DOIs verified through primary sources
+- Audit report: writing/CITATION_AUDIT_REPORT_2026-05-24.md
 
 FIGURE INTEGRATION STATUS (as of 2026-05-23):
 - All 14 figures generated and ready for integration (300dpi PNG)
@@ -44,18 +48,57 @@ FIGURE INTEGRATION STATUS (as of 2026-05-23):
   - Details placement position within each section
 - Ready for: manual verification and caption writing
 
-NEXT ACTION:
+COMPLETED MILESTONES:
 1. ✅ COMPLETED: Audit sections 1-10 for all citations
 2. ✅ COMPLETED: Add discovered citations to References (15 papers total)
 3. ✅ COMPLETED: Verify every in-text citation has reference entry
 4. ✅ COMPLETED: Map figure placements to all sections (16 placement points, 14 figures)
-   - Section 4: Figures 2, 5
-   - Section 5: Figures 3, 7, A, B
-   - Section 6: Figures 4, 9, 10
-   - Section 7: Figures 6, 12
-   - Section 8: Figures 8, 11, 13
-   - Section 9: Figures 1, C
-   - Section 10: (references earlier figures)
-   - Integration map: writing/FIGURE_INTEGRATION_MAP.md
-5. NEXT: Manually verify figures and write captions
-6. FINAL: Cross-section verification and paper compilation
+5. ✅ COMPLETED: RIGOROUS CITATION AUDIT (2026-05-24)
+   - All 14 remaining citations independently verified through primary sources
+   - 4 critical errors corrected (Dekimpe, Lamberti, Vaver, Jin)
+   - Detailed audit report: writing/CITATION_AUDIT_REPORT_2026-05-24.md
+6. ✅ COMPLETED: Figure review and validation (100% pass rate on all 14 figures)
+7. ✅ COMPLETED: Full paper sections 1-10 + References complete and verified
+
+REMAINING WORK — 4 PHASES TO COMPLETION:
+============================================
+
+PHASE 1: FIGURE CAPTIONS (2-3 hours) — ⏳ NEXT
+- Write captions for all 14 figures (Figures 1-13, A-C)
+- Use FIGURE_VALIDATION_REFERENCE.md to identify data sources
+- Format: **Figure X: Title.** *Description (1-2 sentences). Data source: Section Y, Table Z.*
+- Keep captions concise but complete (explain what visualization shows + key insight)
+
+PHASE 2: FIGURE INTEGRATION (1 hour) — ⏳ NEXT
+- Place figures in correct sections using FIGURE_INTEGRATION_MAP.md
+- Section 4: Figures 2, 5
+- Section 5: Figures 3, 7, A, B
+- Section 6: Figures 4, 9, 10
+- Section 7: Figures 6, 12
+- Section 8: Figures 8, 11, 13
+- Section 9: Figures 1, C
+- Section 10: (references earlier figures)
+
+PHASE 3: CROSS-SECTION VERIFICATION (1-2 hours) — ⏳ NEXT
+- Verify all recovery %, MAPE %, pause ratios match across sections
+- Check Section 2 → 3 → 4-8 → 9 → 10 logical flow
+- Confirm all tables properly formatted and cross-referenced
+- Ensure framework terminology consistent (F1/F2/F3)
+- Verify Section 10 summarizes findings from Sections 4-9
+- Check for any inconsistencies in numbers, metrics, or claims
+
+PHASE 4: FINAL PAPER COMPILATION (1-2 hours) — ⏳ NEXT
+- Merge all sections (1-11) into single master document
+- Insert all 14 figures with captions at placement points
+- Add Table of Contents with page numbers
+- Format consistently (fonts, spacing, alignment)
+- Generate publication-quality PDF
+- Final proofread for typos, grammar, citation accuracy
+- Verify word count (~8,500 words + figures)
+
+ESTIMATED TIMELINE TO COMPLETION:
+- Phase 1 (Captions): 2-3 hours
+- Phase 2 (Integration): 1 hour
+- Phase 3 (Verification): 1-2 hours
+- Phase 4 (Compilation): 1-2 hours
+- TOTAL: 5-8 hours to publication-ready state

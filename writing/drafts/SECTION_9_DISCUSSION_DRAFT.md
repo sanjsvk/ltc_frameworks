@@ -57,7 +57,7 @@ Attribution error compounds over planning cycles. Misallocating $1M to a low-ROI
 
 ### Objection 3: "Results May Not Generalize to Real Data"
 
-Parameter ranges (δ 0.65–0.90, baseline $10–$12M, noise $150K–$300K weekly) are calibrated to published MMM benchmarks (Lamberti et al., 2020; Vaver & Koehler, 2011). Structural challenges—collinearity from correlated channel spending, seasonal confounding, discontinuous spend shifts—are standard features of real data that practitioners encounter quarterly. This work is not proposing a new algorithm but comparing existing methods on realistic data structures.
+Parameter ranges (δ 0.65–0.90, baseline $10–$12M, noise $150K–$300K weekly) are calibrated to published MMM benchmarks (Vaver & Koehler, 2011). Structural challenges—collinearity from correlated channel spending, seasonal confounding, discontinuous spend shifts—are standard features of real data that practitioners encounter quarterly. This work is not proposing a new algorithm but comparing existing methods on realistic data structures.
 
 ---
 
