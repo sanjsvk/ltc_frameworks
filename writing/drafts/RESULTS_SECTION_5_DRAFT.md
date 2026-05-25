@@ -44,7 +44,7 @@ Seasonality amplitude increases 20% → 40%, creating correlation between 52-wee
 | **geo_adstock** | 69.9% | 43.2% | −26.7pp | Single decay parameter cannot adapt to collinearity |
 | **almon_pdl** | 42.6% | 40.6% | −2.0pp | Weak throughout; collinearity neutral |
 
-**MCMC peaks at 99.0%:** The non-monotonic trajectory (S1 72.6% → S2 61.4% → S3 99.0% → S4 90.9%) reveals that Bayesian methods exploit additional structure when available. High seasonality provides periodic signal that sharpens latent stock estimation. Joint optimization of decay, coefficient, and initialization enables adaptation to collinearity. This is MCMC's unique strength: **Bayesian flexibility converts collinearity from liability to asset**.
+**MCMC peaks at 99.0%:** The non-monotonic trajectory (S1 72.4% → S2 61.4% → S3 99.0% → S4 90.9%) reveals that Bayesian methods exploit additional structure when available. High seasonality provides periodic signal that sharpens latent stock estimation. Joint optimization of decay, coefficient, and initialization enables adaptation to collinearity. This is MCMC's unique strength: **Bayesian flexibility converts collinearity from liability to asset**.
 
 **Kalman DLM brittleness:** Despite S1 dominance, degrades 17pp under seasonality because fixed decay structure cannot separate seasonal baseline innovations from stock-level changes. The latent level absorbs both, degrading stock estimates. This architectural limitation (documented in Step 3 anomaly resolution) means **state-space models with fixed decay require explicit seasonal components** (BSTS has this; Kalman does not).
 

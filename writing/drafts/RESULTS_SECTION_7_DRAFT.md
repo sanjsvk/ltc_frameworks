@@ -22,7 +22,7 @@ Frozen parameter design (Sections 4–6) demonstrates structural framework diffe
 |-----------|-----------------|-------------------|------------|-------------|
 | **bsts** | 82.4% | **84.1%** | +1.7pp | ROBUST |
 | **kalman_dlm** | 82.0% | **84.3%** | +2.3pp | ROBUST |
-| **mcmc_stock** | 72.6% | **75.2%** | +2.6pp | ROBUST |
+| **mcmc_stock** | 72.4% | **75.2%** | +2.8pp | ROBUST |
 | **koyck** | 46.4% | **51.6%** | +5.2pp | MODERATE |
 | **finite_dl** | 50.3% | **55.8%** | +5.5pp | MODERATE |
 | **ardl** | 0.0% | **6.2%** | +6.2pp | HIGH |
