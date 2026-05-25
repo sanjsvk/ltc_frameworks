@@ -1,6 +1,6 @@
 # Long-Term Media Contribution Estimation: Framework Benchmarking Study
 
-**Author:** Sravya Mandadi  
+**Author:** Sanjan Vijayakumar  
 **Date:** May 2026  
 **Status:** Publication Ready (Phase 4 Final Compilation)
 
