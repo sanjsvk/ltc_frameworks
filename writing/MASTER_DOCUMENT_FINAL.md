@@ -14,8 +14,8 @@
    - 2.2 The Identification Challenge
    - 2.3 Why Existing Validation is Insufficient
    - 2.4 Paper Contributions
-   - 2.5 Literature Review
-   - 2.6 Paper Roadmap
+   - 2.5 Paper Roadmap
+2.1 Literature Review
 3. Methodology
 4. Results: Framework Comparison & Scenario Sensitivity
 5. Results: Scenario Sensitivity & Structural Breaks
@@ -65,15 +65,15 @@ Marketing mix models routinely underestimate long-term media contributions (LTC)
 
 ## 2.1 The Business Problem
 
-Chief marketing officers allocate budgets of billions of dollars across media channels using marketing mix models (MMMs) that systematically underestimate the long-term value of media investments. The industry standard approach relies on short-term elasticities — the immediate sales lift from a single exposure — and ignores sustained brand accumulation effects that persist weeks or months after the initial advertising exposure. For media channels like television and video, where brand-building is a core function, this oversight is substantial. Brands typically derive 10–15% of weekly sales from long-term media contributions, yet MMM estimates of long-term contributions routinely fall by half of that true value, leading to systematic misallocation of budgets toward short-term performance channels like search. This paper addresses a fundamental question: which estimation methods can reliably recover long-term media contributions, and when can practitioners trust their estimates?
+Chief marketing officers allocate budgets across media channels using marketing mix models (MMMs) designed to estimate short-term elasticities — the immediate sales lift from a single exposure. These methods often provide incomplete estimates of long-term value, overlooking sustained brand accumulation effects that persist weeks or months after the initial advertising exposure. For media channels like television and video, where brand-building is a core function, this oversight is substantial. Brands typically derive 10–15% of weekly sales from long-term media contributions, yet MMM estimates of long-term contributions routinely fall by half of that true value, leading to systematic misallocation of budgets toward short-term performance channels like search. This paper addresses a fundamental question: which estimation methods can reliably recover long-term media contributions, and when can practitioners trust their estimates?
 
 ## 2.2 The Identification Challenge in Current Practice
 
-The dominant approach to MMM uses adstock transformations — geometric or polynomial decay functions applied to historical spend series — to capture both short-term and long-term effects in a single coefficient. This framework succeeds when all channels are continuously active: the adstock function can infer long-term persistence by observing how sales respond when one channel's spend fluctuates while others remain constant. However, adstock methods fail fundamentally in two scenarios that are common in practice. First, when long-term effects persist after spend stops — such as a spending pause to measure brand equity decay — adstock cannot separate persistence from zero spend, and the estimated coefficient becomes unreliable. Second, under collinearity, when multiple channels move together, adstock has insufficient statistical variation to identify which channel generates long-term effects, leading to reversals where methods flip the sign and magnitude of channel attribution across scenarios. These limitations have been well-documented in individual case studies, but no comprehensive quantification of their prevalence across methods and scenarios has been published.
+The dominant approach to MMM uses adstock transformations — geometric or polynomial decay functions applied to historical spend series — to capture both short-term and long-term effects in a single coefficient. This framework succeeds when all channels are continuously active: the adstock function can infer long-term persistence by observing how sales respond when one channel's spend fluctuates while others remain constant. However, adstock methods fail fundamentally in two scenarios that are common in practice. First, when long-term effects persist after spend stops — such as a spending pause to measure brand equity decay — adstock cannot separate persistence from zero spend, and the estimated coefficient becomes unreliable (Hanssens et al., 1990). Second, under collinearity, when multiple channels move together, adstock has insufficient statistical variation to identify which channel generates long-term effects, leading to reversals where methods flip the sign and magnitude of channel attribution across scenarios. These identification limitations have been well-documented in individual case studies, but no comprehensive quantification of their prevalence across methods and diagnostic scenarios has been published.
 
 ## 2.3 Why Existing Validation Approaches Are Insufficient
 
-Most MMM validation studies use either aggregate metrics on real data (where ground truth is unknown), or specialized time series models (Kalman filter, state-space) validated only on their own reconstructed baselines. This circular validation cannot detect systematic under-recovery of true long-term effects. A handful of papers have used synthetic data to validate MMM methods, but none compare more than two frameworks or test robustness to multiple scenarios. The methodological gap is clear: to measure how much of true long-term contributions each method recovers, practitioners need synthetic data where the ground truth data-generating process is known and varied to test method robustness. This is the only way to avoid the confound that "best fit to real data" may mask systematic misattribution of long-term effects to wrong channels or scenarios.
+Most MMM validation studies use either aggregate metrics on real data (where ground truth is unknown), or specialized time series models (Kalman filter, state-space per Harvey 1989 and Durbin & Koopman 2012) validated only on their own reconstructed baselines. This circular validation cannot detect systematic under-recovery of true long-term effects. Recent work has introduced synthetic data (Vaver & Koehler, 2011; Jin et al., 2017), but these efforts validate one method at a time or compare at most two frameworks without testing robustness to multiple diagnostic scenarios. The methodological gap is clear: to measure how much of true long-term contributions each method recovers, practitioners need synthetic data where the ground truth data-generating process is known and varied to test method robustness. This is the only way to avoid the confound that "best fit to real data" may mask systematic misattribution of long-term effects to wrong channels or scenarios.
 
 ## 2.4 Contributions of This Paper
 
@@ -235,7 +235,7 @@ $$\text{Stock}_c[t] = \delta_c \times \text{Stock}_c[t-1] + \text{build\_rate}_c
 
 $$\text{LTC}_c[t] = \text{ltc\_coef}_c \times \text{Stock}_c[t] \quad \text{(Eq 4)}$$
 
-where $\delta_c$ is the stock retention rate (0.30–0.90 by channel), build_rate_c governs how quickly spending accumulates stock, and ltc_coef_c converts stock to sales contribution. LTC totals ~$1.23M per week (~12% of observed sales), with TV and Video constituting 77% of long-term value.
+where $\delta_c$ is the stock retention rate (0.30–0.90 by channel), $\text{build\_rate}_c$ governs how quickly spending accumulates stock, and $\text{ltc\_coef}_c$ converts stock to sales contribution. LTC totals ~$1.23M per week (~12% of observed sales), with TV and Video constituting 77% of long-term value.
 
 **Exogenous Effects:** Promotional intensity, pandemic trajectory (COVID-19 impact 2020–2022), 30-year Treasury yield, consumer mobility index, and competitor impression share, each with known coefficients estimated from published MMM studies.
 
@@ -325,7 +325,7 @@ If ARDL achieves 68.8% aggregate recovery in S2 but returns 0% for Video (true V
 
 ## Replicability
 
-All analyses use a fixed random seed (42) for reproducibility across operating systems and Python versions. Synthetic data is generated via `ltc/data/generator.py`, which implements all DGP equations (Eq 1–4) and scenarios (S1–S5). Model estimation code is in `ltc/models/`, with a unified interface in `experiments/run_experiment.py`. Raw results (JSON format) are stored in `outputs/results/{model}_{scenario}.json`, with metrics extracted to CSV by `scripts/extract_metrics.py`. Replication requires Python 3.10+, dependencies listed in `pyproject.toml`, and the code repository available at [github-repository-url].
+All analyses use a fixed random seed (42) for reproducibility across operating systems and Python versions. Synthetic data generation, model estimation, and evaluation are implemented in the Python package `ltc/` with supporting scripts in `experiments/`. Core modules: `ltc/data/` for data loading and feature engineering, `ltc/models/` for all ten estimation frameworks organized by framework class (framework1, framework2, framework3). The unified experiment interface is `experiments/run_experiment.py`, which orchestrates model fitting, evaluation, and result storage. Raw results in JSON format are stored in `outputs/results/{model}_{scenario}.json`. Replication requires Python 3.10+, with all dependencies listed in `pyproject.toml`. The complete codebase is available at https://github.com/sanjsvk/ltc_frameworks.
 
 ---
 
