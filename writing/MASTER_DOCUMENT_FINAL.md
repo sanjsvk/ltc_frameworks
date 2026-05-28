@@ -231,11 +231,11 @@ where $\lambda_c$ is the channel-specific decay rate. STC is the sum of channel-
 
 **Long-Term Contribution (LTC):** Latent brand stock accumulates via paid media spend and decays at a channel-specific rate:
 
-$$\text{Stock}_c[t] = \delta_c \times \text{Stock}_c[t-1] + \text{build\_rate}_c \times \sqrt{\text{Spend}_c[t]} \quad \text{(Eq 3)}$$
+$$\text{Stock}_{c}[t] = \delta_c \times \text{Stock}_{c}[t-1] + \beta_c \times \sqrt{\text{Spend}_{c}[t]} \quad \text{(Eq 3)}$$
 
-$$\text{LTC}_c[t] = \text{ltc\_coef}_c \times \text{Stock}_c[t] \quad \text{(Eq 4)}$$
+$$\text{LTC}_{c}[t] = \gamma_c \times \text{Stock}_{c}[t] \quad \text{(Eq 4)}$$
 
-where $\delta_c$ is the stock retention rate (0.30–0.90 by channel), $\text{build\_rate}_c$ governs how quickly spending accumulates stock, and $\text{ltc\_coef}_c$ converts stock to sales contribution. LTC totals ~$1.23M per week (~12% of observed sales), with TV and Video constituting 77% of long-term value.
+where $\delta_c$ is the stock retention rate (0.30–0.90 by channel), $\beta_c$ is the build rate (how quickly spending accumulates stock), and $\gamma_c$ is the LTC coefficient (converts stock to sales contribution). LTC totals ~$1.23M per week (~12% of observed sales), with TV and Video constituting 77% of long-term value.
 
 **Exogenous Effects:** Promotional intensity, pandemic trajectory (COVID-19 impact 2020–2022), 30-year Treasury yield, consumer mobility index, and competitor impression share, each with known coefficients estimated from published MMM studies.
 
@@ -297,11 +297,11 @@ We evaluate ten methods across three structural frameworks.
 
 Mean Absolute Percentage Error on the full 261-week time series:
 
-$$\text{LTC\_MAPE} = \text{mean}\left(\frac{|\text{LTC\_recovered}[t] - \text{LTC\_true}[t]|}{\text{LTC\_true}[t]}\right) \times 100 \quad \text{(Eq 5)}$$
+$$\text{MAPE}_{\text{LTC}} = \text{mean}\left(\frac{|\text{LTC}_{\text{recovered}}[t] - \text{LTC}_{\text{true}}[t]|}{\text{LTC}_{\text{true}}[t]}\right) \times 100 \quad \text{(Eq 5)}$$
 
 Recovery accuracy is the complement:
 
-$$\text{Recovery} = \left(1 - \frac{\text{LTC\_MAPE}}{100}\right) \times 100 \quad \text{(Eq 6)}$$
+$$\text{Recovery} = \left(1 - \frac{\text{MAPE}_{\text{LTC}}}{100}\right) \times 100 \quad \text{(Eq 6)}$$
 
 A recovery of 80% means the method recovers 80% of true long-term contributions on average, with 20% MAPE.
 
@@ -309,7 +309,7 @@ A recovery of 80% means the method recovers 80% of true long-term contributions 
 
 For scenarios with spend pauses or structural breaks, we compute MAPE separately on the pause window (weeks 100–120) and the full series:
 
-$$\text{Robustness\_Ratio} = \frac{\text{Pause\_Window\_MAPE}}{\text{Full\_Series\_MAPE}} \quad \text{(Eq 7)}$$
+$$\text{Robustness Ratio} = \frac{\text{MAPE}_{\text{pause}}}{\text{MAPE}_{\text{full}}} \quad \text{(Eq 7)}$$
 
 A ratio near 1.0 indicates the method maintains accuracy during structural changes (robust). A ratio >1.35 indicates error increases sharply during the pause (fragile). This metric operationalizes scenario-robustness differences.
 
@@ -317,7 +317,7 @@ A ratio near 1.0 indicates the method maintains accuracy during structural chang
 
 Aggregate recovery alone is insufficient because offsetting channel-level errors cancel: a method might achieve 70% overall recovery while assigning 0% to one channel and 140% to another, inverting budget allocation. We validate per-channel recovery:
 
-$$\text{Budget\_Error}[c] = \frac{\text{Recovered\_Contribution}[c]}{\sum \text{Recovered}} - \frac{\text{True\_Contribution}[c]}{\sum \text{True}} \quad \text{(Eq 8)}$$
+$$\text{Budget Error}_{c} = \frac{\text{Contribution}_{c,\text{recovered}}}{\sum \text{Recovered}} - \frac{\text{Contribution}_{c,\text{true}}}{\sum \text{True}} \quad \text{(Eq 8)}$$
 
 If ARDL achieves 68.8% aggregate recovery in S2 but returns 0% for Video (true Video LTC is ~$0.30M per week), the channel-level failure is a critical diagnostic finding that aggregate metrics alone would miss.
 
