@@ -378,7 +378,7 @@ Dual adstock recovers 0.0% with 789.9% MAPE. This model enforces a constraint th
 
 ### Pause-Window Robustness: S1 Baseline
 
-The pause-window robustness ratio (pause_MAPE / full_series_MAPE) measures error concentration in weeks 100–120 in subsequent scenarios. BSTS maintains a 1.02× ratio, the lowest across all models and scenarios, indicating that prediction error is nearly invariant across time—a hallmark of structural robustness. Kalman DLM and MCMC show 1.41× and 1.30× ratios respectively, suggesting that error concentrations will appear when spending patterns become irregular. F1 and F2 methods already show elevated ratios (1.27–1.49×), signaling that their accuracy will degrade more severely under spend disruption.
+The pause-window robustness ratio (pause_MAPE / full_series_MAPE) measures error concentration in weeks 100–120 in subsequent scenarios. BSTS maintains a 1.023× ratio, the lowest across all models, indicating that prediction error is nearly invariant across time—a hallmark of structural robustness. Kalman DLM achieves 1.401×, MCMC 1.309×, and finite_dl 0.675×. Framework 1 methods show variable ratios: geo_adstock 1.401×, almon_pdl 1.278×, weibull_adstock 1.530× (highest fragility). Framework 2 shows surprising stability: koyck 0.782×, finite_dl 0.675×. These ratios reveal a critical distinction: some models improve under spend pauses (finite_dl, koyck <0.80× errors), while others degrade (almon_pdl 1.28×, weibull 1.53×), signaling architecture-dependent responses to structural breaks.
 
 ### Summary: S1 Establishes Framework Hierarchy
 
@@ -396,7 +396,7 @@ The baseline scenario reveals clear separation. State-space models exploit expli
 
 ## 4.2 S2 Spend Pause — Natural Experiment
 
-Pause-window robustness ratio isolates framework robustness to structural breaks. BSTS achieves 1.02× (pause-window MAPE 19.3% vs full-series 19.0%), the gold standard of structural robustness—error distribution remains near-invariant to the spend discontinuity. Kalman DLM and geo_adstock both achieve 1.41×, but identical ratios mask different mechanisms. Geo_adstock paradoxically improves (+13.2pp recovery, S1 69.9% → S2 83.1%), revealing **identification paradox**: static models depend on spend variation for identification; discontinuity isolates decay parameters and paradoxically helps identification.
+Pause-window robustness ratio isolates framework robustness to structural breaks. BSTS achieves 1.023× (pause-window MAPE 19.3% vs full-series 19.0%), the gold standard of structural robustness—error distribution remains near-invariant to the spend discontinuity. Kalman DLM achieves 1.401× while geo_adstock also achieves 1.401×, but identical ratios mask different mechanisms. Geo_adstock paradoxically improves (+13.2pp recovery, S1 69.9% → S2 83.1%), revealing **identification paradox**: static models depend on spend variation for identification; discontinuity isolates decay parameters and paradoxically helps identification. In contrast, Kalman DLM's high ratio reflects genuine fragility: its implicit seasonal handling creates collinearity that amplifies errors during spend pauses.
 
 ARDL resurrects from 0.0% to 68.8% recovery, proving S1 failure was prior misspecification, not structural flaw. However, channel-level validation reveals critical limitation: 68.8% aggregate recovery with 0% per-channel recovery (TV, Video, Social, Display, Search all individually 0%). Offsetting errors sum to apparent success; model captures total magnitude but misattributes effects completely. Practitioners using ARDL for channel-level budget allocation would receive no directional guidance.
 
@@ -970,7 +970,7 @@ Anomalies in the benchmark reveal that framework architecture dominates over cal
 
 ![Figure 13: Robustness Taxonomy](../../outputs/figures/Figure_13_Robustness_Taxonomy.png)
 
-**Figure 13: Robustness Taxonomy (Tier Classification).** *Two-dimensional scatter plot positioning all ten models by pause-window robustness ratio (x-axis, 1.0–1.5×) and S1 recovery accuracy (y-axis, 0–100%), with four tier zones marked by vertical dotted lines at 1.10× (yellow, Tier 1 boundary) and 1.35× (purple, Tier 2 boundary). Tier 1 (<1.10×, architecturally robust): BSTS (~1.02, 82%) and Kalman DLM (~1.03, 82%); Tier 2 (1.10–1.35×, identification-sensitive): finite_dl, koyck, mcmc_stock; Tier 3 (>1.35×, data-dependent and fragile): almon_pdl, geo_adstock, weibull_adstock, ARDL, dual_adstock. Taxonomy reveals that framework architecture determines robustness, not average recovery alone.* Data source: Section 8, "Robustness Taxonomy" (lines 79–98); Section 7, "Robustness Score Table" (lines 39–46).
+**Figure 13: Robustness Taxonomy (Tier Classification).** *Two-dimensional scatter plot positioning all ten models by pause-window robustness ratio (x-axis, 0.6–1.6×) and S1 recovery accuracy (y-axis, 0–100%), with tier zones marked by vertical dotted lines at 1.10× (yellow, Tier 1 boundary) and 1.35× (purple, Tier 2 boundary). Tier 1 (<1.10×, architecturally robust): BSTS (1.023×, 82%), finite_dl (0.675×, 50%), koyck (0.782×, 46%); Tier 2 (1.10–1.35×, identification-sensitive): mcmc_stock (1.309×, 73%), ardl (1.246×, 0% S1), almon_pdl (1.278×, 43%), dual_adstock (1.307×, 0%); Tier 3 (>1.35×, data-dependent and fragile): kalman_dlm (1.401×, 82%), geo_adstock (1.401×, 70%), weibull_adstock (1.530×, 11%). Taxonomy reveals that framework architecture determines robustness independent of recovery accuracy: Tier 1 architecturally separates STC/LTC; Tier 2 sensitive to scenario structure; Tier 3 dependent on specific spend patterns.* Data source: validation/PHASE2_PAUSE_WINDOW_VALIDATION.md; Section 5, "S2 Scenario Analysis".
 
 ---
 # Section 9: Discussion — Four-Dimensional Framework Comparison
@@ -987,7 +987,7 @@ Beyond average performance, a critical secondary dimension emerges: robustness t
 
 ![Figure 1: Robustness Spectrum](../../outputs/figures/Figure_01_Robustness_Spectrum.png)
 
-**Figure 1: Robustness Spectrum.** *Horizontal bar chart ranking all ten models by pause-window robustness ratio (S2 pause-window MAPE / full-series MAPE), with shorter bars indicating superior robustness to structural breaks (BSTS ~1.02, ardl ~1.10, kalman_dlm ~1.11 most robust) and longer bars indicating fragility (dual_adstock ~2.0, almon_pdl ~1.41, geo_adstock ~1.41 most fragile). Vertical dotted lines at ratio=1.10 (yellow, Tier 1 boundary) and ratio=1.35 (purple, Tier 2 boundary) mark architectural classifications. Framework 3 models (BSTS, Kalman, MCMC in green) cluster on left (robust); Framework 1 models (red) cluster on right (fragile); Framework 2 mixed distribution.* Data source: Section 8, "Robustness Taxonomy" (lines 79–98); Section 7, Table "Robustness Score" (lines 39–46).
+**Figure 1: Robustness Spectrum.** *Horizontal bar chart ranking all ten models by pause-window robustness ratio (S2 pause-window MAPE / full-series MAPE), from most robust (left) to most fragile (right): BSTS 1.023×, finite_dl 0.675×, koyck 0.782× (Tier 1: <1.10×); ardl 1.246×, almon_pdl 1.278×, mcmc_stock 1.309×, dual_adstock 1.307× (Tier 2: 1.10–1.35×); kalman_dlm 1.401×, geo_adstock 1.401×, weibull_adstock 1.530× (Tier 3: >1.35×). Vertical dotted lines at ratio=1.10 (yellow, Tier 1 boundary) and ratio=1.35 (purple, Tier 2 boundary) mark architectural classifications. Colors distinguish Framework 3 (green, mix of Tier 1–3), Framework 2 (blue, primarily Tier 1–2), Framework 1 (red, primarily Tier 2–3).* Data source: validation/PHASE2_PAUSE_WINDOW_VALIDATION.md; Section 5, "S2 Scenario Analysis".
 
 ---
 
@@ -995,10 +995,13 @@ Beyond average performance, a critical secondary dimension emerges: robustness t
 BSTS (pause ratio 1.02) and Kalman DLM in baseline scenarios maintain consistent error rates across spend variations. These models explicitly separate latent stock dynamics from transient shocks, constraining inference to structural components. Recovery degrades modestly (±1–2pp) when scenarios shift.
 
 **Tier 2: Identification-Sensitive** (Pause ratio 1.10–1.35)  
+MCMC (1.309×), almon_pdl (1.278×), ardl (1.246×), and dual_adstock (1.307×) show moderate fragility. MCMC's degradation in S2 (72.6% → 60.9%) but excellence in S3 (99.0%) reveals Bayesian flexibility: posterior samples adapt to scenario signal when present, but over-constrain under spend disruption. Almon PDL's 1.278× ratio reflects polynomial lag incompatibility with exponential decay discontinuities; polynomial basis functions assume smoothness, not exponential drops. ARDL and dual_adstock both achieve 0% in S1 but variable recovery in S2+ due to specification mismatch (prior constraint and sign-flip issues), placing them at Tier 2 boundary despite structural fragility.
+
+
 ARDL (S1→S2: 0%→68.8%) and finite_dl (pause ratio ~1.15) depend on spend variation to identify structural parameters. In featureless baselines (S1), they struggle; in discontinuous scenarios (S2), they succeed. Their prior specifications or autoregressive structure require scenario-specific tuning but respond well to it. Practitioners should expect 5–10pp improvement through scenario-aware calibration.
 
-**Tier 3: Data-Dependent** (Pause ratio >1.35 or high variance)  
-Geo_adstock (pause ratio ~1.41), weibull_adstock, and almon_pdl show erratic performance across scenarios. Recovery swings of 10–25pp occur based on spend patterns. Weibull and almon demonstrate architectural constraints (shape insufficiency, polynomial lag incompatibility) that no amount of tuning resolves. Geo_adstock's paradoxical improvement in S2 (69.9%→83.1%) reveals it is sensitive to spend variation rather than robust to it.
+**Tier 3: Data-Dependent** (Pause ratio >1.35)  
+Kalman DLM (1.401×), geo_adstock (1.401×), and weibull_adstock (1.530×) show high fragility to structural breaks. Kalman DLM's degradation in S3 (82.0% → 64.9%) and high pause ratio reveal missing seasonal state explicitly hurts performance. Weibull's 1.530× ratio (highest observed) confirms shape parameter insufficiency for simultaneous STC/LTC fitting. Geo_adstock's paradoxical S2 improvement (69.9%→83.1%) despite high pause ratio reveals it is fundamentally sensitive to spend variation: discontinuities that harm other models actually help geo_adstock by isolating decay parameters.
 
 This taxonomy connects to literature on identification in time-series models (Hanssens et al., 1990; Dekimpe & Hanssens, 2000): models with strong structural priors generalize across contexts, while models that absorb structure from data become brittle when context shifts.
 
@@ -1083,7 +1086,7 @@ Three contributions:
 
 1. **Framework architecture matters more than calibration.** State-space methods recover 78.4% vs static methods 22.4%. Tuning improves F3 by 2–3pp, F1 by <2pp. The 56pp gap is architectural.
 
-2. **Robustness to scenario variation predicts reliability.** BSTS maintains 1.02× pause-window ratio; geo_adstock and almon_pdl degrade to >1.35× on discontinuities. Tier 1 (robust), Tier 2 (tuning-responsive), Tier 3 (unreliable) taxonomy guides method selection.
+2. **Robustness to scenario variation predicts reliability.** BSTS maintains 1.023× pause-window ratio; geo_adstock (1.401×) and kalman_dlm (1.401×) show Tier 3 fragility (>1.35×) on discontinuities, while almon_pdl (1.278×) shows Tier 2 sensitivity (1.10–1.35×). The three-tier taxonomy guides method selection: Tier 1 (<1.10×) requires no scenario-specific tuning; Tier 2 (1.10–1.35×) requires modest scenario-specific calibration; Tier 3 (>1.35×) requires major re-tuning or model switching across scenarios.
 
 3. **Channel-level validation is mandatory.** ARDL achieves 68.8% aggregate but 0% Video recovery. Any decomposition can hide offsetting errors. Validate per-channel recovery under structural breaks before deployment.
 
