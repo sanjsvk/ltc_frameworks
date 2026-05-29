@@ -30,7 +30,7 @@
 
 # Section 1: Abstract
 
-Marketing mix models routinely underestimate long-term media contributions (LTC) because estimation methods are designed for short-term elasticities, not sustained brand accumulation. This creates systematic budget misallocation, leaving 10–15% of true ROI unaccounted for in optimization. We benchmark ten LTC estimation methods across three frameworks (static adstock, dynamic lag, state-space) using synthetic data with ground-truth long-term effects, evaluating performance across five diagnostic scenarios from baseline to structural breaks. State-space methods with Bayesian latent stock estimation (BSTS, MCMC) recover 78.4% of true LTC on average, compared to 42.8% for dynamic models and 22.4% for static adstock. Critically, aggregate recovery metrics mask channel-level attribution failures: two models achieve 68.8% aggregate recovery while returning 0% recovery for individual channels, inverting budget allocation recommendations. We propose a three-tier robustness taxonomy based on scenario sensitivity and provide a decision framework for practitioners to select methods according to signal strength and spend pattern characteristics.
+Marketing mix models routinely underestimate long-term media contributions (LTC) because estimation methods are designed for short-term elasticities, not sustained brand accumulation. This creates systematic budget misallocation, leaving 10–15% of true ROI unaccounted for in optimization. We benchmark ten LTC estimation methods across three frameworks (static adstock, dynamic lag, state-space) using synthetic data with ground-truth long-term effects, evaluating performance across five diagnostic scenarios from baseline to structural breaks. State-space methods with Bayesian latent stock estimation (BSTS, MCMC) recover 79.3% of true LTC on average across S1–S4, compared to 44.2% for dynamic models and 29.6% for static adstock. Critically, aggregate recovery metrics mask channel-level attribution failures: two models achieve 68.8% aggregate recovery while returning 0% recovery for individual channels, inverting budget allocation recommendations. We propose a three-tier robustness taxonomy based on scenario sensitivity and provide a decision framework for practitioners to select methods according to signal strength and spend pattern characteristics.
 
 ---
 
@@ -54,7 +54,7 @@ Marketing mix models routinely underestimate long-term media contributions (LTC)
   - [x] Sentence 1: Problem stated (LTC underestimation)
   - [x] Sentence 2: Business consequence quantified (10–15% of ROI)
   - [x] Sentence 3: Methodological approach (benchmarking 10 methods)
-  - [x] Sentences 4–5: Specific findings with numbers (78.4% vs 42.8% vs 22.4%, channel failures)
+  - [x] Sentences 4–5: Specific findings with numbers (79.3% vs 44.2% vs 29.6%, channel failures)
   - [x] Sentence 6: Practitioner implication (decision framework)
 - [x] No citations
 - [x] No jargon in problem statement
@@ -358,11 +358,11 @@ All analyses use a fixed random seed (42) for reproducibility across operating s
 
 ## 4.1 Performance Ceiling — S1 Clean Baseline
 
-State-space methods recover 75.7% of true LTC on average in the baseline scenario, compared to 32.2% for dynamic distributed lag models and 30.8% for static adstock methods (Table 3). This three-way hierarchy holds across the 10 models: the top three performers are all state-space frameworks, mid-tier models are all dynamic distributed lag, and weak performers are all static adstock.
+State-space methods recover 79.0% of true LTC on average in the baseline scenario, compared to 32.2% for dynamic distributed lag models and 31.1% for static adstock methods (Table 3). This three-way hierarchy holds across the 10 models: the top three performers are all state-space frameworks, mid-tier models are all dynamic distributed lag, and weak performers are all static adstock.
 
 ### State-Space Dominance (F3)
 
-Within the state-space class, BSTS achieves 82.4% recovery with 17.6% MAPE, marginally exceeding Kalman DLM's 82.0% recovery and 18.0% MAPE. Both methods correctly decompose baseline trend and level from latent brand stock, recovering true LTC with minimal error. MCMC latent stock achieves 72.4% recovery, lower than the deterministic state-space methods but still far above dynamic time-series alternatives. The R-hat diagnostic confirms excellent MCMC convergence: all 19 parameters exhibit R-hat < 1.05, indicating stable posterior estimates.
+Within the state-space class, BSTS achieves 82.4% recovery with 17.6% MAPE, marginally exceeding Kalman DLM's 82.0% recovery and 18.0% MAPE. Both methods correctly decompose baseline trend and level from latent brand stock, recovering true LTC with minimal error. MCMC latent stock achieves 72.6% recovery, lower than the deterministic state-space methods but still far above dynamic time-series alternatives. The R-hat diagnostic confirms excellent MCMC convergence: all 19 parameters exhibit R-hat < 1.05, indicating stable posterior estimates.
 
 ### Dynamic Time-Series Mid-Tier Performance (F2)
 
@@ -370,11 +370,11 @@ Finite distributed lag recovers 50.3%, and Koyck recovers 46.4%, both moderate p
 
 ### Static Adstock Weak Performance (F1)
 
-Geometric adstock achieves 69.9% recovery, the strongest F1 model but still 5 percentage points below Kalman DLM. The method benefits from a lack of structural confounding in S1 (spend variation is relatively clean), but the single decay parameter per channel cannot adapt when data becomes more complex. Almon polynomial distributed lag recovers 42.6%, relying on smoothness assumptions about lag weights that work adequately on baseline data but fail on discontinuous spend patterns. Weibull adstock achieves only 10.5% recovery due to architectural constraints: the Weibull CDF cannot simultaneously fit short-tail STC and long-tail LTC effects, forcing the model to sacrifice one for the other.
+Geometric adstock achieves 69.9% recovery, the strongest F1 model but still 12 percentage points below Kalman DLM. The method benefits from a lack of structural confounding in S1 (spend variation is relatively clean), but the single decay parameter per channel cannot adapt when data becomes more complex. Almon polynomial distributed lag recovers 42.6%, relying on smoothness assumptions about lag weights that work adequately on baseline data but fail on discontinuous spend patterns (see Section 8.3 for mechanistic explanation). Weibull adstock achieves only 11.9% recovery due to architectural constraints: the Weibull CDF cannot simultaneously fit short-tail STC and long-tail LTC effects, forcing the model to sacrifice one for the other (see Section 8.3 for detailed analysis).
 
 ### Critical Failures: ARDL and Dual Adstock
 
-Dual adstock recovers 0.0% with 789.9% MAPE. This model enforces a constraint that LTC decay exceeds STC decay per channel (ltc_coef > stc_coef), intended to ensure meaningful interpretation. However, the constraint creates numerical instability: the optimization cannot find valid parameters satisfying the constraint and fitting the data simultaneously. The model produces sign-flipped predictions and negative LTC estimates, rendering it non-viable.
+Dual adstock recovers 0.0% with 789.9% MAPE. This model enforces a constraint that LTC decay exceeds STC decay per channel (ltc_coef > stc_coef), intended to ensure meaningful interpretation. However, the constraint creates numerical instability: the optimization cannot find valid parameters satisfying the constraint and fitting the data simultaneously. The model produces sign-flipped predictions and negative LTC estimates, rendering it non-viable (see Section 8.3 for root cause analysis).
 
 ### Pause-Window Robustness: S1 Baseline
 
@@ -382,7 +382,7 @@ The pause-window robustness ratio (pause_MAPE / full_series_MAPE) measures error
 
 ### Summary: S1 Establishes Framework Hierarchy
 
-The baseline scenario reveals clear separation. State-space models exploit explicit latent brand dynamics to recover true LTC (average 75.7%). Dynamic distributed lag models partially capture LTC through autoregressive terms but remain fundamentally limited by reliance on spend-sales correlation (average 32.2%). Static adstock models achieve the lowest recovery; their single decay assumption is too rigid for realistic data (average 30.8%). Two models fail completely (ARDL and dual_adstock at 0%), indicating architectural or numerical pathologies that must be investigated in subsequent scenarios.
+The baseline scenario reveals clear separation. State-space models exploit explicit latent brand dynamics to recover true LTC (average 79.0%). Dynamic distributed lag models partially capture LTC through autoregressive terms but remain fundamentally limited by reliance on spend-sales correlation (average 32.2%). Static adstock models achieve the lowest recovery; their single decay assumption is too rigid for realistic data (average 31.1%). Two models fail completely (ARDL and dual_adstock at 0%), indicating architectural or numerical pathologies that must be investigated in subsequent scenarios.
 
 ---
 
@@ -396,11 +396,11 @@ The baseline scenario reveals clear separation. State-space models exploit expli
 
 ## 4.2 S2 Spend Pause — Natural Experiment
 
-Pause-window robustness ratio isolates framework robustness to structural breaks. BSTS achieves 1.023× (pause-window MAPE 19.3% vs full-series 19.0%), the gold standard of structural robustness—error distribution remains near-invariant to the spend discontinuity. Kalman DLM achieves 1.401× while geo_adstock also achieves 1.401×, but identical ratios mask different mechanisms. Geo_adstock paradoxically improves (+13.2pp recovery, S1 69.9% → S2 83.1%), revealing **identification paradox**: static models depend on spend variation for identification; discontinuity isolates decay parameters and paradoxically helps identification. In contrast, Kalman DLM's high ratio reflects genuine fragility: its implicit seasonal handling creates collinearity that amplifies errors during spend pauses.
+Pause-window robustness ratio isolates framework robustness to structural breaks. BSTS achieves 1.023× (pause-window MAPE 19.3% vs full-series 19.0%), the gold standard of structural robustness—error distribution remains near-invariant to the spend discontinuity. Kalman DLM achieves 1.401× while geo_adstock also achieves 1.401×, but identical ratios mask different mechanisms. Geo_adstock paradoxically improves (+13.2pp recovery, S1 69.9% → S2 83.1%), revealing **identification paradox** (see Section 8.4 for mechanistic explanation): static models depend on spend variation for identification; discontinuity isolates decay parameters and paradoxically helps identification. In contrast, Kalman DLM's high ratio reflects genuine fragility: its implicit seasonal handling creates collinearity that amplifies errors during spend pauses.
 
-ARDL resurrects from 0.0% to 68.8% recovery, proving S1 failure was prior misspecification, not structural flaw. However, channel-level validation reveals critical limitation: 68.8% aggregate recovery with 0% per-channel recovery (TV, Video, Social, Display, Search all individually 0%). Offsetting errors sum to apparent success; model captures total magnitude but misattributes effects completely. Practitioners using ARDL for channel-level budget allocation would receive no directional guidance.
+ARDL resurrects from 0.0% to 68.8% recovery, proving S1 failure was prior misspecification, not structural flaw (see Section 8.3 for detailed explanation). However, channel-level validation reveals critical limitation: 68.8% aggregate recovery with 0% per-channel recovery (TV, Video, Social, Display, Search all individually 0%). Offsetting errors sum to apparent success; model captures total magnitude but misattributes effects completely. Practitioners using ARDL for channel-level budget allocation would receive no directional guidance.
 
-Almon PDL collapses (−23.9pp, S1 42.6% → S2 18.7%) because polynomial lag weights cannot capture exponential decay across sharp discontinuity. Weibull improves (+20.0pp) as lag shapes finally become useful. MCMC degrades (−11.1pp) but convergence improves (divergences 8→1), indicating Bayesian over-constraint rather than model failure.
+Almon PDL collapses (−23.9pp, S1 42.6% → S2 18.7%) because polynomial lag weights cannot capture exponential decay across sharp discontinuity. Weibull improves (+19.7pp) as lag shapes finally become useful. MCMC degrades (−11.7pp) but convergence improves (divergences 8→1), indicating Bayesian over-constraint rather than model failure.
 
 **F2 paradox:** Finite_dl (0.69× ratio) and koyck (0.77× ratio) show error improvements in pause window—false robustness reflecting baseline overfitting correction. Channel analysis shows koyck inverts ranking: Social 50.4%, Display 59.3% > TV 2.2%, Video 14.9% (true ranking TV > Video > Social > Display).
 
@@ -412,11 +412,11 @@ Almon PDL collapses (−23.9pp, S1 42.6% → S2 18.7%) because polynomial lag we
 
 Seasonality amplitude increases 20% → 40%, creating collinearity between 52-week seasonal cycle and channel spend patterns.
 
-MCMC peaks at 99.0% recovery (MAPE 1.0%), achieving highest single-scenario performance. Non-monotonic trajectory (S1 72.6% → S2 61.4% → S3 99.0% → S4 90.9%) reveals Bayesian flexibility: seasonal regularity provides additional identification source. Pause-window ratio 0.93× (lowest across all scenarios) confirms near-perfect error invariance.
+MCMC peaks at 98.9% recovery (MAPE 1.1%), achieving highest single-scenario performance (see Section 8.4 for explanation of Bayesian flexibility). Non-monotonic trajectory (S1 72.6% → S2 60.9% → S3 98.9% → S4 91.8%) reveals seasonal regularity provides additional identification source. Pause-window ratio 0.93× (lowest across all scenarios) confirms near-perfect error invariance.
 
-Kalman DLM unexpectedly degrades (−17.1pp, S1 82.0% → S3 64.9%) due to missing explicit seasonal state. BSTS recovers 76.8% but pause-window ratio rises to 1.37× (37% error concentration). Channel analysis reveals BSTS inverts ranking: Display 72% > TV 68% (true rank #1 and #4). **Critical caveat:** BSTS aggregate stability masks channel-level fragility under seasonal collinearity.
+Kalman DLM unexpectedly degrades (−17.1pp, S1 82.0% → S3 64.9%) due to missing explicit seasonal state (see Section 8.3 for detailed analysis). BSTS recovers 76.8% but pause-window ratio rises to 1.37× (37% error concentration). Channel analysis reveals BSTS inverts ranking: Display 72% > TV 68% (true rank #1 and #4) (see Section 8.3 for channel-level caveat). **Critical caveat:** BSTS aggregate stability masks channel-level fragility under seasonal collinearity.
 
-Geo_adstock S2 improvement fully reverses (−39.9pp drop S2→S3), confirming identification dependence. F1 models collapse to average 20.9% recovery (vs F3 80.2%). Video LTC signal is lost in all non-MCMC models: MCMC 56%, Kalman 0%, BSTS 0%, geo_adstock 0%. **Video recovery serves as diagnostic test for channel-level robustness.**
+Geo_adstock S2 improvement fully reverses (−39.9pp drop S2→S3), confirming identification dependence. F1 models collapse to average 20.9% recovery (vs F3 80.2%). Video LTC signal is lost in all non-MCMC models: MCMC 58%, Kalman 0%, BSTS 0%, geo_adstock 0%. **Video recovery serves as diagnostic test for channel-level robustness.**
 
 ---
 
@@ -424,9 +424,9 @@ Geo_adstock S2 improvement fully reverses (−39.9pp drop S2→S3), confirming i
 
 Permanent spend reduction to 20% of baseline from week 104 onwards tests adaptation to regime shift.
 
-**ARDL catastrophe:** Collapses to −19.8% recovery (−88.6pp from S2 68.8%), the most damaging finding. Model works perfectly on temporary pauses (S2) but fails catastrophically on permanent shifts. Mechanism: AR and polynomial lag structure calibrated to high-spend regime produce inverted predictions under permanent low-spend baseline. **Asymmetry proves that validation on scenario pauses does not transfer to permanent budget reallocations.**
+**ARDL catastrophe:** Recovery floors at 0% under the `max(0, 100 - MAPE)` definition; the uncapped `100 - MAPE` value reaches −119.8%, a swing of −188.6pp from S2 68.8% — the most damaging finding. Model works perfectly on temporary pauses (S2) but fails catastrophically on permanent shifts. Mechanism: AR and polynomial lag structure calibrated to high-spend regime produce inverted predictions under permanent low-spend baseline. **Asymmetry proves that validation on scenario pauses does not transfer to permanent budget reallocations.**
 
-MCMC achieves 90.9% recovery (only −0.1pp from S1), sustained Bayesian flexibility under regime change. BSTS maintains 81.6% (−0.8pp). Kalman DLM degrades to 75.4% (−6.6pp); fixed decay parameters struggle when observation process fundamentally changes.
+MCMC achieves 91.8% recovery (+19.2pp from S1), sustained Bayesian flexibility under regime change. BSTS maintains 81.5% (−0.9pp). Kalman DLM degrades to 75.4% (−6.6pp); fixed decay parameters struggle when observation process fundamentally changes.
 
 Almon PDL unexpectedly improves (68.6%, +26.0pp from S1) because permanent shift removes seasonal confound. Weibull and other F1 models sign-flip under regime change. F3 holds (average 82.7%) while F2 fragments (average 24.3%).
 
@@ -442,18 +442,18 @@ LTC contributions halved (50% of S1). All 10 models return 0% recovery with froz
 
 | Rank | Model | Framework | S1 | S2 | S3 | S4 | S5 | Avg(S1-S4) | Notes |
 |------|-------|-----------|----|----|----|----|----|----|-------|
-| 1 | **bsts** | F3 | 82.4% | 81.0% | 76.8% | 81.6% | 0.0% | 80.5% | ✓ Most stable |
+| 1 | **bsts** | F3 | 82.4% | 81.0% | 76.8% | 81.5% | 0.0% | 80.5% | ✓ Most stable |
 | 2 | **kalman_dlm** | F3 | 82.0% | 83.1% | 64.9% | 75.4% | 0.0% | 76.4% | ✓ Structural |
-| 3 | **mcmc_stock** | F3 | 72.4% | 59.9% | 99.0% | 90.9% | 0.0% | 80.6% | ✓ Flexible |
+| 3 | **mcmc_stock** | F3 | 72.6% | 60.9% | 98.9% | 91.8% | 0.0% | 81.0% | ✓ Flexible |
 | 4 | **geo_adstock** | F1 | 69.9% | 83.1% | 43.2% | 63.4% | 0.0% | 64.9% | ⚠ Volatile |
 | 5 | **finite_dl** | F2 | 50.3% | 54.6% | 58.0% | 40.5% | 0.0% | 50.9% | ✓ Stable |
 | 6 | **koyck** | F2 | 46.4% | 43.0% | 53.7% | 52.3% | 0.0% | 48.9% | ✓ Moderate |
 | 7 | **almon_pdl** | F1 | 42.6% | 18.7% | 40.6% | 68.6% | 0.0% | 32.6% | ✗ Volatile |
-| 8 | **weibull_adstock** | F1 | 10.5% | 30.5% | 0.0% | -23.2% | 0.0% | 4.4% | ✗ Arch limit |
-| 9 | **ardl** | F2 | 0.0% | 68.8% | 63.3% | -19.8% | 0.0% | 28.1% | ✗ Fragile |
-| 10 | **dual_adstock** | F1 | 0.0% | 0.0% | 0.0% | -578% | 0.0% | -144.5% | ✗ Broken |
+| 8 | **weibull_adstock** | F1 | 11.9% | 31.7% | 0.0% | 0.0%* | 0.0% | 10.9% | ✗ Arch limit |
+| 9 | **ardl** | F2 | 0.0% | 68.8% | 63.3% | 0.0%* | 0.0% | 33.0% | ✗ Fragile |
+| 10 | **dual_adstock** | F1 | 0.0% | 0.0% | 0.0% | 0.0%* | 0.0% | 0.0% | ✗ Broken |
 
-*Note.* S1–S4 average excludes S5 (all models collapse under weak signal with frozen parameters). BSTS 1.02× pause-window ratio is paper centrepiece.
+*Note.* S1–S4 average excludes S5 (all models collapse under weak signal with frozen parameters). BSTS 1.02× pause-window ratio is paper centrepiece. *Recovery accuracy is floored at 0% per definition `max(0, 100 - MAPE)`; S4 entries marked with * indicate models whose underlying `100 - MAPE` value is negative (uncapped: weibull -21.5%, ARDL -119.8%, dual_adstock -1478%), reflecting predictions worse than zero-LTC baseline.
 
 ---
 
@@ -514,16 +514,16 @@ Seasonality amplitude increases 20% → 40%, creating correlation between 52-wee
 
 | Model | S1 Recovery | S3 Recovery | Δ | Mechanism |
 |-------|-------------|-------------|---|-----------|
-| **mcmc_stock** | 72.6% | 99.0% | +26.4pp | Seasonal regularity aids Bayesian posterior estimation |
+| **mcmc_stock** | 72.6% | 98.9% | +26.3pp | Seasonal regularity aids Bayesian posterior estimation |
 | **kalman_dlm** | 82.0% | 64.9% | −17.1pp | Fixed decay insufficient; no explicit seasonal state |
 | **geo_adstock** | 69.9% | 43.2% | −26.7pp | Single decay parameter cannot adapt to collinearity |
 | **almon_pdl** | 42.6% | 40.6% | −2.0pp | Weak throughout; collinearity neutral |
 
-**MCMC peaks at 99.0%:** The non-monotonic trajectory (S1 72.4% → S2 61.4% → S3 99.0% → S4 90.9%) reveals that Bayesian methods exploit additional structure when available. High seasonality provides periodic signal that sharpens latent stock estimation. Joint optimization of decay, coefficient, and initialization enables adaptation to collinearity. This is MCMC's unique strength: **Bayesian flexibility converts collinearity from liability to asset**.
+**MCMC peaks at 98.9%:** The non-monotonic trajectory (S1 72.6% → S2 60.9% → S3 98.9% → S4 91.8%) reveals that Bayesian methods exploit additional structure when available. High seasonality provides periodic signal that sharpens latent stock estimation. Joint optimization of decay, coefficient, and initialization enables adaptation to collinearity. This is MCMC's unique strength: **Bayesian flexibility converts collinearity from liability to asset**.
 
 **Kalman DLM brittleness:** Despite S1 dominance, degrades 17pp under seasonality because fixed decay structure cannot separate seasonal baseline innovations from stock-level changes. The latent level absorbs both, degrading stock estimates. This architectural limitation (documented in Step 3 anomaly resolution) means **state-space models with fixed decay require explicit seasonal components** (BSTS has this; Kalman does not).
 
-**Framework collapse:** Geo_adstock's S2 improvement fully reverses (39.9pp drop S2→S3), revealing that spend pause benefit was temporary. F1 models average 20.9% recovery in S3 versus 80.2% for F3—collinearity exploits static models' fundamental vulnerability. Video LTC signal is lost in all non-MCMC models: MCMC 56%, Kalman 0%, BSTS 0%, geo_adstock 0%. **Video recovery serves as diagnostic test for channel-level robustness.**
+**Framework collapse:** Geo_adstock's S2 improvement fully reverses (39.9pp drop S2→S3), revealing that spend pause benefit was temporary. F1 models average 20.9% recovery in S3 versus 80.2% for F3—collinearity exploits static models' fundamental vulnerability. Video LTC signal is lost in all non-MCMC models: MCMC 58%, Kalman 0%, BSTS 0%, geo_adstock 0%. **Video recovery serves as diagnostic test for channel-level robustness.**
 
 ---
 
@@ -534,15 +534,15 @@ Permanent spend reduction (weeks 104+ at 20% of pre-break level) tests adaptatio
 | Model | S2 Recovery | S4 Recovery | Δ | Mechanism |
 |-------|-------------|-------------|---|-----------|
 | **ardl** | 68.8% | −19.8% | −88.6pp | AR calibrated to high-spend regime; permanent shift causes sign-flip |
-| **mcmc_stock** | 61.4% | 90.9% | +29.5pp | Bayesian posterior adapts to new regime; no structural catastrophe |
-| **bsts** | 81.0% | 81.6% | +0.6pp | Slope component handles level shifts naturally |
-| **weibull_adstock** | 30.5% | −23.2% | −53.7pp | Sign-flip under regime change |
+| **mcmc_stock** | 60.9% | 91.8% | +30.9pp | Bayesian posterior adapts to new regime; no structural catastrophe |
+| **bsts** | 81.0% | 81.5% | +0.5pp | Slope component handles level shifts naturally |
+| **weibull_adstock** | 31.7% | 0.0% (uncapped −21.5%) | −53.2pp uncapped | Sign-flip under regime change |
 
 **ARDL catastrophe (88.6pp swing):** The most damaging finding for practitioners. ARDL works perfectly on temporary pauses (S2: 68.8%) but catastrophically fails on permanent shifts (S4: −19.8%). The model's AR and polynomial lag structure, calibrated to S1–S3 high-spend distributions, produces inverted predictions when spend permanently shifts lower. **This asymmetry proves that validation on scenario pauses does not transfer to permanent budget reallocations.** Real-world MMM systems face permanent shifts (TV budget cuts, channel consolidations) far more often than temporary pauses.
 
-**MCMC sustained excellence:** Achieves 90.9% in S4 (only −0.1pp from S1), proving that Bayesian joint optimization treats permanent shifts as regime changes rather than catastrophes. The posterior reidentifies decay rates under the new spend baseline.
+**MCMC sustained excellence:** Achieves 91.8% in S4 (+19.2pp from S1), proving that Bayesian joint optimization treats permanent shifts as regime changes rather than catastrophes. The posterior reidentifies decay rates under the new spend baseline.
 
-**State-space advantage:** BSTS maintains 81.6% (−0.8pp); slope component naturally captures level shifts. Kalman DLM degrades to 75.4% (−6.6pp), confirming that fixed decay parameters struggle when observation process fundamentally changes. Despite degradation, F3 methods remain far superior to F1/F2 alternatives (F2 average 24.3%, F1 fragmented).
+**State-space advantage:** BSTS maintains 81.5% (−0.9pp); slope component naturally captures level shifts. Kalman DLM degrades to 75.4% (−6.6pp), confirming that fixed decay parameters struggle when observation process fundamentally changes. Despite degradation, F3 methods remain far superior to F1/F2 alternatives (F2 average 24.3%, F1 fragmented).
 
 ---
 
@@ -560,7 +560,7 @@ LTC halved (50% of S1). All 10 models return 0% recovery with frozen S1 paramete
 
 **Framework 2 (Dynamic Time-Series):** AR structure provides flexibility but introduces new vulnerability: coefficient estimates become unstable under permanent regime shifts (ARDL S4 sign-flip). Inverts channel rankings under collinearity (S3 Koyck, S4 Social > TV). **Fundamental vulnerability: calibration-dependent on spend regime; catastrophic failure on permanent shifts.**
 
-**Framework 3 (State-Space):** Explicit latent stock structure provides structural robustness (±1–11pp range S1–S4 for BSTS). Fixed decay remains brittle on collinearity (Kalman S3) and weak signal (S5). MCMC's Bayesian joint optimization overcomes both limitations, achieving 99.0% on seasonality and 88.5% on weak signal when calibrated. **Structural advantage: exploit domain knowledge of accumulation/decay; joint optimization enables adaptation.**
+**Framework 3 (State-Space):** Explicit latent stock structure provides structural robustness (±1–11pp range S1–S4 for BSTS). Fixed decay remains brittle on collinearity (Kalman S3) and weak signal (S5). MCMC's Bayesian joint optimization overcomes both limitations, achieving 98.9% on seasonality and 88.5% on weak signal when calibrated. **Structural advantage: exploit domain knowledge of accumulation/decay; joint optimization enables adaptation.**
 
 ---
 
@@ -620,7 +620,7 @@ Standard MMM benchmarking reports aggregate LTC recovery (e.g., "the model achie
 
 ![Figure 4: S2 Channel Attribution](../../outputs/figures/Figure_04_Channel_Attribution_S2.png)
 
-**Figure 4: S2 Channel Validation by Model.** *Sorted bar chart showing six representative models' aggregate S2 recovery accuracy: Kalman DLM (83.1%) and geo_adstock (83.1%) tie for highest recovery, followed by BSTS (81.0%), ARDL (68.8%, recovery reversed from S1 failure), MCMC (59.9%, constrained by informative prior), finite_dl (54.6%), and koyck (43%), illustrating how aggregate metrics mask channel-level misattribution (ARDL recovers 0% of Video LTC despite 68.8% aggregate recovery per Section 6 analysis).* Data source: Section 4, Table 3 "Full Recovery Matrix" (line 91, S2 values); Section 6, "S2 Channel-Level Attribution" (lines 15–38).
+**Figure 4: S2 Channel Validation by Model.** *Sorted bar chart showing six representative models' aggregate S2 recovery accuracy: Kalman DLM (83.1%) and geo_adstock (83.1%) tie for highest recovery, followed by BSTS (81.0%), ARDL (68.8%, recovery reversed from S1 failure), MCMC (60.9%, constrained by informative prior), finite_dl (54.6%), and koyck (43%), illustrating how aggregate metrics mask channel-level misattribution (ARDL recovers 0% of Video LTC despite 68.8% aggregate recovery per Section 6 analysis).* Data source: Section 4, Table 3 "Full Recovery Matrix" (line 91, S2 values); Section 6, "S2 Channel-Level Attribution" (lines 15–38).
 
 ---
 
@@ -667,30 +667,32 @@ Video retention (δ=0.88) is nearly identical to TV (δ=0.90), differing by only
 
 ---
 
-| Model | S3 | S4 | S5 | Pattern |
-|-------|----|----|----|----|
-| **mcmc_stock** | 56% | 46% | 71% | ✓ Consistent recovery across scenarios |
+| Model | S3 | S4 | S5 (frozen / scenario-prior) | Pattern |
+|-------|----|----|------------------------------|---------|
+| **mcmc_stock** | 58% | 48% | 0% / 71%* | ✓ Consistent S3/S4; S5 requires scenario-prior re-tune |
 | **kalman_dlm** | 0% | 0% | 0% | ✗ Loses video signal everywhere |
 | **bsts** | 0% | 0% | 0% | ✗ Loses video signal everywhere |
-| **koyck** | 5% | 0% | 0% | ✗ Nearly complete failure |
+| **koyck** | 5% | 0% | 8% | ✗ Nearly complete failure |
 | **ardl** | 0% | 0% | 0% | ✗ Complete failure |
 | **geo_adstock** | 0% | 5% | 0% | ✗ Sporadic recovery |
+
+\* MCMC S5 video recovery of 71% comes from the supplementary scenario-prior run reported in Section 5.4 (logit-normal δ priors loosened, build_rate prior recentered); the frozen-parameter run yields 0% across all channels in S5.
 
 **Finding:** Only MCMC preserves Video LTC identification across scenario variation. All fixed-parameter methods collapse to 0% Video recovery, indicating inability to resolve fine-grained channel heterogeneity. This is not a data quality issue; the DGP explicitly assigns δ_video = 0.88. The test reveals that **fixed-decay state-space models cannot distinguish between channels with similar decay rates under real-world conditions with signal variation**.
 
 ---
 
-## 6.4 MCMC Channel Stability: Correct Ranking Preservation
+## 6.4 MCMC Channel Stability: Ranking Behaviour Across Scenarios
 
-MCMC preserves correct channel hierarchy across S1–S4 scenarios despite signal variation:
+MCMC channel-level recovery exhibits scenario-dependent ordering. In the structured-signal scenarios (S3, S4), MCMC recovers the true TV-dominant hierarchy. In the baseline (S1) and spend-pause (S2) scenarios, the posterior elevates Paid Social due to identification ambiguity:
 
-**Channel ranking preserved (S1–S4):**
-- S1: TV(92%) > Video(77%) > Social(61%) > Display(14%) > Search(0%) ✓ Correct
-- S2: TV(79%) > Video(68%) > Social(45%) > Display(9%) > Search(0%) ✓ Correct
-- S3: TV(92%) > Social(70%) > Video(56%) > Display(9%) > Search(0%) ~ Minor social/video swap
-- S4: TV(87%) > Social(51%) > Video(46%) > Display(5%) > Search(0%) ~ Minor social/video swap
+**Channel recovery per scenario (reproduced from `outputs/results/mcmc_stock_S{1-4}.json`):**
+- S1: Social(76%) > TV(62%) > Video(40%) > Display(27%) > Search(0%) — Social–TV inversion
+- S2: Social(59%) > Video(55%) > Display(6%) > TV(0%) > Search(0%) — TV signal lost under spend pause
+- S3: TV(94%) > Social(65%) > Video(58%) > Display(5%) > Search(0%) ✓ TV dominant
+- S4: TV(86%) > Social(50%) > Video(48%) > Display(0%) > Search(0%) ✓ TV dominant
 
-**Interpretation:** MCMC maintains TV dominance across all scenarios (range 79–92%). The minor S3–S4 social/video swap may reflect genuine signal content in those scenarios (posterior adapts to data). All other models either invert ranking systematically (F2: Koyck, ARDL) or lose video signal entirely (F3 fixed-decay: Kalman, BSTS; F1: all models).
+**Interpretation:** MCMC recovers TV dominance in scenarios with strong structural signal (S3 seasonality, S4 permanent regime shift), reaching 86–94% TV recovery. In S1 (smooth baseline) and S2 (spend pause), the latent stock posterior cannot uniquely identify TV's contribution and partially attributes it to Paid Social, which retains continuous spend variation. This is a documented identification limit, not a model error: under the brand-stock data-generating process the TV and Social channels become approximately collinear when TV variation is weak (S1) or absent (S2). All other models exhibit more severe failures—F2 (Koyck, ARDL) invert rankings systematically across all scenarios, while F3 fixed-decay (Kalman, BSTS) and F1 lose the Video signal entirely (Section 6.3).
 
 ---
 
@@ -700,7 +702,7 @@ MCMC preserves correct channel hierarchy across S1–S4 scenarios despite signal
 
 ![Figure 9: S4 Structural Break](../../outputs/figures/Figure_09_S4_Structural_Break_Regime_Change_Sensitivity.png)
 
-**Figure 9: S4 Structural Break Regime Change Sensitivity.** *Scenario 4 applies permanent budget reallocation (continuous regime shift, not discrete pause) to frozen S1 parameters, revealing model brittleness: MCMC achieves highest recovery (90.9%, Bayesian posterior re-tuning), BSTS (81.6%), Kalman DLM (75.4%), geo_adstock and almon_pdl both (68.6%), but ARDL fails catastrophically (-19.8%, structural-break-induced sign-flip), weibull (-23.2%), and dual_adstock collapses (-578%), demonstrating architectural limitations when parameters diverge from true values. Framework 3 shows bounded degradation (±9pp); Framework 1/2 show unbounded failure.* Data source: Section 5, "S4 Structural Break Scenario" (lines 72–83).
+**Figure 9: S4 Structural Break Regime Change Sensitivity.** *Scenario 4 applies permanent budget reallocation (continuous regime shift, not discrete pause) to frozen S1 parameters, revealing model brittleness: MCMC achieves highest recovery (91.8%, Bayesian posterior re-tuning), BSTS (81.5%), Kalman DLM (75.4%), geo_adstock (63.4%), almon_pdl (68.6%), but ARDL fails catastrophically (recovery 0% / uncapped 100-MAPE = -119.8%, structural-break-induced sign-flip), weibull (recovery 0% / uncapped -21.5%), and dual_adstock collapses (recovery 0% / uncapped -1478%), demonstrating architectural limitations when parameters diverge from true values. Framework 3 shows bounded degradation (±9pp); Framework 1/2 show unbounded failure.* Data source: Section 5, "S4 Structural Break Scenario" (lines 72–83).
 
 ---
 
@@ -754,13 +756,13 @@ Frozen parameter design (Sections 4–6) demonstrates structural framework diffe
 |-----------|-----------------|-------------------|------------|-------------|
 | **bsts** | 82.4% | **84.1%** | +1.7pp | ROBUST |
 | **kalman_dlm** | 82.0% | **84.3%** | +2.3pp | ROBUST |
-| **mcmc_stock** | 72.4% | **75.2%** | +2.8pp | ROBUST |
+| **mcmc_stock** | 72.6% | **75.2%** | +2.6pp | ROBUST |
 | **koyck** | 46.4% | **51.6%** | +5.2pp | MODERATE |
 | **finite_dl** | 50.3% | **55.8%** | +5.5pp | MODERATE |
 | **ardl** | 0.0% | **6.2%** | +6.2pp | HIGH |
 | **geo_adstock** | 69.9% | **72.0%** | +2.1pp | MODERATE |
 | **almon_pdl** | 42.6% | **44.1%** | +1.5pp | MIXED |
-| **weibull_adstock** | 10.5% | **10.7%** | +0.2pp | NONE |
+| **weibull_adstock** | 11.9% | **12.1%** | +0.2pp | NONE |
 | **dual_adstock** | 0.0% | **1.3%** | +1.3pp | NONE |
 
 **Framework-level aggregates (S1 baseline):**
@@ -776,14 +778,14 @@ Single-scenario optimization gains are incomplete without cross-scenario stabili
 
 | Model | Framework | Avg Recovery (S1-S4) | StdDev (S1-S4) | Robustness Score | Tier |
 |-------|-----------|---|---|---|---|
-| **bsts** | F3 | 80.5% | 2.4pp | 78.6 | ✓✓ Gold |
-| **kalman_dlm** | F3 | 76.4% | 8.4pp | 70.5 | ✓ Silver |
-| **mcmc_stock** | F3 | 80.6% | 16.9pp | 69.0 | ✓ Silver |
-| **koyck** | F2 | 48.9% | 4.9pp | 46.6 | ✓ Mid-tier |
-| **geo_adstock** | F1 | 64.9% | 16.5pp | 55.7 | ⚠ Volatile |
-| **ardl** | F2 | 28.1% | 38.9pp | 20.2 | ✗ Fragile |
+| **bsts** | F3 | 80.5% | 2.2pp | 78.7 | ✓✓ Gold |
+| **kalman_dlm** | F3 | 76.3% | 7.2pp | 71.2 | ✓ Silver |
+| **mcmc_stock** | F3 | 81.0% | 15.1pp | 70.4 | ✓ Silver |
+| **koyck** | F2 | 48.9% | 4.4pp | 46.8 | ✓ Mid-tier |
+| **geo_adstock** | F1 | 64.9% | 14.4pp | 56.7 | ⚠ Volatile |
+| **ardl** | F2 | 33.0% | 33.1pp | 24.8 | ✗ Fragile |
 
-**Interpretation:** BSTS achieves both highest average recovery (80.5%) and lowest cross-scenario variance (2.4pp), yielding robustness score 78.6—the gold standard. MCMC achieves comparable average (80.6%) but with higher variance (16.9pp), reflecting scenario-dependent performance (excels on seasonality S3 99.0%, degrades on pauses S2 61.4%). **Robustness score reveals that BSTS is more deployment-ready despite MCMC's higher ceiling on specific scenarios.**
+**Interpretation:** BSTS achieves both highest average recovery (80.5%) and lowest cross-scenario variance (2.2pp), yielding robustness score 78.7—the gold standard. MCMC achieves comparable average (81.0%) but with higher variance (15.1pp), reflecting scenario-dependent performance (excels on seasonality S3 98.9%, degrades on pauses S2 60.9%). **Robustness score reveals that BSTS is more deployment-ready despite MCMC's higher ceiling on specific scenarios.**
 
 ---
 
@@ -811,7 +813,7 @@ Calibration sensitivity ranking inverts across frameworks:
 - **F2 (Dynamic AR):** Moderate calibration gains (5–6pp) + moderate stability = Calibration matters; scenario-specific tuning valuable
 - **F1 (Static Adstock):** Variable gains (0–2pp) + poor stability = Calibration cannot overcome structural ceiling; weibull remains 10.7% despite optimization
 
-**Critical finding:** Weibull_adstock's +0.2pp improvement (10.5% → 10.7%) demonstrates that **architectural limitations are irreducible by calibration**. The Weibull CDF cannot simultaneously fit STC and LTC regardless of parameter tuning. Similarly, dual_adstock's collinearity constraint prevents recovery beyond 1.3% despite optimization.
+**Critical finding:** Weibull_adstock's +0.2pp improvement (11.9% → 12.1%) demonstrates that **architectural limitations are irreducible by calibration**. The Weibull CDF cannot simultaneously fit STC and LTC regardless of parameter tuning. Similarly, dual_adstock's collinearity constraint prevents recovery beyond 1.3% despite optimization.
 
 In contrast, ARDL's +6.2pp improvement (0.0% → 6.2%) proves that S1 failure was calibration artifact (prior misspecification), not architecture. The model has potential but requires scenario-specific tuning to unlock it.
 
@@ -845,7 +847,7 @@ Framework choice determines 80% of performance variance; calibration tunes withi
 
 ![Figure 12: Budget Allocation Error](../../outputs/figures/Figure_12_Budget_Allocation_Error.png)
 
-**Figure 12: Budget Allocation Error Magnitude.** *Horizontal bar chart showing allocation error (100% - recovery%) for all ten models sorted worst-to-best: dual_adstock and ARDL show catastrophic errors (100.0%), weibull_adstock (89.5%), almon_pdl (57.4%), koyck (53.6%), finite_dl (49.7%), geo_adstock (30.1%), mcmc_stock (27.4%), kalman_dlm (18.0%), and BSTS (17.6% minimum error). Error magnitude represents cumulative per-channel budget misallocation; dual_adstock and ARDL achieve zero true channel recovery despite aggregate figures, exemplifying aggregate-metric illusions documented in Section 9.2.* Data source: Section 7, "Budget Allocation Error Analysis" (lines 76–78); methodology Equation 8.
+**Figure 12: Budget Allocation Error Magnitude.** *Horizontal bar chart showing allocation error (100% - recovery%) for all ten models sorted worst-to-best: dual_adstock and ARDL show catastrophic errors (100.0%), weibull_adstock (88.1%), almon_pdl (57.4%), koyck (53.6%), finite_dl (49.7%), geo_adstock (30.1%), mcmc_stock (27.4%), kalman_dlm (18.0%), and BSTS (17.6% minimum error). Error magnitude represents cumulative per-channel budget misallocation; dual_adstock and ARDL achieve zero true channel recovery despite aggregate figures, exemplifying aggregate-metric illusions documented in Section 9.2.* Data source: Section 7, "Budget Allocation Error Analysis" (lines 76–78); methodology Equation 8.
 
 ---
 
@@ -862,7 +864,7 @@ Framework choice determines 80% of performance variance; calibration tunes withi
 
 ## Introduction
 
-The benchmark results in Sections 4–7 revealed systematic performance gaps between frameworks and surprising reversals across scenarios. This section explains the mechanistic roots of key anomalies: unexpected reversals (ARDL 0%→68.8%), scenario-dependent improvements (geo_adstock +13.2pp), and architectural ceilings (Weibull capped at 30.5%).
+The benchmark results in Sections 4–7 revealed systematic performance gaps between frameworks and surprising reversals across scenarios. This section explains the mechanistic roots of key anomalies: unexpected reversals (ARDL 0%→68.8%), scenario-dependent improvements (geo_adstock +13.2pp), and architectural ceilings (Weibull capped at 31.7%).
 
 Three categories emerge: (1) architectural limitations that are immutable, (2) technical issues that are fixable, and (3) prior misspecifications that reveal model quality rather than structural flaws.
 
@@ -872,7 +874,7 @@ Three categories emerge: (1) architectural limitations that are immutable, (2) t
 
 ### Weibull Shape Parameter Insufficiency
 
-Weibull adstock achieves 10.5% recovery in S1 and fails to improve meaningfully even in S2 (30.5%). Investigation confirmed the shape parameter IS specified per-channel (TV, Paid Search, Paid Social, Display, Video each have independent bounds), ruling out a configuration error.
+Weibull adstock achieves 11.9% recovery in S1 and fails to improve meaningfully even in S2 (31.7%). Investigation confirmed the shape parameter IS specified per-channel (TV, Paid Search, Paid Social, Display, Video each have independent bounds), ruling out a configuration error.
 
 **Root mechanism:** Weibull lags must simultaneously fit both short-term impulse response (STC) and long-term decay tail (LTC) through a single shape-scale distribution per channel. The grid search optimizes for STC fit on the smooth baseline period; it underfits the long-tail LTC recovery. Improvement in S2 (+20pp) occurs only because the spend pause provides a cleaner exponential decay signal, but the shape parameter still cannot separate the two effects sufficiently. This is a fundamental architectural constraint, not a tuning issue.
 
@@ -922,7 +924,7 @@ Almon PDL achieves 42.6% recovery in S1 but collapses to 18.7% in S2, a -23.9pp 
 
 **Root cause:** Almon PDL assume smooth polynomial lag weights: w[t] = Σ β_k t^k. When spend drops to zero (weeks 104–112), true stock decays exponentially: stock[t] = δ·stock[t-1]. Polynomials have bounded derivatives; exponential decay is asymptotic with different curvature throughout. The model cannot fit this discontinuity without overfitting, attempting a polynomial approximation to exponential decay—fundamentally incompatible structures.
 
-**Comparison to other models:** Weibull (flexible but underfitted) improves from 10.5% to 30.5% in S2 because the Weibull distribution CAN approximate exponential decay. Geo_adstock (with fixed geometric decay) improves from 69.9% to 83.1% because geometric decay matches the spend-pause dynamics perfectly.
+**Comparison to other models:** Weibull (flexible but underfitted) improves from 11.9% to 31.7% in S2 because the Weibull distribution CAN approximate exponential decay. Geo_adstock (with fixed geometric decay) improves from 69.9% to 83.1% because geometric decay matches the spend-pause dynamics perfectly.
 
 **Framework implication:** Polynomial lag structures degrade sharply on structural breaks. Almon PDL recovery drops 23.9pp when spend discontinuity occurs (42.6% → 18.7%), versus geometric adstock improvement of 13.2pp. Models assuming smooth, continuous lag weights cannot fit exponential decay patterns.
 
@@ -942,7 +944,7 @@ The S2 spend pause (zero inflow weeks 104–112) acts as a natural experiment, r
 
 **Geo_adstock +13.2pp improvement:** Simple geometric adstock benefits from the spend pause because it cleanly isolates decay rates. Multicollinearity in S1 (correlated spend across channels) makes STC/LTC decomposition ambiguous; the pause removes this ambiguity.
 
-**MCMC -11.1pp degradation despite improved convergence:** The spend pause provides a clear δ signal, reducing divergences (8→1). However, this same signal over-constrains the joint prior on build_rate and ltc_coef. This reveals a fundamental Bayesian tension: informative priors prevent posterior wandering but restrict the parameter space. In S1, weak signal allows posterior flexibility. In S2, the decay signal tightens prior constraints, exchanging convergence diagnostics for estimation range.
+**MCMC -11.7pp degradation despite improved convergence:** The spend pause provides a clear δ signal, reducing divergences (8→1). However, this same signal over-constrains the joint prior on build_rate and ltc_coef. This reveals a fundamental Bayesian tension: informative priors prevent posterior wandering but restrict the parameter space. In S1, weak signal allows posterior flexibility. In S2, the decay signal tightens prior constraints, exchanging convergence diagnostics for estimation range.
 
 **Koyck ±3.4pp stability:** Autoregressive models are naturally adaptive because the lagged-sales term (y[t-1]) conditions on realized outcomes rather than parametric assumptions. The model re-estimates coefficients without changing its fundamental structure.
 
@@ -964,7 +966,7 @@ The S2 spend pause (zero inflow weeks 104–112) acts as a natural experiment, r
 
 ## Conclusion
 
-Anomalies in the benchmark reveal that framework architecture dominates over calibration choice. Three categories emerge: (1) immutable architectural constraints (Weibull recovery capped at 30.5%, Kalman ratio 1.345 in S3) that require framework switching, (2) fixable technical issues (MCMC divergences 23 → 0 after tuning) that improve with configuration, and (3) scenario-dependent specification errors (ARDL 0% → 68.8%, Almon -23.9pp drop) that reveal which models require scenario-specific adaptation. Spend discontinuities (S2, S4) serve as diagnostic experiments, distinguishing models that improve (geo_adstock +13.2pp, weibull +20pp) from those that degrade (almon_pdl -23.9pp, MCMC -11.1pp).
+Anomalies in the benchmark reveal that framework architecture dominates over calibration choice. Three categories emerge: (1) immutable architectural constraints (Weibull recovery capped at 31.7%, Kalman ratio 1.345 in S3) that require framework switching, (2) fixable technical issues (MCMC divergences 23 → 0 after tuning) that improve with configuration, and (3) scenario-dependent specification errors (ARDL 0% → 68.8%, Almon -23.9pp drop) that reveal which models require scenario-specific adaptation. Spend discontinuities (S2, S4) serve as diagnostic experiments, distinguishing models that improve (geo_adstock +13.2pp, weibull +19.7pp) from those that degrade (almon_pdl -23.9pp, MCMC -11.7pp).
 
 ---
 
@@ -975,7 +977,7 @@ Anomalies in the benchmark reveal that framework architecture dominates over cal
 ---
 # Section 9: Discussion — Four-Dimensional Framework Comparison
 
-The empirical findings in Sections 4–8 establish a clear hierarchy: state-space methods (Framework 3) recover 78.4% of true LTC on average across baseline and stress scenarios; dynamic distributed-lag methods (Framework 2) achieve 42.8%; static adstock methods (Framework 1) achieve 22.4%. This section interprets the mechanisms underlying this hierarchy and derives actionable guidance for practitioners.
+The empirical findings in Sections 4–8 establish a clear hierarchy: state-space methods (Framework 3) recover 79.3% of true LTC on average across S1–S4 (baseline + stress scenarios); dynamic distributed-lag methods (Framework 2) achieve 44.2%; static adstock methods (Framework 1) achieve 29.6% (S1–S4 average, recovery floored at 0%). This section interprets the mechanisms underlying this hierarchy and derives actionable guidance for practitioners.
 
 ---
 
@@ -995,7 +997,7 @@ Beyond average performance, a critical secondary dimension emerges: robustness t
 BSTS (pause ratio 1.02) and Kalman DLM in baseline scenarios maintain consistent error rates across spend variations. These models explicitly separate latent stock dynamics from transient shocks, constraining inference to structural components. Recovery degrades modestly (±1–2pp) when scenarios shift.
 
 **Tier 2: Identification-Sensitive** (Pause ratio 1.10–1.35)  
-MCMC (1.309×), almon_pdl (1.278×), ardl (1.246×), and dual_adstock (1.307×) show moderate fragility. MCMC's degradation in S2 (72.6% → 60.9%) but excellence in S3 (99.0%) reveals Bayesian flexibility: posterior samples adapt to scenario signal when present, but over-constrain under spend disruption. Almon PDL's 1.278× ratio reflects polynomial lag incompatibility with exponential decay discontinuities; polynomial basis functions assume smoothness, not exponential drops. ARDL and dual_adstock both achieve 0% in S1 but variable recovery in S2+ due to specification mismatch (prior constraint and sign-flip issues), placing them at Tier 2 boundary despite structural fragility.
+MCMC (1.309×), almon_pdl (1.278×), ardl (1.246×), and dual_adstock (1.307×) show moderate fragility. MCMC's degradation in S2 (72.6% → 60.9%) but excellence in S3 (98.9%) reveals Bayesian flexibility: posterior samples adapt to scenario signal when present, but over-constrain under spend disruption. Almon PDL's 1.278× ratio reflects polynomial lag incompatibility with exponential decay discontinuities; polynomial basis functions assume smoothness, not exponential drops. ARDL and dual_adstock both achieve 0% in S1 but variable recovery in S2+ due to specification mismatch (prior constraint and sign-flip issues), placing them at Tier 2 boundary despite structural fragility.
 
 
 ARDL (S1→S2: 0%→68.8%) and finite_dl (pause ratio ~1.15) depend on spend variation to identify structural parameters. In featureless baselines (S1), they struggle; in discontinuous scenarios (S2), they succeed. Their prior specifications or autoregressive structure require scenario-specific tuning but respond well to it. Practitioners should expect 5–10pp improvement through scenario-aware calibration.
@@ -1019,7 +1021,7 @@ This is not unique to MMM. Any multivariate decomposition model—linear regress
 
 ## 9.3 MCMC as Production Standard: Evidence and Limitations
 
-The Bayesian latent-stock model (MCMC) achieves highest average recovery (77% S1–S4 average) with correct channel ranking preservation across scenarios. It identifies Video LTC in scenarios where deterministic methods fail (S3 recovery 99.0%, S5 supplementary 88.5%). Most importantly, it recovers the model structure that generated the data: explicit stock dynamics with realistic channel effects.
+The Bayesian latent-stock model (MCMC) achieves highest average recovery (81.0% S1–S4 average) with correct channel ranking preservation in structured-signal scenarios (S3 and S4). It identifies Video LTC in scenarios where deterministic methods fail (S3 aggregate recovery 98.9%, S5 supplementary 88.5%). Most importantly, it recovers the model structure that generated the data: explicit stock dynamics with realistic channel effects.
 
 **Computational cost:** MCMC requires ~60 seconds per scenario on standard hardware, compared to <1 second for geo_adstock. Over a portfolio of 10 campaigns with quarterly reoptimization, this is 40 minutes per year—minimal relative to the cost of misallocating budgets.
 
@@ -1047,7 +1049,7 @@ Parameter ranges (δ 0.65–0.90, baseline $10–$12M, noise $150K–$300K weekl
 
 ## 9.5 Implications for the Central Claim
 
-The paper's central claim—that static adstock methods systematically fail to recover LTC from sustained brand investment—is strongly supported. Static adstock recovery averages 22.4% across baseline and stress scenarios (Section 4), with 80% of this range driven by data features (collinearity, seasonality) rather than method choice. In contrast, state-space methods achieve 78.4% average recovery with low variance (±6pp across scenarios).
+The paper's central claim—that static adstock methods systematically fail to recover LTC from sustained brand investment—is strongly supported. Static adstock recovery averages 29.6% across S1–S4 (Section 4), with 80% of this range driven by data features (collinearity, seasonality) rather than method choice. In contrast, state-space methods achieve 79.3% average recovery with low variance (BSTS std 2.2pp across scenarios).
 
 The failure of static methods is not a parameter tuning issue (Section 7: calibration sensitivity analysis shows <2pp improvement) but a fundamental architectural limitation: these methods cannot identify stock dynamics without explicit state equations. Dynamic and Bayesian methods succeed because they estimate latent state evolution, not just aggregate effects.
 
@@ -1084,7 +1086,7 @@ Marketing mix modelers cannot estimate long-term media contributions reliably. B
 
 Three contributions:
 
-1. **Framework architecture matters more than calibration.** State-space methods recover 78.4% vs static methods 22.4%. Tuning improves F3 by 2–3pp, F1 by <2pp. The 56pp gap is architectural.
+1. **Framework architecture matters more than calibration.** State-space methods recover 79.3% (S1–S4 average) vs static methods 29.6%. Tuning improves F3 by 2–3pp, F1 by <2pp. The 50pp gap is architectural.
 
 2. **Robustness to scenario variation predicts reliability.** BSTS maintains 1.023× pause-window ratio; geo_adstock (1.401×) and kalman_dlm (1.401×) show Tier 3 fragility (>1.35×) on discontinuities, while almon_pdl (1.278×) shows Tier 2 sensitivity (1.10–1.35×). The three-tier taxonomy guides method selection: Tier 1 (<1.10×) requires no scenario-specific tuning; Tier 2 (1.10–1.35×) requires modest scenario-specific calibration; Tier 3 (>1.35×) requires major re-tuning or model switching across scenarios.
 
@@ -1109,7 +1111,7 @@ Future research: (1) validate on real branded data using recovery hierarchy as p
 | Condition | Recommended Method | Why |
 |-----------|-------------------|-----|
 | Strong signal, stability priority | BSTS | Lowest variance (pause ratio 1.02×) across scenarios |
-| Strong signal, accuracy priority | MCMC | Highest recovery (78.4% average) with correct channel ranking |
+| Strong signal, accuracy priority | MCMC | Highest recovery (81.0% S1–S4 average) with correct channel ranking in structured-signal scenarios |
 | Weak signal (LTC <5% sales) | MCMC + scenario priors | Only method with recovery in weak-signal scenario (88.5% S5) |
 | Structural break suspected | MCMC or BSTS | F1/F2 fail on discontinuities; pause ratios >1.35 |
 | Budget constraints, quick results | Kalman DLM | Solid S1/S2 performance (82% avg), sub-second runtime |
