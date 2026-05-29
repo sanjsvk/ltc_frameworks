@@ -1,5 +1,5 @@
 """
-experiments.run_experiment — CLI entry point for running LTC framework experiments.
+experiments.run_experiment - CLI entry point for running LTC framework experiments.
 
 Usage examples:
   # Single model, single scenario
@@ -8,15 +8,15 @@ Usage examples:
   # Single model, all scenarios
   python experiments/run_experiment.py --model mcmc_stock --all-scenarios
 
-  # Full benchmark: all models × all scenarios
+  # Full benchmark: all models x all scenarios
   python experiments/run_experiment.py --all-models --all-scenarios
 
   # Framework group
   python experiments/run_experiment.py --framework F3_state_space --scenario S2
 
 Outputs written to:
-  outputs/results/{model}_{scenario}.json   — metrics JSON
-  outputs/figures/{model}_{scenario}_decomp.png  — decomposition chart
+  outputs/results/{model}_{scenario}.json   - metrics JSON
+  outputs/figures/{model}_{scenario}_decomp.png  - decomposition chart
 """
 
 from __future__ import annotations
@@ -58,13 +58,13 @@ def load_config(model_name: str) -> dict:
 
 def run_one(model_name: str, scenario: str, save_fig: bool = True) -> dict:
     """
-    Run a single model × scenario experiment.
+    Run a single model x scenario experiment.
 
     Returns
     -------
-    dict — score_model() output (metrics).
+    dict - score_model() output (metrics).
     """
-    click.echo(f"[run] {model_name} × {scenario} ...")
+    click.echo(f"[run] {model_name} x {scenario} ...")
 
     # --- Data loading ---
     try:
@@ -87,7 +87,7 @@ def run_one(model_name: str, scenario: str, save_fig: bool = True) -> dict:
     try:
         model.fit(df_obs, config)
     except Exception as e:
-        click.echo(f"[error] fit() failed for {model_name} × {scenario}: {e}")
+        click.echo(f"[error] fit() failed for {model_name} x {scenario}: {e}")
         return {}
 
     # --- Decomposition ---
@@ -109,7 +109,7 @@ def run_one(model_name: str, scenario: str, save_fig: bool = True) -> dict:
     result_path = RESULTS_DIR / f"{model_name}_{scenario}.json"
     with open(result_path, "w") as f:
         json.dump(scores, f, indent=2, default=str)
-    click.echo(f"[save] Results → {result_path}")
+    click.echo(f"[save] Results -> {result_path}")
 
     # --- Optional figure ---
     if save_fig:
@@ -117,7 +117,7 @@ def run_one(model_name: str, scenario: str, save_fig: bool = True) -> dict:
             FIGURES_DIR.mkdir(parents=True, exist_ok=True)
             fig = plot_ltc_vs_truth(
                 decomp, df_truth,
-                title=f"{model_name} — {scenario}: Estimated vs. True LTC"
+                title=f"{model_name} - {scenario}: Estimated vs. True LTC"
             )
             fig_path = FIGURES_DIR / f"{model_name}_{scenario}_decomp.png"
             save_figure(fig, fig_path)
@@ -129,7 +129,7 @@ def run_one(model_name: str, scenario: str, save_fig: bool = True) -> dict:
     # Print summary
     ltc_total = scores.get("ltc", {}).get("total", {})
     click.echo(
-        f"  → LTC recovery_accuracy={ltc_total.get('recovery_accuracy', 'n/a'):.1f}%  "
+        f"  -> LTC recovery_accuracy={ltc_total.get('recovery_accuracy', 'n/a'):.1f}%  "
         f"mape={ltc_total.get('mape', 'n/a'):.1f}%  "
         f"total_ratio={ltc_total.get('total_recovery_ratio', 'n/a'):.3f}"
     )
@@ -189,7 +189,7 @@ def main(
         click.echo("[error] Specify --scenario or --all-scenarios")
         sys.exit(1)
 
-    click.echo(f"Running {len(models_to_run)} model(s) × {len(scenarios_to_run)} scenario(s) ...")
+    click.echo(f"Running {len(models_to_run)} model(s) x {len(scenarios_to_run)} scenario(s) ...")
     click.echo(f"Models: {models_to_run}")
     click.echo(f"Scenarios: {scenarios_to_run}")
     click.echo("")

@@ -133,20 +133,51 @@ def _compute_scenario_diagnostics(
     """
     Compute scenario-specific diagnostic metrics.
 
-    S2: Check LTC recovery during spend pause (weeks 104-112).
+    S2: Check LTC recovery during spend pause (weeks 100-120) + compute pause_window_ratio.
     S4: Check LTC recovery pre-break (weeks 0-103) vs post-break (weeks 104-261).
     """
+    from ltc.evaluation.metrics import compute_all_metrics
+
     diag: dict = {}
 
     if scenario == "S2":
-        # Evaluate LTC recovery during spend pause weeks 104-112
-        pause_slice = slice(104, 113)
+        # Compute pause-window robustness ratio: pause_window_MAPE / full_series_MAPE
+        pause_slice = slice(100, 120)  # weeks 100-120
+
+        # Get LTC totals
+        ltc_est_total = np.zeros(len(decomposition))
+        ltc_true_total = np.zeros(len(truth_df))
+        for ch in channels:
+            est_col = f"ltc_{ch}"
+            true_col = f"ltc_{ch}_true"
+            if est_col in decomposition.columns and true_col in truth_df.columns:
+                ltc_est_total += decomposition[est_col].to_numpy(float)
+                ltc_true_total += truth_df[true_col].to_numpy(float)
+
+        # Compute MAPE for full series and pause window
+        try:
+            full_metrics = compute_all_metrics(ltc_est_total, ltc_true_total)
+            pause_metrics = compute_all_metrics(ltc_est_total.iloc[pause_slice].to_numpy(float) if hasattr(ltc_est_total, 'iloc')
+                                               else ltc_est_total[100:120],
+                                               ltc_true_total.iloc[pause_slice].to_numpy(float) if hasattr(ltc_true_total, 'iloc')
+                                               else ltc_true_total[100:120])
+
+            full_mape = full_metrics.get('mape', 1.0)
+            pause_mape = pause_metrics.get('mape', 1.0)
+
+            if full_mape > 0:
+                diag['pause_window_ratio'] = round(pause_mape / full_mape, 3)
+        except Exception as e:
+            diag['pause_window_ratio_error'] = str(e)
+
+        # Also evaluate LTC recovery during spend pause weeks 104-112
+        pause_detail_slice = slice(104, 113)
         for ch in ["tv", "video"]:
             est_col = f"ltc_{ch}"
             true_col = f"ltc_{ch}_true"
             if est_col in decomposition.columns and true_col in truth_df.columns:
-                est_pause = decomposition[est_col].iloc[pause_slice].to_numpy(float)
-                true_pause = truth_df[true_col].iloc[pause_slice].to_numpy(float)
+                est_pause = decomposition[est_col].iloc[pause_detail_slice].to_numpy(float)
+                true_pause = truth_df[true_col].iloc[pause_detail_slice].to_numpy(float)
                 diag[f"ltc_{ch}_pause_recovery_ratio"] = total_recovery_ratio(est_pause, true_pause)
 
     elif scenario == "S4":
