@@ -69,11 +69,11 @@ Marketing mix models routinely underestimate long-term media contributions (LTC)
 
 ### 2.1 The Business Problem
 
-Chief marketing officers allocate budgets across media channels using marketing mix models (MMMs) designed to estimate short-term elasticities –” the immediate sales lift from a single exposure. These methods often provide incomplete estimates of long-term value, overlooking sustained brand accumulation effects that persist weeks or months after the initial advertising exposure. For media channels like television and video, where brand-building is a core function, this oversight is substantial. Brands typically derive 10–15% of weekly sales from long-term media contributions, yet MMM estimates of long-term contributions routinely fall by half of that true value, leading to systematic misallocation of budgets toward short-term performance channels like search. This paper addresses a fundamental question: which estimation methods can reliably recover long-term media contributions, and when can practitioners trust their estimates?
+Chief marketing officers allocate budgets across media channels using marketing mix models (MMMs) designed to estimate short-term elasticities – the immediate sales lift from a single exposure. These methods often provide incomplete estimates of long-term value, overlooking sustained brand accumulation effects that persist weeks or months after the initial advertising exposure. For media channels like television and video, where brand-building is a core function, this oversight is substantial. Brands typically derive 10–15% of weekly sales from long-term media contributions, yet MMM estimates of long-term contributions routinely fall by half of that true value, leading to systematic misallocation of budgets toward short-term performance channels like search. This paper addresses a fundamental question: which estimation methods can reliably recover long-term media contributions, and when can practitioners trust their estimates?
 
 ### 2.2 The Identification Challenge in Current Practice
 
-The dominant approach to MMM uses adstock transformations –” geometric or polynomial decay functions applied to historical spend series –” to capture both short-term and long-term effects in a single coefficient. This framework succeeds when all channels are continuously active: the adstock function can infer long-term persistence by observing how sales respond when one channel's spend fluctuates while others remain constant. However, adstock methods fail fundamentally in two scenarios that are common in practice. First, when long-term effects persist after spend stops –” such as a spending pause to measure brand equity decay –” adstock cannot separate persistence from zero spend, and the estimated coefficient becomes unreliable (Hanssens et al., 1990). Second, under collinearity, when multiple channels move together, adstock has insufficient statistical variation to identify which channel generates long-term effects, leading to reversals where methods flip the sign and magnitude of channel attribution across scenarios. These identification limitations have been well-documented in individual case studies, but no comprehensive quantification of their prevalence across methods and diagnostic scenarios has been published.
+The dominant approach to MMM uses adstock transformations – geometric or polynomial decay functions applied to historical spend series – to capture both short-term and long-term effects in a single coefficient. This framework succeeds when all channels are continuously active: the adstock function can infer long-term persistence by observing how sales respond when one channel's spend fluctuates while others remain constant. However, adstock methods fail fundamentally in two scenarios that are common in practice. First, when long-term effects persist after spend stops – such as a spending pause to measure brand equity decay – adstock cannot separate persistence from zero spend, and the estimated coefficient becomes unreliable (Hanssens et al., 1990). Second, under collinearity, when multiple channels move together, adstock has insufficient statistical variation to identify which channel generates long-term effects, leading to reversals where methods flip the sign and magnitude of channel attribution across scenarios. These identification limitations have been well-documented in individual case studies, but no comprehensive quantification of their prevalence across methods and diagnostic scenarios has been published.
 
 ### 2.3 Why Existing Validation Approaches Are Insufficient
 
@@ -87,7 +87,7 @@ This paper fills this gap with a reproducible benchmarking framework and four sp
 
 2. **Empirical evidence that aggregate recovery masks channel-level attribution failure.** We show that a method achieving 68.8% aggregate long-term contribution recovery can return 0% recovery for individual channels, inverting budget allocation recommendations. Practitioners validating only on aggregate metrics will accept models that misallocate systematically across channels.
 
-3. **A three-tier robustness taxonomy based on scenario sensitivity.** We classify methods by their pause-window robustness ratio –” how much estimation error increases when spend temporarily stops. Tier 1 methods maintain <1.10Ã— error ratio; Tier 2 methods degrade to 1.10–1.35Ã—; Tier 3 methods exceed 1.35Ã—. This taxonomy operationalizes the distinction between architectures that can and cannot identify latent effects.
+3. **A three-tier robustness taxonomy based on scenario sensitivity.** We classify methods by their pause-window robustness ratio – how much estimation error increases when spend temporarily stops. Tier 1 methods maintain <1.10× error ratio; Tier 2 methods degrade to 1.10–1.35×; Tier 3 methods exceed 1.35×. This taxonomy operationalizes the distinction between architectures that can and cannot identify latent effects.
 
 4. **A practitioner decision framework for method selection.** Based on signal strength (long-term effects as % of baseline sales) and spend pattern characteristics (stability, discontinuities, seasonality), we recommend specific methods and warn against those with known failure modes. This translates academic findings into actionable guidance for MMM practitioners.
 
@@ -114,12 +114,12 @@ Section 3 describes the synthetic data-generating process, ten estimation method
 - [x] No literature review content
 - [x] Central claim clear by end (framework architecture determines reliability)
 - [x] Active voice throughout
-- [x] No vague language (quantified: 10-15%, 68.8%, 0%, <1.10Ã—, 1.10-1.35Ã—, >1.35Ã—)
+- [x] No vague language (quantified: 10-15%, 68.8%, 0%, <1.10×, 1.10-1.35×, >1.35×)
 ### 2.6 Adstock and Distributed Lag Models in Marketing Mix Modeling
 
-The foundational framework for modeling advertising carryover effects in MMM stems from econometrics and distributed lag models. Koyck (1954) introduced the distributed lag framework, demonstrating that economic responses to shocks persist over multiple periods and can be modeled as a geometric series decaying over time. This framework was adapted to advertising in marketing research by Clarke (1976), who formalized the concept of "adstock" –” the persistence of advertising effects in consumer memory –” and provided empirical evidence that 90% of advertising effects dissipate within three to fifteen months. Clarke's work established the paradigm that short-term elasticity coefficients alone systematically underestimate true media effects.
+The foundational framework for modeling advertising carryover effects in MMM stems from econometrics and distributed lag models. Koyck (1954) introduced the distributed lag framework, demonstrating that economic responses to shocks persist over multiple periods and can be modeled as a geometric series decaying over time. This framework was adapted to advertising in marketing research by Clarke (1976), who formalized the concept of "adstock" – the persistence of advertising effects in consumer memory – and provided empirical evidence that 90% of advertising effects dissipate within three to fifteen months. Clarke's work established the paradigm that short-term elasticity coefficients alone systematically underestimate true media effects.
 
-Building on Clarke, Broadbent (1979) extended adstock modeling by introducing the Weibull distribution as an alternative to geometric decay, allowing for flexible lag shapes (e.g., peak effect delayed by multiple periods, then decay). Broadbent showed that advertising effects can exhibit non-monotonic patterns –” building slowly, reaching a peak, then decaying –” a richer description than constant-rate geometric decay.
+Building on Clarke, Broadbent (1979) extended adstock modeling by introducing the Weibull distribution as an alternative to geometric decay, allowing for flexible lag shapes (e.g., peak effect delayed by multiple periods, then decay). Broadbent showed that advertising effects can exhibit non-monotonic patterns – building slowly, reaching a peak, then decaying – a richer description than constant-rate geometric decay.
 
 The comprehensive treatment of these methods in practice is provided by Hanssens, Parsons, and Schultz (2001), whose seminal book *Market Response Models: Econometric and Time Series Analysis* synthesized decades of work on distributed lag methods for marketing. Their framework dominated MMM practice for two decades, with practitioners using geometric and Weibull adstock to estimate both short-term and long-term effects in a single regression coefficient.
 
@@ -129,7 +129,7 @@ The comprehensive treatment of these methods in practice is provided by Hanssens
 
 ### 2.7 State-Space and Latent Variable Approaches in Time Series Analysis
 
-The state-space framework provides an alternative paradigm in which unobserved components (trend, seasonal, latent effects) are modeled explicitly as dynamic states independent of current observations. Harvey (1989) developed the theoretical foundation in *Forecasting, Structural Time Series Models and the Kalman Filter*, showing that time series can be decomposed into interpretable components (trend, seasonal, level) and estimated via the Kalman filter. Harvey's approach allows the trend and seasonal components to evolve over time, adapting to structural changes in the data –” a critical advantage over static ARIMA methods.
+The state-space framework provides an alternative paradigm in which unobserved components (trend, seasonal, latent effects) are modeled explicitly as dynamic states independent of current observations. Harvey (1989) developed the theoretical foundation in *Forecasting, Structural Time Series Models and the Kalman Filter*, showing that time series can be decomposed into interpretable components (trend, seasonal, level) and estimated via the Kalman filter. Harvey's approach allows the trend and seasonal components to evolve over time, adapting to structural changes in the data – a critical advantage over static ARIMA methods.
 
 This framework was extended and systematized by Durbin and Koopman (2012) in *Time Series Analysis by State Space Methods*, which provided the modern computational methods and theoretical guarantees for state-space estimation. Their treatment enabled the application of state-space models to complex marketing problems with multiple unobserved components, including latent brand stock accumulation.
 
@@ -139,7 +139,7 @@ This framework was extended and systematized by Durbin and Koopman (2012) in *Ti
 
 ### 2.8 Brand Equity and Long-Term Marketing Effects
 
-The conceptual foundation for long-term media effects comes from brand equity research. Keller (1993), in his influential paper "Conceptualizing, Measuring, and Managing Customer-Based Brand Equity" (published in *Journal of Marketing*), formalized brand equity as a latent construct built from consumer brand awareness and brand associations. Keller argued that advertising accumulates over time by strengthening these associations and that brand equity, once built, persists in consumer memory independent of current advertising spend –” a key insight for LTC theory.
+The conceptual foundation for long-term media effects comes from brand equity research. Keller (1993), in his influential paper "Conceptualizing, Measuring, and Managing Customer-Based Brand Equity" (published in *Journal of Marketing*), formalized brand equity as a latent construct built from consumer brand awareness and brand associations. Keller argued that advertising accumulates over time by strengthening these associations and that brand equity, once built, persists in consumer memory independent of current advertising spend – a key insight for LTC theory.
 
 Keller's framework positioned brand equity as a latent stock, but his measurement relied on survey-based consumer research (Brand Asset Valuator, brand tracking studies) rather than transaction-level sales data. The gap between consumer perception (brand equity) and sales response (marketing-mix elasticity) has been a persistent challenge in MMM.
 
@@ -179,23 +179,23 @@ This paper fills this gap by providing the first reproducible synthetic-data ben
 ### Verified References (11 total)
 
 **Section 2.1: Adstock and Distributed Lag Models**
-- [x] Koyck (1954): "Distributed Lags and Investment Analysis" –” North-Holland, Amsterdam
-- [x] Clarke (1976): "Econometric Measurement of the Duration of Advertising Effect on Sales" –” Journal of Marketing Research
-- [x] Broadbent (1979): "One Way TV Advertisements Work" –” Journal of the Market Research Society
-- [x] Hanssens et al. (2001): "Market Response Models: Econometric and Time Series Analysis" –” Kluwer Academic
+- [x] Koyck (1954): "Distributed Lags and Investment Analysis" – North-Holland, Amsterdam
+- [x] Clarke (1976): "Econometric Measurement of the Duration of Advertising Effect on Sales" – Journal of Marketing Research
+- [x] Broadbent (1979): "One Way TV Advertisements Work" – Journal of the Market Research Society
+- [x] Hanssens et al. (2001): "Market Response Models: Econometric and Time Series Analysis" – Kluwer Academic
 
 **Section 2.2: State-Space and Latent Variable Approaches**
-- [x] Harvey (1989): "Forecasting, Structural Time Series Models and the Kalman Filter" –” Cambridge University Press
-- [x] Durbin & Koopman (2012): "Time Series Analysis by State Space Methods" –” Oxford University Press
+- [x] Harvey (1989): "Forecasting, Structural Time Series Models and the Kalman Filter" – Cambridge University Press
+- [x] Durbin & Koopman (2012): "Time Series Analysis by State Space Methods" – Oxford University Press
 
 **Section 2.3: Brand Equity and Long-Term Marketing Effects**
-- [x] Keller (1993): "Conceptualizing, Measuring, and Managing Customer-Based Brand Equity" –” Journal of Marketing, Vol. 57, pp. 1-22
-- [x] Srinivasan & Hanssens (2009): "Marketing and Firm Value" –” Journal of Marketing Research, Vol. XLVI, pp. 293-312
-- [x] Datta, Ailawadi, & van Heerde (2017): "Consumer-Based vs Sales-Based Brand Equity Alignment" –” Journal of Marketing, Vol. 81, No. 3
+- [x] Keller (1993): "Conceptualizing, Measuring, and Managing Customer-Based Brand Equity" – Journal of Marketing, Vol. 57, pp. 1-22
+- [x] Srinivasan & Hanssens (2009): "Marketing and Firm Value" – Journal of Marketing Research, Vol. XLVI, pp. 293-312
+- [x] Datta, Ailawadi, & van Heerde (2017): "Consumer-Based vs Sales-Based Brand Equity Alignment" – Journal of Marketing, Vol. 81, No. 3
 
 **Section 2.4: MMM Benchmarking and Validation**
-- [x] Jin et al. (2017): "Bayesian Methods for Media Mix Modeling with Carryover and Shape Effects" –” Google Research
-- [x] Meta Robyn (2022-2023): Open-source Bayesian MMM package –” Facebook/Meta Marketing Science
+- [x] Jin et al. (2017): "Bayesian Methods for Media Mix Modeling with Carryover and Shape Effects" – Google Research
+- [x] Meta Robyn (2022-2023): Open-source Bayesian MMM package – Facebook/Meta Marketing Science
 
 ### Context Validation
 - [x] All papers verified for correct title and publication year
@@ -205,10 +205,10 @@ This paper fills this gap by providing the first reproducible synthetic-data ben
 
 ### Structure Alignment
 - [x] Four subsections (2.1–2.4) per requirements
-- [x] Each subsection follows: What's known â†’ What's missing â†’ How paper addresses it
+- [x] Each subsection follows: What's known → What's missing → How paper addresses it
 - [x] Each subsection identifies a distinct gap
 - [x] Synthesis ties together all four gaps
-- [x] 1,000–1,400 word target (1,387 words) âœ“
+- [x] 1,000–1,400 word target (1,387 words) ✓
 
 ### Checklist for Second Verification
 - [ ] Read each citation one more time (second verification)
@@ -223,13 +223,13 @@ Ground truth is unavailable in real marketing mix modeling data: practitioners c
 
 $$\text{Net Sales}[t] = \text{Baseline}[t] + \sum_{c} \text{STC}_c[t] + \sum_{c} \text{LTC}_c[t] + \text{Exog}[t] + \epsilon[t] \quad \text{(Eq 1)}$$
 
-**Baseline** (Piecewise Trend + Seasonality + Holidays): A piecewise linear trend spanning 2020–2025 (~$10M–$12M per week), annual seasonality (52-week harmonic), and holiday uplifts (Thanksgiving, Christmas, Black Friday) totaling âˆ’$1.5M to +$2.0M per week.
+**Baseline** (Piecewise Trend + Seasonality + Holidays): A piecewise linear trend spanning 2020–2025 (~$10M–$12M per week), annual seasonality (52-week harmonic), and holiday uplifts (Thanksgiving, Christmas, Black Friday) totaling −$1.5M to +$2.0M per week.
 
 **Short-Term Contribution (STC):** Impressions in each channel decay via a geometric adstock transformation:
 
 $$\text{Adstocked}_c[t] = \text{Impr}_c[t] + \lambda_c \times \text{Adstocked}_c[t-1] \quad \text{(Eq 2)}$$
 
-where $\lambda_c$ is the channel-specific decay rate. STC is the sum of channel-level elasticity Ã— adstocked impressions, totaling ~$1.58M per week (~15% of observed sales).
+where $\lambda_c$ is the channel-specific decay rate. STC is the sum of channel-level elasticity × adstocked impressions, totaling ~$1.58M per week (~15% of observed sales).
 
 **Long-Term Contribution (LTC):** Latent brand stock accumulates via paid media spend and decays at a channel-specific rate:
 
@@ -253,7 +253,7 @@ where $\delta_c$ is the stock retention rate (0.30–0.90 by channel), $\beta_c$
 
 **S4 (Structural Break).** Permanent 30% reduction in total media spend at week 180, mimicking a realistic budget cut or market shock. Tests whether methods can adapt their stock estimates when the spend level permanently changes midway through the series.
 
-**S5 (Weak Signal).** Long-term contribution coefficients scaled to Ã—0.35 of baseline, making LTC <5% of observed sales. Tests whether methods can identify a weak signal without false discovery. Methods with uninformative priors will confidently estimate nonexistent LTC; Bayesian methods with strong priors will shrink estimates toward zero.
+**S5 (Weak Signal).** Long-term contribution coefficients scaled to ×0.35 of baseline, making LTC <5% of observed sales. Tests whether methods can identify a weak signal without false discovery. Methods with uninformative priors will confidently estimate nonexistent LTC; Bayesian methods with strong priors will shrink estimates toward zero.
 
 ### Fixed-Parameter Design Justification
 
@@ -352,13 +352,13 @@ All analyses use a fixed random seed (42) for reproducibility across operating s
 - [x] Equations numbered and all symbols defined
 ## 4. Results
 
-**Status:** DRAFT –” Framework Comparison on Baseline Scenario (S1) + Scenario Sensitivity (S2-S5)  
+**Status:** DRAFT – Framework Comparison on Baseline Scenario (S1) + Scenario Sensitivity (S2-S5)  
 **Length Target:** ~2 pages (consolidated from extended draft)  
 **Focus:** Establish baseline hierarchy with frozen parameters; test robustness across scenarios
 
 ---
 
-### 4.1 Performance Ceiling –” S1 Clean Baseline
+### 4.1 Performance Ceiling – S1 Clean Baseline
 
 State-space methods recover 79.0% of true LTC on average in the baseline scenario, compared to 32.2% for dynamic distributed lag models and 31.1% for static adstock methods (Table 3). This three-way hierarchy holds across the 10 models: the top three performers are all state-space frameworks, mid-tier models are all dynamic distributed lag, and weak performers are all static adstock.
 
@@ -368,7 +368,7 @@ Within the state-space class, BSTS achieves 82.4% recovery with 17.6% MAPE, marg
 
 ### Dynamic Time-Series Mid-Tier Performance (F2)
 
-Finite distributed lag recovers 50.3%, and Koyck recovers 46.4%, both moderate performers. Both methods use autoregressive structure to capture sales momentum, but the fundamental lag-based approach cannot fully separate fast STC decay from slow LTC accumulation when both dynamics operate on the same set of regressors. ARDL performs catastrophically in S1: 0.0% recovery with 316.8% MAPE. This is not a calibration artifact; the failure is structural. The model's autoregressive specification over-fits to sales momentum in the smooth baseline, leaving insufficient degrees of freedom to identify true LTC dynamics. The S1 failure is diagnostic of prior misspecification–”a finding that becomes clear in S2.
+Finite distributed lag recovers 50.3%, and Koyck recovers 46.4%, both moderate performers. Both methods use autoregressive structure to capture sales momentum, but the fundamental lag-based approach cannot fully separate fast STC decay from slow LTC accumulation when both dynamics operate on the same set of regressors. ARDL performs catastrophically in S1: 0.0% recovery with 316.8% MAPE. This is not a calibration artifact; the failure is structural. The model's autoregressive specification over-fits to sales momentum in the smooth baseline, leaving insufficient degrees of freedom to identify true LTC dynamics. The S1 failure is diagnostic of prior misspecification–a finding that becomes clear in S2.
 
 ### Static Adstock Weak Performance (F1)
 
@@ -380,7 +380,7 @@ Dual adstock recovers 0.0% with 789.9% MAPE. This model enforces a constraint th
 
 ### Pause-Window Robustness: S1 Baseline
 
-The pause-window robustness ratio (pause_MAPE / full_series_MAPE) measures error concentration in weeks 100–120 in subsequent scenarios. BSTS maintains a 1.023Ã— ratio, the lowest across all models, indicating that prediction error is nearly invariant across time–”a hallmark of structural robustness. Kalman DLM achieves 1.401Ã—, MCMC 1.309Ã—, and finite_dl 0.675Ã—. Framework 1 methods show variable ratios: geo_adstock 1.401Ã—, almon_pdl 1.278Ã—, weibull_adstock 1.530Ã— (highest fragility). Framework 2 shows surprising stability: koyck 0.782Ã—, finite_dl 0.675Ã—. These ratios reveal a critical distinction: some models improve under spend pauses (finite_dl, koyck <0.80Ã— errors), while others degrade (almon_pdl 1.28Ã—, weibull 1.53Ã—), signaling architecture-dependent responses to structural breaks.
+The pause-window robustness ratio (pause_MAPE / full_series_MAPE) measures error concentration in weeks 100–120 in subsequent scenarios. BSTS maintains a 1.023× ratio, the lowest across all models, indicating that prediction error is nearly invariant across time–a hallmark of structural robustness. Kalman DLM achieves 1.401×, MCMC 1.309×, and finite_dl 0.675×. Framework 1 methods show variable ratios: geo_adstock 1.401×, almon_pdl 1.278×, weibull_adstock 1.530× (highest fragility). Framework 2 shows surprising stability: koyck 0.782×, finite_dl 0.675×. These ratios reveal a critical distinction: some models improve under spend pauses (finite_dl, koyck <0.80× errors), while others degrade (almon_pdl 1.28×, weibull 1.53×), signaling architecture-dependent responses to structural breaks.
 
 ### Summary: S1 Establishes Framework Hierarchy
 
@@ -390,72 +390,72 @@ The baseline scenario reveals clear separation. State-space models exploit expli
 
 ![Figure 5: Framework Hierarchy](../outputs/figures/Figure_05_Framework_Hierarchy.png)
 
-**Figure 5: Framework Hierarchy –” Distribution by Class.** *Boxplot showing baseline (S1) recovery accuracy distributions for three framework classes: Framework 3 (State-Space) dominates with median 82%, IQR [72–82%], showing BSTS (82.4%) and Kalman DLM (82.0%) outperforming Framework 2 (median ~48%, range 46–50%) and Framework 1 (median ~40%, range 0–70% with high variability). Framework 3 median exceeds all Framework 2 and F1 models except geo_adstock (69.9%), establishing state-space as architectural standard for LTC recovery.* Data source: Section 4, Table 3 "Framework Hierarchy" (lines 83–98).
+**Figure 5: Framework Hierarchy – Distribution by Class.** *Boxplot showing baseline (S1) recovery accuracy distributions for three framework classes: Framework 3 (State-Space) dominates with median 82%, IQR [72–82%], showing BSTS (82.4%) and Kalman DLM (82.0%) outperforming Framework 2 (median ~48%, range 46–50%) and Framework 1 (median ~40%, range 0–70% with high variability). Framework 3 median exceeds all Framework 2 and F1 models except geo_adstock (69.9%), establishing state-space as architectural standard for LTC recovery.* Data source: Section 4, Table 3 "Framework Hierarchy" (lines 83–98).
 
 ---
 
 ---
 
-### 4.2 S2 Spend Pause –” Natural Experiment
+### 4.2 S2 Spend Pause – Natural Experiment
 
-Pause-window robustness ratio isolates framework robustness to structural breaks. BSTS achieves 1.023Ã— (pause-window MAPE 19.3% vs full-series 19.0%), the gold standard of structural robustness–”error distribution remains near-invariant to the spend discontinuity. Kalman DLM achieves 1.401Ã— while geo_adstock also achieves 1.401Ã—, but identical ratios mask different mechanisms. Geo_adstock paradoxically improves (+13.2pp recovery, S1 69.9% â†’ S2 83.1%), revealing **identification paradox** (see Section 8.4 for mechanistic explanation): static models depend on spend variation for identification; discontinuity isolates decay parameters and paradoxically helps identification. In contrast, Kalman DLM's high ratio reflects genuine fragility: its implicit seasonal handling creates collinearity that amplifies errors during spend pauses.
+Pause-window robustness ratio isolates framework robustness to structural breaks. BSTS achieves 1.023× (pause-window MAPE 19.3% vs full-series 19.0%), the gold standard of structural robustness–error distribution remains near-invariant to the spend discontinuity. Kalman DLM achieves 1.401× while geo_adstock also achieves 1.401×, but identical ratios mask different mechanisms. Geo_adstock paradoxically improves (+13.2pp recovery, S1 69.9% → S2 83.1%), revealing **identification paradox** (see Section 8.4 for mechanistic explanation): static models depend on spend variation for identification; discontinuity isolates decay parameters and paradoxically helps identification. In contrast, Kalman DLM's high ratio reflects genuine fragility: its implicit seasonal handling creates collinearity that amplifies errors during spend pauses.
 
 ARDL resurrects from 0.0% to 68.8% recovery, proving S1 failure was prior misspecification, not structural flaw (see Section 8.3 for detailed explanation). However, channel-level validation reveals critical limitation: 68.8% aggregate recovery with 0% per-channel recovery (TV, Video, Social, Display, Search all individually 0%). Offsetting errors sum to apparent success; model captures total magnitude but misattributes effects completely. Practitioners using ARDL for channel-level budget allocation would receive no directional guidance.
 
-Almon PDL collapses (âˆ’23.9pp, S1 42.6% â†’ S2 18.7%) because polynomial lag weights cannot capture exponential decay across sharp discontinuity. Weibull improves (+19.7pp) as lag shapes finally become useful. MCMC degrades (âˆ’11.7pp) but convergence improves (divergences 8â†’1), indicating Bayesian over-constraint rather than model failure.
+Almon PDL collapses (−23.9pp, S1 42.6% → S2 18.7%) because polynomial lag weights cannot capture exponential decay across sharp discontinuity. Weibull improves (+19.7pp) as lag shapes finally become useful. MCMC degrades (−11.7pp) but convergence improves (divergences 8→1), indicating Bayesian over-constraint rather than model failure.
 
-**F2 paradox:** Finite_dl (0.69Ã— ratio) and koyck (0.77Ã— ratio) show error improvements in pause window–”false robustness reflecting baseline overfitting correction. Channel analysis shows koyck inverts ranking: Social 50.4%, Display 59.3% > TV 2.2%, Video 14.9% (true ranking TV > Video > Social > Display).
+**F2 paradox:** Finite_dl (0.69× ratio) and koyck (0.77× ratio) show error improvements in pause window–false robustness reflecting baseline overfitting correction. Channel analysis shows koyck inverts ranking: Social 50.4%, Display 59.3% > TV 2.2%, Video 14.9% (true ranking TV > Video > Social > Display).
 
 **Implication:** Aggregate LTC recovery does not validate channel-level precision. Channel-level validation is mandatory.
 
 ---
 
-### 4.3 S3 High Seasonality –” Collinearity Challenge
+### 4.3 S3 High Seasonality – Collinearity Challenge
 
-Seasonality amplitude increases 20% â†’ 40%, creating collinearity between 52-week seasonal cycle and channel spend patterns.
+Seasonality amplitude increases 20% → 40%, creating collinearity between 52-week seasonal cycle and channel spend patterns.
 
-MCMC peaks at 98.9% recovery (MAPE 1.1%), achieving highest single-scenario performance (see Section 8.4 for explanation of Bayesian flexibility). Non-monotonic trajectory (S1 72.6% â†’ S2 60.9% â†’ S3 98.9% â†’ S4 91.8%) reveals seasonal regularity provides additional identification source. Pause-window ratio 0.93Ã— (lowest across all scenarios) confirms near-perfect error invariance.
+MCMC peaks at 98.9% recovery (MAPE 1.1%), achieving highest single-scenario performance (see Section 8.4 for explanation of Bayesian flexibility). Non-monotonic trajectory (S1 72.6% → S2 60.9% → S3 98.9% → S4 91.8%) reveals seasonal regularity provides additional identification source. Pause-window ratio 0.93× (lowest across all scenarios) confirms near-perfect error invariance.
 
-Kalman DLM unexpectedly degrades (âˆ’17.1pp, S1 82.0% â†’ S3 64.9%) due to missing explicit seasonal state (see Section 8.3 for detailed analysis). BSTS recovers 76.8% but pause-window ratio rises to 1.37Ã— (37% error concentration). Channel analysis reveals BSTS inverts ranking: Display 72% > TV 68% (true rank #1 and #4) (see Section 8.3 for channel-level caveat). **Critical caveat:** BSTS aggregate stability masks channel-level fragility under seasonal collinearity.
+Kalman DLM unexpectedly degrades (−17.1pp, S1 82.0% → S3 64.9%) due to missing explicit seasonal state (see Section 8.3 for detailed analysis). BSTS recovers 76.8% but pause-window ratio rises to 1.37× (37% error concentration). Channel analysis reveals BSTS inverts ranking: Display 72% > TV 68% (true rank #1 and #4) (see Section 8.3 for channel-level caveat). **Critical caveat:** BSTS aggregate stability masks channel-level fragility under seasonal collinearity.
 
-Geo_adstock S2 improvement fully reverses (âˆ’39.9pp drop S2â†’S3), confirming identification dependence. F1 models collapse to average 20.9% recovery (vs F3 80.2%). Video LTC signal is lost in all non-MCMC models: MCMC 58%, Kalman 0%, BSTS 0%, geo_adstock 0%. **Video recovery serves as diagnostic test for channel-level robustness.**
+Geo_adstock S2 improvement fully reverses (−39.9pp drop S2→S3), confirming identification dependence. F1 models collapse to average 20.9% recovery (vs F3 80.2%). Video LTC signal is lost in all non-MCMC models: MCMC 58%, Kalman 0%, BSTS 0%, geo_adstock 0%. **Video recovery serves as diagnostic test for channel-level robustness.**
 
 ---
 
-### 4.4 S4 Structural Break –” Permanent Shift
+### 4.4 S4 Structural Break – Permanent Shift
 
 Permanent spend reduction to 20% of baseline from week 104 onwards tests adaptation to regime shift.
 
-**ARDL catastrophe:** Recovery floors at 0% under the `max(0, 100 - MAPE)` definition; the uncapped `100 - MAPE` value reaches âˆ’119.8%, a swing of âˆ’188.6pp from S2 68.8% –” the most damaging finding. Model works perfectly on temporary pauses (S2) but fails catastrophically on permanent shifts. Mechanism: AR and polynomial lag structure calibrated to high-spend regime produce inverted predictions under permanent low-spend baseline. **Asymmetry proves that validation on scenario pauses does not transfer to permanent budget reallocations.**
+**ARDL catastrophe:** Recovery floors at 0% under the `max(0, 100 - MAPE)` definition; the uncapped `100 - MAPE` value reaches −119.8%, a swing of −188.6pp from S2 68.8% – the most damaging finding. Model works perfectly on temporary pauses (S2) but fails catastrophically on permanent shifts. Mechanism: AR and polynomial lag structure calibrated to high-spend regime produce inverted predictions under permanent low-spend baseline. **Asymmetry proves that validation on scenario pauses does not transfer to permanent budget reallocations.**
 
-MCMC achieves 91.8% recovery (+19.2pp from S1), sustained Bayesian flexibility under regime change. BSTS maintains 81.5% (âˆ’0.9pp). Kalman DLM degrades to 75.4% (âˆ’6.6pp); fixed decay parameters struggle when observation process fundamentally changes.
+MCMC achieves 91.8% recovery (+19.2pp from S1), sustained Bayesian flexibility under regime change. BSTS maintains 81.5% (−0.9pp). Kalman DLM degrades to 75.4% (−6.6pp); fixed decay parameters struggle when observation process fundamentally changes.
 
 Almon PDL unexpectedly improves (68.6%, +26.0pp from S1) because permanent shift removes seasonal confound. Weibull and other F1 models sign-flip under regime change. F3 holds (average 82.7%) while F2 fragments (average 24.3%).
 
 ---
 
-### 4.5 S5 Weak LTC Signal –” Identification Boundary
+### 4.5 S5 Weak LTC Signal – Identification Boundary
 
 LTC contributions halved (50% of S1). All 10 models return 0% recovery with frozen S1 parameters. **Universal collapse demonstrates signal threshold as calibration boundary, not structural limitation.** Supplementary analysis with scenario-specific priors shows MCMC recovers 88.5% when calibrated appropriately (weakened decay priors, reduced stock initialization, tighter coefficient priors). Fixed-parameter models remain at 0%, confirming **joint Bayesian optimization is essential below signal threshold.**
 
 ---
 
-## Table 3: Full Recovery Matrix –” All Models, All Scenarios
+## Table 3: Full Recovery Matrix – All Models, All Scenarios
 
 | Rank | Model | Framework | S1 | S2 | S3 | S4 | S5 | Avg(S1-S4) | Notes |
 |------|-------|-----------|----|----|----|----|----|----|-------|
-| 1 | **bsts** | F3 | 82.4% | 81.0% | 76.8% | 81.5% | 0.0% | 80.5% | âœ“ Most stable |
-| 2 | **kalman_dlm** | F3 | 82.0% | 83.1% | 64.9% | 75.4% | 0.0% | 76.4% | âœ“ Structural |
-| 3 | **mcmc_stock** | F3 | 72.6% | 60.9% | 98.9% | 91.8% | 0.0% | 81.0% | âœ“ Flexible |
-| 4 | **geo_adstock** | F1 | 69.9% | 83.1% | 43.2% | 63.4% | 0.0% | 64.9% | âš  Volatile |
-| 5 | **finite_dl** | F2 | 50.3% | 54.6% | 58.0% | 40.5% | 0.0% | 50.9% | âœ“ Stable |
-| 6 | **koyck** | F2 | 46.4% | 43.0% | 53.7% | 52.3% | 0.0% | 48.9% | âœ“ Moderate |
-| 7 | **almon_pdl** | F1 | 42.6% | 18.7% | 40.6% | 68.6% | 0.0% | 32.6% | âœ— Volatile |
-| 8 | **weibull_adstock** | F1 | 11.9% | 31.7% | 0.0% | 0.0%* | 0.0% | 10.9% | âœ— Arch limit |
-| 9 | **ardl** | F2 | 0.0% | 68.8% | 63.3% | 0.0%* | 0.0% | 33.0% | âœ— Fragile |
-| 10 | **dual_adstock** | F1 | 0.0% | 0.0% | 0.0% | 0.0%* | 0.0% | 0.0% | âœ— Broken |
+| 1 | **bsts** | F3 | 82.4% | 81.0% | 76.8% | 81.5% | 0.0% | 80.5% | ✓ Most stable |
+| 2 | **kalman_dlm** | F3 | 82.0% | 83.1% | 64.9% | 75.4% | 0.0% | 76.4% | ✓ Structural |
+| 3 | **mcmc_stock** | F3 | 72.6% | 60.9% | 98.9% | 91.8% | 0.0% | 81.0% | ✓ Flexible |
+| 4 | **geo_adstock** | F1 | 69.9% | 83.1% | 43.2% | 63.4% | 0.0% | 64.9% | → Volatile |
+| 5 | **finite_dl** | F2 | 50.3% | 54.6% | 58.0% | 40.5% | 0.0% | 50.9% | ✓ Stable |
+| 6 | **koyck** | F2 | 46.4% | 43.0% | 53.7% | 52.3% | 0.0% | 48.9% | ✓ Moderate |
+| 7 | **almon_pdl** | F1 | 42.6% | 18.7% | 40.6% | 68.6% | 0.0% | 32.6% | ✓ Volatile |
+| 8 | **weibull_adstock** | F1 | 11.9% | 31.7% | 0.0% | 0.0%* | 0.0% | 10.9% | ✓ Arch limit |
+| 9 | **ardl** | F2 | 0.0% | 68.8% | 63.3% | 0.0%* | 0.0% | 33.0% | ✓ Fragile |
+| 10 | **dual_adstock** | F1 | 0.0% | 0.0% | 0.0% | 0.0%* | 0.0% | 0.0% | ✓ Broken |
 
-*Note.* S1–S4 average excludes S5 (all models collapse under weak signal with frozen parameters). BSTS 1.02Ã— pause-window ratio is paper centrepiece. *Recovery accuracy is floored at 0% per definition `max(0, 100 - MAPE)`; S4 entries marked with * indicate models whose underlying `100 - MAPE` value is negative (uncapped: weibull -21.5%, ARDL -119.8%, dual_adstock -1478%), reflecting predictions worse than zero-LTC baseline.
+*Note.* S1–S4 average excludes S5 (all models collapse under weak signal with frozen parameters). BSTS 1.02× pause-window ratio is paper centrepiece. *Recovery accuracy is floored at 0% per definition `max(0, 100 - MAPE)`; S4 entries marked with * indicate models whose underlying `100 - MAPE` value is negative (uncapped: weibull -21.5%, ARDL -119.8%, dual_adstock -1478%), reflecting predictions worse than zero-LTC baseline.
 
 ---
 
@@ -488,21 +488,21 @@ Beyond average performance, a critical secondary dimension emerges: robustness t
 
 ![Figure 1: Robustness Spectrum](../outputs/figures/Figure_01_Robustness_Spectrum.png)
 
-**Figure 1: Robustness Spectrum.** *Horizontal bar chart ranking all ten models by pause-window robustness ratio (S2 pause-window MAPE / full-series MAPE), from most robust (left) to most fragile (right): BSTS 1.023Ã—, finite_dl 0.675Ã—, koyck 0.782Ã— (Tier 1: <1.10Ã—); ardl 1.246Ã—, almon_pdl 1.278Ã—, mcmc_stock 1.309Ã—, dual_adstock 1.307Ã— (Tier 2: 1.10–1.35Ã—); kalman_dlm 1.401Ã—, geo_adstock 1.401Ã—, weibull_adstock 1.530Ã— (Tier 3: >1.35Ã—). Vertical dotted lines at ratio=1.10 (yellow, Tier 1 boundary) and ratio=1.35 (purple, Tier 2 boundary) mark architectural classifications. Colors distinguish Framework 3 (green, mix of Tier 1–3), Framework 2 (blue, primarily Tier 1–2), Framework 1 (red, primarily Tier 2–3).* Data source: validation/PHASE2_PAUSE_WINDOW_VALIDATION.md; Section 5, "S2 Scenario Analysis".
+**Figure 1: Robustness Spectrum.** *Horizontal bar chart ranking all ten models by pause-window robustness ratio (S2 pause-window MAPE / full-series MAPE), from most robust (left) to most fragile (right): BSTS 1.023×, finite_dl 0.675×, koyck 0.782× (Tier 1: <1.10×); ardl 1.246×, almon_pdl 1.278×, mcmc_stock 1.309×, dual_adstock 1.307× (Tier 2: 1.10–1.35×); kalman_dlm 1.401×, geo_adstock 1.401×, weibull_adstock 1.530× (Tier 3: >1.35×). Vertical dotted lines at ratio=1.10 (yellow, Tier 1 boundary) and ratio=1.35 (purple, Tier 2 boundary) mark architectural classifications. Colors distinguish Framework 3 (green, mix of Tier 1–3), Framework 2 (blue, primarily Tier 1–2), Framework 1 (red, primarily Tier 2–3).* Data source: validation/PHASE2_PAUSE_WINDOW_VALIDATION.md; Section 5, "S2 Scenario Analysis".
 
 ---
 
 **Tier 1: Architecturally Robust** (Pause ratio 1.00–1.10)  
-BSTS (pause ratio 1.02) and Kalman DLM in baseline scenarios maintain consistent error rates across spend variations. These models explicitly separate latent stock dynamics from transient shocks, constraining inference to structural components. Recovery degrades modestly (Â±1–2pp) when scenarios shift.
+BSTS (pause ratio 1.02) and Kalman DLM in baseline scenarios maintain consistent error rates across spend variations. These models explicitly separate latent stock dynamics from transient shocks, constraining inference to structural components. Recovery degrades modestly (±1–2pp) when scenarios shift.
 
 **Tier 2: Identification-Sensitive** (Pause ratio 1.10–1.35)  
-MCMC (1.309Ã—), almon_pdl (1.278Ã—), ardl (1.246Ã—), and dual_adstock (1.307Ã—) show moderate fragility. MCMC's degradation in S2 (72.6% â†’ 60.9%) but excellence in S3 (98.9%) reveals Bayesian flexibility: posterior samples adapt to scenario signal when present, but over-constrain under spend disruption. Almon PDL's 1.278Ã— ratio reflects polynomial lag incompatibility with exponential decay discontinuities; polynomial basis functions assume smoothness, not exponential drops. ARDL and dual_adstock both achieve 0% in S1 but variable recovery in S2+ due to specification mismatch (prior constraint and sign-flip issues), placing them at Tier 2 boundary despite structural fragility.
+MCMC (1.309×), almon_pdl (1.278×), ardl (1.246×), and dual_adstock (1.307×) show moderate fragility. MCMC's degradation in S2 (72.6% → 60.9%) but excellence in S3 (98.9%) reveals Bayesian flexibility: posterior samples adapt to scenario signal when present, but over-constrain under spend disruption. Almon PDL's 1.278× ratio reflects polynomial lag incompatibility with exponential decay discontinuities; polynomial basis functions assume smoothness, not exponential drops. ARDL and dual_adstock both achieve 0% in S1 but variable recovery in S2+ due to specification mismatch (prior constraint and sign-flip issues), placing them at Tier 2 boundary despite structural fragility.
 
 
-ARDL (S1â†’S2: 0%â†’68.8%) and finite_dl (pause ratio ~1.15) depend on spend variation to identify structural parameters. In featureless baselines (S1), they struggle; in discontinuous scenarios (S2), they succeed. Their prior specifications or autoregressive structure require scenario-specific tuning but respond well to it. Practitioners should expect 5–10pp improvement through scenario-aware calibration.
+ARDL (S1→S2: 0%→68.8%) and finite_dl (pause ratio ~1.15) depend on spend variation to identify structural parameters. In featureless baselines (S1), they struggle; in discontinuous scenarios (S2), they succeed. Their prior specifications or autoregressive structure require scenario-specific tuning but respond well to it. Practitioners should expect 5–10pp improvement through scenario-aware calibration.
 
 **Tier 3: Data-Dependent** (Pause ratio >1.35)  
-Kalman DLM (1.401Ã—), geo_adstock (1.401Ã—), and weibull_adstock (1.530Ã—) show high fragility to structural breaks. Kalman DLM's degradation in S3 (82.0% â†’ 64.9%) and high pause ratio reveal missing seasonal state explicitly hurts performance. Weibull's 1.530Ã— ratio (highest observed) confirms shape parameter insufficiency for simultaneous STC/LTC fitting. Geo_adstock's paradoxical S2 improvement (69.9%â†’83.1%) despite high pause ratio reveals it is fundamentally sensitive to spend variation: discontinuities that harm other models actually help geo_adstock by isolating decay parameters.
+Kalman DLM (1.401×), geo_adstock (1.401×), and weibull_adstock (1.530×) show high fragility to structural breaks. Kalman DLM's degradation in S3 (82.0% → 64.9%) and high pause ratio reveal missing seasonal state explicitly hurts performance. Weibull's 1.530× ratio (highest observed) confirms shape parameter insufficiency for simultaneous STC/LTC fitting. Geo_adstock's paradoxical S2 improvement (69.9%→83.1%) despite high pause ratio reveals it is fundamentally sensitive to spend variation: discontinuities that harm other models actually help geo_adstock by isolating decay parameters.
 
 This taxonomy connects to literature on identification in time-series models (Hanssens et al., 1990; Dekimpe & Hanssens, 2000): models with strong structural priors generalize across contexts, while models that absorb structure from data become brittle when context shifts.
 
@@ -510,9 +510,9 @@ This taxonomy connects to literature on identification in time-series models (Ha
 
 ### 5.3 The Channel Attribution Problem: Aggregate Accuracy is Insufficient
 
-A critical finding cuts across frameworks: aggregate LTC recovery can mask severe channel-level misattribution. ARDL achieves 68.8% aggregate recovery in S2 but recovers 0% of Video LTC. Koyck inverts channel rankings, placing Paid Social at 59.3% and TV at 2.2%–”opposite the ground truth (TV dominance). (Table 5 in Section 6).
+A critical finding cuts across frameworks: aggregate LTC recovery can mask severe channel-level misattribution. ARDL achieves 68.8% aggregate recovery in S2 but recovers 0% of Video LTC. Koyck inverts channel rankings, placing Paid Social at 59.3% and TV at 2.2%–opposite the ground truth (TV dominance). (Table 5 in Section 6).
 
-This is not unique to MMM. Any multivariate decomposition model–”linear regression with interaction terms, neural networks, Bayesian hierarchical models–”can achieve aggregate fit through offsetting channel errors: one channel overestimated, another underestimated, net error small.
+This is not unique to MMM. Any multivariate decomposition model–linear regression with interaction terms, neural networks, Bayesian hierarchical models–can achieve aggregate fit through offsetting channel errors: one channel overestimated, another underestimated, net error small.
 
 **Implication for practitioners:** Channel-level validation is mandatory, not supplementary. Before deploying a framework, validate not just aggregate accuracy but per-channel recovery across at least one structural-break scenario (e.g., spend pause, format shift, seasonality contrast). Models that preserve channel rankings under stress are more trustworthy for budget allocation.
 
@@ -522,9 +522,9 @@ This is not unique to MMM. Any multivariate decomposition model–”linear regr
 
 The Bayesian latent-stock model (MCMC) achieves highest average recovery (81.0% S1–S4 average) with correct channel ranking preservation in structured-signal scenarios (S3 and S4). It identifies Video LTC in scenarios where deterministic methods fail (S3 aggregate recovery 98.9%, S5 supplementary 88.5%). Most importantly, it recovers the model structure that generated the data: explicit stock dynamics with realistic channel effects.
 
-**Computational cost:** MCMC requires ~60 seconds per scenario on standard hardware, compared to <1 second for geo_adstock. Over a portfolio of 10 campaigns with quarterly reoptimization, this is 40 minutes per year–”minimal relative to the cost of misallocating budgets.
+**Computational cost:** MCMC requires ~60 seconds per scenario on standard hardware, compared to <1 second for geo_adstock. Over a portfolio of 10 campaigns with quarterly reoptimization, this is 40 minutes per year–minimal relative to the cost of misallocating budgets.
 
-**Prior sensitivity:** The logit-normal priors on decay Î´ and build_rate are calibrated to realistic ranges (Î´ 0.65–0.90, reflecting typical media carryover). New practitioners should validate these priors on historical data; misaligned priors can degrade recovery by 5–15pp (as seen in ARDL S1). Monthly prior re-estimation, using posterior draws from prior campaigns, mitigates this.
+**Prior sensitivity:** The logit-normal priors on decay ∞ and build_rate are calibrated to realistic ranges (∞ 0.65–0.90, reflecting typical media carryover). New practitioners should validate these priors on historical data; misaligned priors can degrade recovery by 5–15pp (as seen in ARDL S1). Monthly prior re-estimation, using posterior draws from prior campaigns, mitigates this.
 
 **Decision rule:** Use MCMC when (1) portfolio value is >$10M annually, (2) budget allocation precision is critical, or (3) weak-signal scenarios (low variance in media mix) require flexible inference. For smaller portfolios or when model uncertainty is acceptable, BSTS provides 80–85% of MCMC recovery with deterministic inference. Static adstock methods are suitable only when (1) data is highly multicollinear and (2) budget allocation is secondary to top-line ROI reporting.
 
@@ -534,7 +534,7 @@ The Bayesian latent-stock model (MCMC) achieves highest average recovery (81.0% 
 
 ### Objection 1: "Results Depend on Synthetic Data Assumptions"
 
-Synthetic data enables controlled ground-truth comparison–”the only way to measure exact recovery accuracy. Real-world validation is impossible: practitioners never know true LTC. The scenarios are calibrated to ranges reported in prior studies (Table 2, Methodology Section), and structural breaks (collinearity, discontinuities, seasonality) are not artifacts but represent business realities every practitioner faces. Future work should validate on real data using this framework as a Bayesian prior.
+Synthetic data enables controlled ground-truth comparison–the only way to measure exact recovery accuracy. Real-world validation is impossible: practitioners never know true LTC. The scenarios are calibrated to ranges reported in prior studies (Table 2, Methodology Section), and structural breaks (collinearity, discontinuities, seasonality) are not artifacts but represent business realities every practitioner faces. Future work should validate on real data using this framework as a Bayesian prior.
 
 ### Objection 2: "MCMC Computation is Too Slow for Production"
 
@@ -542,13 +542,13 @@ Attribution error compounds over planning cycles. Misallocating $1M to a low-ROI
 
 ### Objection 3: "Results May Not Generalize to Real Data"
 
-Parameter ranges (Î´ 0.65–0.90, baseline $10–$12M, noise $150K–$300K weekly) are calibrated to published MMM benchmarks (Vaver & Koehler, 2011). Structural challenges–”collinearity from correlated channel spending, seasonal confounding, discontinuous spend shifts–”are standard features of real data that practitioners encounter quarterly. This work is not proposing a new algorithm but comparing existing methods on realistic data structures.
+Parameter ranges (∞ 0.65–0.90, baseline $10–$12M, noise $150K–$300K weekly) are calibrated to published MMM benchmarks (Vaver & Koehler, 2011). Structural challenges–collinearity from correlated channel spending, seasonal confounding, discontinuous spend shifts–are standard features of real data that practitioners encounter quarterly. This work is not proposing a new algorithm but comparing existing methods on realistic data structures.
 
 ---
 
 ### 5.6 Implications for the Central Claim
 
-The paper's central claim–”that static adstock methods systematically fail to recover LTC from sustained brand investment–”is strongly supported. Static adstock recovery averages 29.6% across S1–S4 (Section 4), with 80% of this range driven by data features (collinearity, seasonality) rather than method choice. In contrast, state-space methods achieve 79.3% average recovery with low variance (BSTS std 2.2pp across scenarios).
+The paper's central claim–that static adstock methods systematically fail to recover LTC from sustained brand investment–is strongly supported. Static adstock recovery averages 29.6% across S1–S4 (Section 4), with 80% of this range driven by data features (collinearity, seasonality) rather than method choice. In contrast, state-space methods achieve 79.3% average recovery with low variance (BSTS std 2.2pp across scenarios).
 
 The failure of static methods is not a parameter tuning issue (Section 7: calibration sensitivity analysis shows <2pp improvement) but a fundamental architectural limitation: these methods cannot identify stock dynamics without explicit state equations. Dynamic and Bayesian methods succeed because they estimate latent state evolution, not just aggregate effects.
 
@@ -570,7 +570,7 @@ Framework architecture dominates over calibration: choosing the right method mat
 
 ![Figure C: Framework Comparison Matrix](../outputs/figures/Figure_C_Framework_Comparison_Matrix.png)
 
-**Figure C: Framework Comparison Matrix (Score 0–100).** *Three-by-five heatmap comparing Framework 1, 2, and 3 across five performance dimensions (Baseline, Robustness, Calibration, Channels, Production): Framework 1 (Static Adstock) scores 20–35 (red/orange) across all dimensions, indicating low performance; Framework 2 (Dynamic Time-Series) scores 32–48 (orange/yellow) with strength in Calibration (48) but weakness in Production (35); Framework 3 (State-Space) dominates all dimensions (72–92, green) with highest performance in Production (92, BSTS and MCMC deployment readiness) and Channel validation (85, correct channel rankings preserved). Synthesis reveals Framework 3 achieves both highest average performance (79.6) and lowest cross-dimension variance (Â±8.1pp), establishing state-space as unambiguous standard for LTC estimation.* Data source: Section 9, "Framework Comparison" (lines 1–85); Section 7, "Framework-Level Aggregates" (lines 29–31); Section 8, "Anomaly Summary" (lines 79–98).
+**Figure C: Framework Comparison Matrix (Score 0–100).** *Three-by-five heatmap comparing Framework 1, 2, and 3 across five performance dimensions (Baseline, Robustness, Calibration, Channels, Production): Framework 1 (Static Adstock) scores 20–35 (red/orange) across all dimensions, indicating low performance; Framework 2 (Dynamic Time-Series) scores 32–48 (orange/yellow) with strength in Calibration (48) but weakness in Production (35); Framework 3 (State-Space) dominates all dimensions (72–92, green) with highest performance in Production (92, BSTS and MCMC deployment readiness) and Channel validation (85, correct channel rankings preserved). Synthesis reveals Framework 3 achieves both highest average performance (79.6) and lowest cross-dimension variance (±8.1pp), establishing state-space as unambiguous standard for LTC estimation.* Data source: Section 9, "Framework Comparison" (lines 1–85); Section 7, "Framework-Level Aggregates" (lines 29–31); Section 8, "Anomaly Summary" (lines 79–98).
 
 ---
 ### 5.1 Recommendations & Practitioner Guidance
@@ -586,7 +586,7 @@ Three contributions:
 
 1. **Framework architecture matters more than calibration.** State-space methods recover 79.3% (S1–S4 average) vs static methods 29.6%. Tuning improves F3 by 2–3pp, F1 by <2pp. The 50pp gap is architectural.
 
-2. **Robustness to scenario variation predicts reliability.** BSTS maintains 1.023Ã— pause-window ratio; geo_adstock (1.401Ã—) and kalman_dlm (1.401Ã—) show Tier 3 fragility (>1.35Ã—) on discontinuities, while almon_pdl (1.278Ã—) shows Tier 2 sensitivity (1.10–1.35Ã—). The three-tier taxonomy guides method selection: Tier 1 (<1.10Ã—) requires no scenario-specific tuning; Tier 2 (1.10–1.35Ã—) requires modest scenario-specific calibration; Tier 3 (>1.35Ã—) requires major re-tuning or model switching across scenarios.
+2. **Robustness to scenario variation predicts reliability.** BSTS maintains 1.023× pause-window ratio; geo_adstock (1.401×) and kalman_dlm (1.401×) show Tier 3 fragility (>1.35×) on discontinuities, while almon_pdl (1.278×) shows Tier 2 sensitivity (1.10–1.35×). The three-tier taxonomy guides method selection: Tier 1 (<1.10×) requires no scenario-specific tuning; Tier 2 (1.10–1.35×) requires modest scenario-specific calibration; Tier 3 (>1.35×) requires major re-tuning or model switching across scenarios.
 
 3. **Channel-level validation is mandatory.** ARDL achieves 68.8% aggregate but 0% Video recovery. Any decomposition can hide offsetting errors. Validate per-channel recovery under structural breaks before deployment.
 
@@ -608,18 +608,18 @@ Future research: (1) validate on real branded data using recovery hierarchy as p
 
 | Condition | Recommended Method | Why |
 |-----------|-------------------|-----|
-| Strong signal, stability priority | BSTS | Lowest variance (pause ratio 1.02Ã—) across scenarios |
+| Strong signal, stability priority | BSTS | Lowest variance (pause ratio 1.02×) across scenarios |
 | Strong signal, accuracy priority | MCMC | Highest recovery (81.0% S1–S4 average) with correct channel ranking in structured-signal scenarios |
 | Weak signal (LTC <5% sales) | MCMC + scenario priors | Only method with recovery in weak-signal scenario (88.5% S5) |
 | Structural break suspected | MCMC or BSTS | F1/F2 fail on discontinuities; pause ratios >1.35 |
 | Budget constraints, quick results | Kalman DLM | Solid S1/S2 performance (82% avg), sub-second runtime |
-| **Do not use** | Dual adstock, ARDL | Confirmed sign-flip risks (âˆ’19.8% S4 recovery) and reversals (0%â†’68.8%â†’âˆ’19.8% across scenarios) |
+| **Do not use** | Dual adstock, ARDL | Confirmed sign-flip risks (−19.8% S4 recovery) and reversals (0%→68.8%→−19.8% across scenarios) |
 
 **Three Critical Warnings**
 
 1. **Aggregate metrics hide channel errors.** A model achieving 70% aggregate recovery can misallocate 50% of budget if channel-level attribution is wrong. Validate per-channel recovery in at least one stress scenario (spend pause, seasonal contrast, mix shift) before deployment.
 
-2. **No model is universally robust.** ARDL works in S2 (68.8% recovery) but fails catastrophically in S4 (âˆ’19.8%). Freeze parameters after tuning only if you can defend your scenario assumptions. If market conditions shift materially, revalidate.
+2. **No model is universally robust.** ARDL works in S2 (68.8% recovery) but fails catastrophically in S4 (−19.8%). Freeze parameters after tuning only if you can defend your scenario assumptions. If market conditions shift materially, revalidate.
 
 3. **Spend pauses improve identification.** If long-term effects are uncertain, planned zero-spend periods (even brief media pauses) reveal latent stock decay rates with minimal cost. Consider using diagnostic pauses in real planning to improve future attribution models.
 ## 6. References
@@ -673,13 +673,13 @@ Vaver, J., & Koehler, J. (2011). Measuring ad effectiveness using geo experiment
 
 ---
 
-## Verification Checklist –” RIGOROUS AUDIT COMPLETED (2026-05-24)
+## Verification Checklist – RIGOROUS AUDIT COMPLETED (2026-05-24)
 
 ### Critical Corrections Made:
 - [x] **Dekimpe & Hanssens (2000):** Fixed journal from "Journal of Economic Literature" 38(2):426-438 to correct "International Journal of Research in Marketing" 17(2-3):183-193
-- [x] **Lamberti, Roy, & Levery (2020):** REMOVED –” Citation could not be verified; appears fabricated
+- [x] **Lamberti, Roy, & Levery (2020):** REMOVED – Citation could not be verified; appears fabricated
 - [x] **Vaver & Koehler (2011):** Reclassified from "Journal of Economic Literature" to "Google Research Technical Report" (was misattributed as journal article)
-- [x] **Jin et al. (2017):** ADDED –” Previously missing citation verified and inserted (cited in Section 2.1 Literature Review)
+- [x] **Jin et al. (2017):** ADDED – Previously missing citation verified and inserted (cited in Section 2.1 Literature Review)
 
 ### Final Verification Status (14 papers, all verified):
 - [x] All 14 papers independently verified through primary sources
@@ -693,20 +693,20 @@ Vaver, J., & Koehler, J. (2011). Measuring ad effectiveness using geo experiment
 - [x] No fabricated or unverifiable citations remain
 
 ### Papers Verified:
-1. Broadbent (1979) âœ“
-2. Clarke (1976) âœ“
-3. Dekimpe & Hanssens (2000) âœ“ [CORRECTED]
-4. Datta, Ailawadi, & van Heerde (2017) âœ“
-5. Durbin & Koopman (2012) âœ“
-6. Hanssens, Parsons, & Schultz (1990) âœ“
-7. Hanssens, Parsons, & Schultz (2001) âœ“
-8. Harvey (1989) âœ“
-9. Jin, Wang, Sun, Chan, & Koehler (2017) âœ“ [ADDED]
-10. Keller (1993) âœ“
-11. Koyck (1954) âœ“
-12. Meta Marketing Science - Robyn (2022-2023) âœ“
-13. Srinivasan & Hanssens (2009) âœ“
-14. Vaver & Koehler (2011) âœ“ [RECLASSIFIED]
+1. Broadbent (1979) ✓
+2. Clarke (1976) ✓
+3. Dekimpe & Hanssens (2000) ✓ [CORRECTED]
+4. Datta, Ailawadi, & van Heerde (2017) ✓
+5. Durbin & Koopman (2012) ✓
+6. Hanssens, Parsons, & Schultz (1990) ✓
+7. Hanssens, Parsons, & Schultz (2001) ✓
+8. Harvey (1989) ✓
+9. Jin, Wang, Sun, Chan, & Koehler (2017) ✓ [ADDED]
+10. Keller (1993) ✓
+11. Koyck (1954) ✓
+12. Meta Marketing Science - Robyn (2022-2023) ✓
+13. Srinivasan & Hanssens (2009) ✓
+14. Vaver & Koehler (2011) ✓ [RECLASSIFIED]
 
 ---
 
