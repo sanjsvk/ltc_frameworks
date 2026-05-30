@@ -366,6 +366,29 @@ ltc_frameworks_replication_2026-05-29/
 
 ---
 
+## Artificial Intelligence (AI) Policy ✅ FOUND
+
+**Requirement:** SAGE Publishing (JMR's publisher) **requires disclosure of generative AI use** in manuscripts.
+
+**What Requires Disclosure:**
+- ✅ **Generative AI:** Text generation, data analysis, reference suggestions, image generation affecting results
+- ✅ **Examples:** Claude, ChatGPT, Copilot used for writing, figure generation, code development, analysis
+- ❌ **No Disclosure Needed:** Grammar/spell-check tools, assistive writing aids without content generation
+
+**Where to Disclose:**
+- Add brief paragraph in **Acknowledgements** section OR
+- Add note in **Methods** section (if AI used for analysis)
+
+**Example Disclosure for Your Paper:**
+> "The authors acknowledge the use of Claude 4.5 (Anthropic) for manuscript writing assistance, experimental validation, figure generation, and data interpretation. Generative AI was used as a writing and analysis aid; all numerical claims and findings are original work by the authors and verified against source code and reproduced experiments."
+
+**Official Sources (Credibility Score: ✅ 1 — Verified):**
+- [SAGE Artificial Intelligence Policy](https://www.sagepub.com/journals/publication-ethics-policies/artificial-intelligence-policy)
+- [SAGE AI Author Guidelines](https://www.sagepub.com/about/sage-policies/corporate-policies/ai-author-guidelines)
+- [Journal of Marketing Research — Submission Guidelines](https://journals.sagepub.com/author-instructions/mrj)
+
+---
+
 ## Missing Information & Next Steps
 
 ### Items NOT Verified in Official JMR Sources
@@ -374,7 +397,7 @@ The following items are either not explicitly stated in official JMR guidelines 
 
 | Item | Status | Recommended Action |
 |------|--------|-------------------|
-| **AI disclosure policy** | ❌ Not found | Contact editor (editorial@marketingpower.org); ask if AI-assisted writing must be disclosed |
+| **IRB / ethical approval specifics** | ❌ Not found | If human subjects data used, confirm IRB approval letter format and submission location |
 | **IRB / ethical approval specifics** | ❌ Not found | If human subjects data used, confirm IRB approval letter format and submission location |
 | **Maximum figure count** | ❌ Not specified | Inferred as unlimited (within 50-page limit); clarify if >15 figures unusual |
 | **Supplementary online figure format** | ❌ Not specified | Assume same 300dpi/800dpi standards as main paper; confirm if different |
@@ -385,24 +408,26 @@ The following items are either not explicitly stated in official JMR guidelines 
 
 ### Recommended Next Steps for Author
 
-1. **Contact JMR Editorial Office**
+1. **Contact JMR Editorial Office** (if clarification needed)
    - **Email:** editorial@marketingpower.org
    - **Phone:** +1 (312) 541-1000 (Journal of Marketing / AMA main line)
-   - **Question template:**
+   - **Question template** (if you have additional questions):
      ```
-     Subject: Submission Guidelines Clarification — AI-Assisted Writing, Data Archiving, Pre-Registration
+     Subject: Submission Guidelines Clarification — Data Archiving & Pre-Registration
      
      Dear Editors,
      
      I am preparing a manuscript on LTC estimation frameworks for submission to JMR.
      I have questions on:
-     1. Must I disclose AI-assisted writing or analysis?
-     2. Is pre-registration required for empirical research?
-     3. Which data repositories are acceptable (ICPSR, GitHub, OSF, other)?
+     1. Is pre-registration required for empirical research?
+     2. Which data repositories are acceptable (ICPSR, GitHub, OSF, Zenodo, other)?
+     3. Is there a preferred format or location for supplementary code?
      
      Thank you,
      [Your name]
      ```
+   
+   **Note:** AI disclosure requirement is already specified by SAGE policy (see "Artificial Intelligence (AI) Policy" section above).
 
 2. **Prepare submission materials in parallel**
    - Create master PDF with all sections (1–10), figures, and references
