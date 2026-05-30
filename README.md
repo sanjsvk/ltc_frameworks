@@ -1,99 +1,223 @@
 # LTC Frameworks: Long-Term Media Contribution Estimation
 
-A benchmarking study comparing analytical frameworks for estimating long-term media contributions (LTC) in Media Mix Modelling (MMM), using synthetic ground-truth data.
+Benchmarking study evaluating **10 analytical methods across 3 frameworks** for estimating long-term media contributions (LTC) in Marketing Mix Modeling (MMM). Uses **synthetic data with known ground truth** to measure recovery accuracy, robustness to structural breaks, and channel-level attribution precision.
 
-## Research Question
+**Key Finding:** State-space methods (BSTS, Bayesian MCMC) recover 79.3% of true LTC on average, compared to 44.2% for dynamic models and 29.6% for static adstock. However, aggregate recovery metrics mask channel-level attribution failures: two methods achieve 68.8% aggregate recovery while returning 0% for individual channels.
 
-Media investment drives both **short-term sales spikes** (STC) and **long-term brand equity accumulation** (LTC). The LTC component — representing effects that persist weeks or months after exposure — is notoriously difficult to isolate. This project benchmarks three methodological families against known ground truth to evaluate when each approach succeeds or fails.
+---
 
-## Frameworks Under Evaluation
+## Quick Start
 
-| Framework | Description |
-|-----------|-------------|
-| **Static Adstock Regression** | Geometric/Weibull adstock applied to impressions; treats media effect as a single decaying coefficient |
-| **Dynamic Time-Series Models** | DLM/Kalman Filter-based; allows media effectiveness to evolve over time |
-| **State-Space / Latent Brand-Stock Models** | Explicit latent brand equity stock that builds and decays; closest to the true data-generating process |
+### Installation
 
-## Synthetic Dataset
-
-Ground truth data generated across **5 scenarios**, **5 media channels**, and **261 weeks (2020–2025)**:
-
-- **Channels:** TV, Paid Search, Paid Social, Display, Video
-- **True STC:** ~$1.58M/week (~15% of sales)
-- **True LTC:** ~$1.23M/week (~12% of sales)
-- **LTC mechanism:** Latent brand stock — `stock[t] = δ × stock[t-1] + build_rate × √spend[t]`
-
-Each scenario varies channel mix, spend patterns, and LTC signal strength to stress-test each framework under different conditions.
-
-## Replication Instructions
-
-All code, data, and results are provided for reproducibility. To replicate:
+**Requirements:** Python 3.10+
 
 ```bash
-# Install dependencies
-pip install -r pyproject.toml
+# Clone the repository
+git clone https://github.com/sanjsvk/ltc_frameworks.git
+cd ltc_frameworks
 
-# Run experiments for a single model and scenario
+# Create virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install package with all dependencies
+pip install -e ".[dev]"
+```
+
+**Dependencies are fully pinned in `pyproject.toml`:**
+- Core: numpy, pandas, scipy
+- Econometrics: statsmodels
+- Bayesian: pymc, numpyro
+- Time-series: pykalman
+- ML: scikit-learn
+- Viz: matplotlib, seaborn
+- Config: pyyaml, click
+- Development: pytest, ruff, jupyterlab
+
+### Run Experiments
+
+```bash
+# Single model × scenario (takes ~2–5 min depending on framework)
 python experiments/run_experiment.py --model bsts --scenario S1
 
-# Run all 10 models across all 5 scenarios
+# All 10 models × 1 scenario
+python experiments/run_experiment.py --scenario S2 --all-models
+
+# All 10 models × all 5 scenarios (full benchmark: ~45 min)
 python experiments/run_experiment.py --all-models --all-scenarios
 ```
 
-Results are stored as JSON in `outputs/results/{model}_{scenario}.json`.
+Results are saved as JSON to `outputs/results/{model}_{scenario}.json`.
+
+---
+
+## What This Repository Contains
+
+### The Problem
+
+CMOs allocate budgets using MMMs designed for **short-term elasticities**, missing 10–15% of true ROI from **long-term effects**. Current methods fail under:
+- **Spending pauses** (can't separate persistence from zero spend)
+- **Collinearity** (channels move together → attribution reversals)
+- **Weak signals** (insufficient variance → identification failure)
+
+### The Solution
+
+This repo provides:
+1. **Reproducible benchmarking framework** with ground-truth data
+2. **10 implementations** (4 static + 3 dynamic + 3 state-space)
+3. **5 diagnostic scenarios** (baseline, spend pause, seasonality, structural break, weak signal)
+4. **Metrics** for evaluating recovery accuracy, robustness, and channel precision
+5. **Decision framework** for practitioners on method selection
+
+### 10 Models Evaluated
+
+| Framework | Models | Strengths | Weaknesses |
+|-----------|--------|-----------|-----------|
+| **F1: Static Adstock** | geometric, weibull, almon_pdl, dual_adstock | Simple, interpretable | Fails on pauses & collinearity |
+| **F2: Dynamic Time-Series** | koyck, ardl, finite_dl | Flexible lag shapes | Channel attribution instability |
+| **F3: State-Space** | kalman_dlm, mcmc_stock, bsts | Robust to breaks | Computationally expensive |
+
+---
 
 ## Repository Structure
 
 ```
 ltc_frameworks/
-├── ltc/                    # Core Python package (reusable models + utilities)
-│   ├── data/              # Data loading & feature engineering
-│   ├── models/            # 10 estimation methods across 3 frameworks
-│   │   ├── framework1/    # Static Adstock (4 models)
-│   │   ├── framework2/    # Dynamic Time-Series (3 models)
-│   │   └── framework3/    # State-Space / Latent Stock (3 models)
-│   ├── evaluation/        # Metrics & scoring
-│   └── visualization/     # Plotting utilities
-├── experiments/           # Main experiment runner
-│   ├── run_experiment.py  # CLI interface
-│   ├── registry.py        # Model registry
-│   └── configs/           # Hyperparameter grids per framework
-├── data/                  # Synthetic CSV datasets (5 scenarios × 261 weeks)
+├── ltc/                          # Core replicable package
+│   ├── data/                     # Data loading (CSV → DataFrame)
+│   ├── models/
+│   │   ├── framework1/           # 4 static adstock models
+│   │   ├── framework2/           # 3 dynamic time-series models
+│   │   └── framework3/           # 3 state-space/latent stock models
+│   ├── evaluation/
+│   │   ├── metrics.py            # recovery_accuracy, MAPE, CI coverage
+│   │   ├── scorer.py             # Unified scoring interface
+│   │   └── benchmark.py          # Multi-model comparison
+│   └── visualization/            # Plotting utilities
+│
+├── experiments/
+│   ├── run_experiment.py         # Main CLI interface
+│   ├── registry.py               # Model registry
+│   └── configs/                  # YAML hyperparameter grids
+│
+├── data/
+│   ├── raw/                      # 5 scenario CSVs (261 weeks × 39 columns each)
+│   └── processed/                # Feature-engineered data (generated)
+│
 ├── outputs/
-│   ├── results/           # JSON outputs (per model × scenario) - gitignored
-│   ├── figures/           # 120+ publication-quality PNG figures
-│   └── reports/           # Summary tables
-├── notebooks/             # Jupyter analysis & exploration
-├── writing/               # Paper manuscript & figures
-├── analysis/              # Validation reports & intermediate analysis
-├── scripts/               # Utility scripts (conversion, extraction, validation)
-├── pyproject.toml         # Dependencies & package metadata
-├── CLAUDE.md              # Project instructions
-└── README.md              # This file
+│   ├── results/                  # JSON per model×scenario (gitignored)
+│   ├── figures/                  # 120+ PNG figures tracked in git
+│   └── reports/                  # Summary tables
+│
+├── notebooks/                    # Jupyter exploration notebooks
+├── writing/                      # Paper manuscript (MASTER_DOCUMENT_FINAL.md)
+├── analysis/                     # Validation reports & intermediate analysis
+├── scripts/                      # Utility scripts (archived)
+│
+├── pyproject.toml                # Package metadata & dependencies
+├── CLAUDE.md                     # Project instructions
+├── .gitignore                    # Git configuration (secrets, outputs)
+└── README.md                     # This file
 ```
 
-## Key Files for Replication
+### Key Entry Points
 
-- **Data generation:** Hardcoded in `ltc/data/loader.py` (imports from `data/` CSVs)
-- **Model registry:** `experiments/registry.py` (maps model names to classes)
-- **Hyperparameter configs:** `experiments/configs/` (per-framework parameter grids)
-- **Evaluation metrics:** `ltc/evaluation/metrics.py` (recovery_accuracy, MAPE, etc.)
-- **Paper manuscript:** `writing/MASTER_DOCUMENT_FINAL.md` (markdown source)
+- **Run experiments:** `experiments/run_experiment.py`
+- **Register models:** `experiments/registry.py`
+- **Score results:** `ltc/evaluation/scorer.py`
+- **Paper manuscript:** `writing/MASTER_DOCUMENT_FINAL.md`
+
+---
+
+## Environment & Security
+
+### Credentials
+
+This repository has **no private credentials**. All configuration is:
+- Hardcoded defaults in code
+- Set via CLI arguments
+- Captured in checked-in YAML configs
+
+If you need API keys or tokens:
+1. Create `.env` (automatically .gitignored)
+2. Load with `python-dotenv` (not included — add if needed)
+3. Never commit `.env` files
+
+### Data Privacy
+
+Synthetic data is fully generated; no real customer/campaign data included.
+
+---
+
+## Experiment Details
+
+### Synthetic Data Generation
+
+**Process:** Hardcoded in `ltc/data/loader.py`
+- **Time span:** Jan 2020 – Dec 2025 (261 weeks)
+- **Channels:** 5 (TV, Search, Social, Display, Video)
+- **True STC:** ~$1.58M/week (geometric adstock)
+- **True LTC:** ~$1.23M/week (latent brand stock)
+- **Exogenous:** Promo intensity, COVID index, Treasury yield, mobility, competitor share
+
+**Ground truth:** Available in `data/{scenario}.csv` under columns:
+- `*_true` — true contribution values
+- `baseline_true`, `stc_*_true`, `ltc_*_true` — component breakdown
+
+### 5 Diagnostic Scenarios
+
+| Scenario | Objective | Weeks 104–112 | Interpretation |
+|----------|-----------|---------------|-----------------|
+| **S1: Baseline** | Establish floor | Normal | Clean identification |
+| **S2: Spend Pause** | Test latent decay | TV+Video = $0 | Can model identify persistence? |
+| **S3: Seasonality** | Test collinearity | 85% intensity | Does framework separate signal? |
+| **S4: Struct. Break** | Test regime stability | 20% of baseline | Adapt to permanent shift? |
+| **S5: Weak Signal** | Test identifiability | Normal (low variance) | Resolve weak effects? |
+
+### Metrics
+
+- **Recovery Accuracy (%):** `(estimated_LTC / true_LTC) × 100` — primary metric
+- **MAPE (%):** Mean Absolute Percentage Error on LTC estimates
+- **Pause Ratio:** `MAPE(pause_window) / MAPE(full_series)` — robustness to structural breaks
+- **Channel Recovery (%):** Per-channel recovery accuracy (diagnostic for F2)
+
+---
 
 ## Citation
-
-If you use this framework, please cite:
 
 ```bibtex
 @article{Vijayakumar2026LTC,
   author = {Vijayakumar, Sanjan},
-  title = {Long-Term Media Contribution Estimation: Framework Benchmarking Study},
+  title = {Long-Term Media Contribution Estimation: 
+           Framework Benchmarking Study},
   journal = {Journal of Marketing Research},
   year = {2026},
   note = {Available at https://github.com/sanjsvk/ltc_frameworks}
 }
 ```
 
-## Context
+---
 
-This research is part of an EB1-A visa portfolio demonstrating original analytical contributions at the intersection of econometrics, marketing science, and applied machine learning.
+## Contributing
+
+This is a research artifact. Modifications should focus on:
+- Extending to real data
+- Adding new frameworks
+- Improving documentation
+
+Pull requests welcome; please test against all scenarios before submitting.
+
+---
+
+## License
+
+See CLAUDE.md for research context and usage guidelines.
+
+---
+
+## Contact
+
+**Author:** Sanjan Vijayakumar  
+**Email:** sanjan.svk@gmail.com  
+**Repository:** https://github.com/sanjsvk/ltc_frameworks
