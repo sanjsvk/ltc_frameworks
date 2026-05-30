@@ -358,6 +358,12 @@ All analyses use a fixed random seed (42) for reproducibility across operating s
 
 ---
 
+![Figure 2: Cross-Scenario Heatmap](../outputs/figures/Figure_02_Cross_Scenario_Heatmap.png)
+
+**Figure 2: Cross-Scenario Recovery Heatmap.** *Ten models (rows) evaluated across five scenarios (S1–S5 columns) with LTC recovery accuracy encoded as color gradient (red 0% to green 100%). BSTS and Kalman DLM (Framework 3) maintain consistent high recovery across scenarios (S1–S4: 76–82%), while ARDL (Framework 2) shows catastrophic S1 failure (0%) followed by S2 recovery (68.8%), and all Framework 1 models degrade sharply in S5 to 0% recovery, highlighting framework-dependent scenario sensitivity.* Data source: Section 4, Table 3 "Full Recovery Matrix".
+
+---
+
 ### 4.1 Performance Ceiling – S1 Clean Baseline
 
 State-space methods recover 79.0% of true LTC on average in the baseline scenario, compared to 32.2% for dynamic distributed lag models and 31.1% for static adstock methods (Table 3). This three-way hierarchy holds across the 10 models: the top three performers are all state-space frameworks, mid-tier models are all dynamic distributed lag, and weak performers are all static adstock.
@@ -410,6 +416,18 @@ Almon PDL collapses (−23.9pp, S1 42.6% → S2 18.7%) because polynomial lag we
 
 ---
 
+![Figure 3: S2 Pause Window Detail](../outputs/figures/Figure_03_S2_Pause_Window_Detail.png)
+
+**Figure 3: S2 Spend Pause Improvement Ranges.** *Spend discontinuity (zero spend weeks 104–112) induces divergent model responses: ARDL achieves largest improvement (+68.8pp from 0% to 68.8%, revealing prior misspecification in S1), geo_adstock improves (+13.2pp from 69.9% to 83.1%), while almon_pdl catastrophically degrades (−23.9pp from 42.6% to 18.7% due to polynomial lag incompatibility with exponential decay). Framework 3 models (BSTS, Kalman DLM) show minimal variation (±1.4pp), demonstrating architectural robustness to structural breaks.* Data source: Section 4.2 S2 Spend Pause analysis.
+
+---
+
+![Figure 4: S2 Channel Attribution](../outputs/figures/Figure_04_Channel_Attribution_S2.png)
+
+**Figure 4: S2 Channel Validation by Model.** *Sorted bar chart showing six representative models' aggregate S2 recovery accuracy: Kalman DLM (83.1%) and geo_adstock (83.1%) tie for highest recovery, followed by BSTS (81.0%), ARDL (68.8%), MCMC (59.9%), finite_dl (54.6%), illustrating how aggregate metrics mask channel-level misattribution (ARDL recovers 0% of Video LTC despite 68.8% aggregate recovery).* Data source: Section 4.2 and detailed channel analysis.
+
+---
+
 ### 4.3 S3 High Seasonality – Collinearity Challenge
 
 Seasonality amplitude increases 20% → 40%, creating collinearity between 52-week seasonal cycle and channel spend patterns.
@@ -419,6 +437,12 @@ MCMC peaks at 98.9% recovery (MAPE 1.1%), achieving highest single-scenario perf
 Kalman DLM unexpectedly degrades (−17.1pp, S1 82.0% → S3 64.9%) due to missing explicit seasonal state (see Section 8.3 for detailed analysis). BSTS recovers 76.8% but pause-window ratio rises to 1.37× (37% error concentration). Channel analysis reveals BSTS inverts ranking: Display 72% > TV 68% (true rank #1 and #4) (see Section 8.3 for channel-level caveat). **Critical caveat:** BSTS aggregate stability masks channel-level fragility under seasonal collinearity.
 
 Geo_adstock S2 improvement fully reverses (−39.9pp drop S2→S3), confirming identification dependence. F1 models collapse to average 20.9% recovery (vs F3 80.2%). Video LTC signal is lost in all non-MCMC models: MCMC 58%, Kalman 0%, BSTS 0%, geo_adstock 0%. **Video recovery serves as diagnostic test for channel-level robustness.**
+
+---
+
+![Figure 8: S3 High Seasonality](../outputs/figures/Figure_08_Pause_Window_Timeline.png)
+
+**Figure 8: S3 High Seasonality Model Performance.** *Scenario 3 (high seasonality, 85% intensity) shows MCMC achieving exceptional recovery (99.0%, leveraging Bayesian flexibility to posterior-shift build_rate), followed by BSTS (76.8%), Kalman DLM (64.9%, degraded from S1 due to lack of explicit seasonal state), ARDL (63.3%). MCMC's S3 uniqueness (99% vs. 72.6% S1) demonstrates Bayesian advantage for seasonal confounding.* Data source: Section 4.3 and Table 3 S3 recovery values.
 
 ---
 
@@ -434,9 +458,33 @@ Almon PDL unexpectedly improves (68.6%, +26.0pp from S1) because permanent shift
 
 ---
 
+![Figure 9: S4 Structural Break](../outputs/figures/Figure_09_Channel_Level_Detail.png)
+
+**Figure 9: S4 Structural Break Regime Change Sensitivity.** *Scenario 4 applies permanent budget reallocation (continuous regime shift, not discrete pause) to frozen S1 parameters, revealing model brittleness: MCMC achieves highest recovery (90.9%), BSTS (81.6%), Kalman DLM (75.4%), but ARDL fails catastrophically (−19.8%, structural-break-induced sign-flip), demonstrating architectural limitations when parameters diverge from true values. Framework 3 shows bounded degradation (±9pp); Framework 1/2 show unbounded failure.* Data source: Section 4.4 and Table 3 S4 recovery values.
+
+---
+
+![Figure 6: Calibration Sensitivity](../outputs/figures/Figure_06_Calibration_Sensitivity.png)
+
+**Figure 6: Calibration Sensitivity by Model.** *Paired bar chart comparing frozen (grid-search initialized) vs. optimized (scenario-specific calibration) recovery reveals calibration-structure trade-off: Framework 3 models show minimal improvement (BSTS +1.7pp, Kalman +2.3pp, MCMC +2.6pp) indicating structural dominance; Framework 2 shows moderate gains (koyck +5.2pp, finite_dl +5.5pp, ARDL +6.2pp); Framework 1 shows highly variable response indicating calibration cannot overcome architectural limitations.* Data source: Section 4.4 calibration sensitivity analysis.
+
+---
+
 ### 4.5 S5 Weak LTC Signal – Identification Boundary
 
 LTC contributions halved (50% of S1). All 10 models return 0% recovery with frozen S1 parameters. **Universal collapse demonstrates signal threshold as calibration boundary, not structural limitation.** Supplementary analysis with scenario-specific priors shows MCMC recovers 88.5% when calibrated appropriately (weakened decay priors, reduced stock initialization, tighter coefficient priors). Fixed-parameter models remain at 0%, confirming **joint Bayesian optimization is essential below signal threshold.**
+
+---
+
+![Figure 10: S5 Weak Signal Identification](../outputs/figures/Figure_10_Video_LTC_Signal_Loss.png)
+
+**Figure 10: S5 Weak Signal Identification Boundary.** *Scenario 5 (weak signal: low spend variance, high noise) causes complete identification failure for all models with frozen parameters (0% recovery), but MCMC recovers 88.5% when scenario-specific logit-normal priors are applied. All other models remain at 0% recovery regardless of prior adjustment, indicating that fixed-parameter structures cannot adapt to fundamentally different signal conditions.* Data source: Section 4.5 and supplementary MCMC analysis.
+
+---
+
+![Figure 13: Robustness Taxonomy](../outputs/figures/Figure_13_Robustness_Taxonomy.png)
+
+**Figure 13: Robustness Taxonomy (Tier Classification).** *Two-dimensional scatter plot positioning all ten models by pause-window robustness ratio (x-axis, 1.0–1.5×) and S1 recovery accuracy (y-axis, 0–100%), with tier zones marked by vertical lines at 1.10× (Tier 1 boundary) and 1.35× (Tier 2 boundary). Tier 1 (<1.10×, architecturally robust): BSTS (~1.02, 82%) and Kalman DLM; Tier 2 (1.10–1.35×, identification-sensitive): finite_dl, koyck, mcmc_stock; Tier 3 (>1.35×, data-dependent and fragile): almon_pdl, geo_adstock, weibull_adstock, ARDL, dual_adstock. Taxonomy reveals that framework architecture determines robustness, not average recovery alone.* Data source: Section 7 robustness score table and pause-window validation.
 
 ---
 
@@ -482,6 +530,12 @@ The empirical findings in Sections 4–8 establish a clear hierarchy: state-spac
 
 ### 5.2 The Robustness Spectrum: A Four-Tier Taxonomy
 
+![Figure 1: Robustness Spectrum](../outputs/figures/Figure_01_Robustness_Spectrum.png)
+
+**Figure 1: Robustness Spectrum.** *Horizontal bar chart ranking all ten models by pause-window robustness ratio (S2 pause-window MAPE / full-series MAPE), with bars indicating robustness from most robust (BSTS ~1.02) to most fragile (weibull_adstock ~1.53). Vertical dotted lines at ratio=1.10 (Tier 1 boundary) and ratio=1.35 (Tier 2 boundary) mark architectural classifications. Framework 3 models (green, left side) cluster on Tier 1; Framework 1 models (red, right side) cluster on Tier 3; Framework 2 mixed distribution.* Data source: Phase 2 pause-window validation and Table 3.
+
+---
+
 Beyond average performance, a critical secondary dimension emerges: robustness to structural variation. Across the five scenarios, pause-window ratios reveal how error concentrates when spend patterns change (Section 8.5).
 
 ---
@@ -510,7 +564,15 @@ This taxonomy connects to literature on identification in time-series models (Ha
 
 ### 5.3 The Channel Attribution Problem: Aggregate Accuracy is Insufficient
 
-A critical finding cuts across frameworks: aggregate LTC recovery can mask severe channel-level misattribution. ARDL achieves 68.8% aggregate recovery in S2 but recovers 0% of Video LTC. Koyck inverts channel rankings, placing Paid Social at 59.3% and TV at 2.2%–opposite the ground truth (TV dominance). (Table 5 in Section 6).
+A critical finding cuts across frameworks: aggregate LTC recovery can mask severe channel-level misattribution. ARDL achieves 68.8% aggregate recovery in S2 but recovers 0% of Video LTC. Koyck inverts channel rankings, placing Paid Social at 59.3% and TV at 2.2%–opposite the ground truth (TV dominance).
+
+---
+
+![Figure 12: Budget Allocation Error](../outputs/figures/Figure_12_Budget_Allocation_Error.png)
+
+**Figure 12: Budget Allocation Error Magnitude.** *Horizontal bar chart showing allocation error (100% − recovery%) for all ten models sorted worst-to-best: dual_adstock and ARDL show catastrophic errors (100.0%), weibull_adstock (89.5%), almon_pdl (57.4%), koyck (53.6%), finite_dl (49.7%), geo_adstock (30.1%), mcmc_stock (27.4%), kalman_dlm (18.0%), and BSTS (17.6% minimum error). Error magnitude represents cumulative per-channel budget misallocation; dual_adstock and ARDL achieve zero true channel recovery despite aggregate figures.* Data source: Section 4 budget allocation analysis and channel recovery validation.
+
+---
 
 This is not unique to MMM. Any multivariate decomposition model–linear regression with interaction terms, neural networks, Bayesian hierarchical models–can achieve aggregate fit through offsetting channel errors: one channel overestimated, another underestimated, net error small.
 
@@ -521,6 +583,14 @@ This is not unique to MMM. Any multivariate decomposition model–linear regress
 ### 5.4 MCMC as Production Standard: Evidence and Limitations
 
 The Bayesian latent-stock model (MCMC) achieves highest average recovery (81.0% S1–S4 average) with correct channel ranking preservation in structured-signal scenarios (S3 and S4). It identifies Video LTC in scenarios where deterministic methods fail (S3 aggregate recovery 98.9%, S5 supplementary 88.5%). Most importantly, it recovers the model structure that generated the data: explicit stock dynamics with realistic channel effects.
+
+---
+
+![Figure 11: MCMC Convergence](../outputs/figures/Figure_11_MCMC_Convergence.png)
+
+**Figure 11: MCMC Convergence Quality (R-hat) Across Scenarios.** *After tuning adjustment (target_accept: 0.95→0.99, tune: 1000→1500 steps), all five scenarios show excellent MCMC convergence with maximum R-hat well below 1.05 threshold (S1: ~1.020, S2: ~1.010, S3: ~1.030, S4: ~1.010, S5: ~1.040), indicating stable posterior estimation and reliable parameter draws. Initial S1 divergence count (23 divergences) dropped to 0 after tuning. All 19 parameters converge successfully across all scenarios.* Data source: Section 8 MCMC diagnostics and convergence analysis.
+
+---
 
 **Computational cost:** MCMC requires ~60 seconds per scenario on standard hardware, compared to <1 second for geo_adstock. Over a portfolio of 10 campaigns with quarterly reoptimization, this is 40 minutes per year–minimal relative to the cost of misallocating budgets.
 
@@ -565,6 +635,12 @@ Computational limits were not tested: portfolios exceeding 50 campaigns or Bayes
 ### 5.9 Conclusion
 
 Framework architecture dominates over calibration: choosing the right method matters more than tuning the chosen method. The robustness spectrum (Tier 1 architecturally robust, Tier 2 identification-sensitive, Tier 3 data-dependent) provides a clear decision framework. Channel-level validation is mandatory. MCMC emerges as the production standard for high-value portfolios, with clear decision rules for when simpler methods suffice. State-space methods solve the long-term contribution problem that static adstock methods cannot address.
+
+---
+
+![Figure A: Ranking Reversals](../outputs/figures/Figure_A_Ranking_Reversals.png)
+
+**Figure A: Ranking Reversals: Framework Stability Across Scenarios.** *Line chart showing framework-level average recovery by scenario (S1–S5) reveals stability hierarchy: Framework 3 (green) maintains 75–82% recovery through S1–S4 before sharp degradation at S5 (32%, weak signal failure); Framework 2 (orange) peaks at S2 then declines to 0% at S5; Framework 1 (blue) starts 32% and declines monotonically to 0% at S5. Framework 3 dominance is scenario-invariant except at weak-signal boundary (S5). Reversals demonstrate that framework selection determines performance hierarchy across business conditions.* Data source: Section 5 scenario sensitivity analysis and Table 3.
 
 ---
 
@@ -670,6 +746,20 @@ Vaver, J., & Koehler, J. (2011). Measuring ad effectiveness using geo experiment
 - Two authors: (Hanssens and Parsons 2001) or (Srinivasan & Hanssens 2009)
 - Three+ authors: (Datta, Ailawadi, & van Heerde 2017)
 - Page-specific: (Clarke 1976, pp. 345–351)
+
+---
+
+## Web Appendix: Supplementary Materials
+
+### Figure B: Scenario Characteristics – Diagnostic Intensity
+
+![Figure B: Scenario Characteristics](../outputs/figures/Figure_B_Scenario_Characteristics.png)
+
+**Figure B: Scenario Characteristics (Intensity 0–100%).** *Three-by-five heatmap showing diagnostic intensity of collinearity, discontinuity, and seasonality across five scenarios: S1 (Baseline) shows low intensity (10–20%) across all features; S2 (Spend Pause) shows high discontinuity (90%) due to zero-spend weeks 104–112; S3 (High Seasonality) shows high collinearity (80%) and seasonality (85%); S4 (Structural Break) shows high collinearity (50%) and discontinuity (85%) combined; S5 (Weak Signal) shows low intensity (10–20%) across all features. Heatmap reveals that scenarios test complementary model weaknesses: S2 isolates decay identification; S3 tests seasonal confounding; S4 tests regime stability; S5 tests signal identifiability threshold.* Data source: Section 3 methodology scenario specifications.
+
+---
+
+**Note on Web Appendix:** Figure B provides detailed specification of scenario design characteristics. While informative for reproducibility, it is supplementary to the main narrative in the paper. All main results, framework comparisons, and practitioner guidance are contained in the main manuscript (Sections 4–5).
 
 ---
 
