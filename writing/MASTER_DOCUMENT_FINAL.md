@@ -388,7 +388,7 @@ The baseline scenario reveals clear separation. State-space models exploit expli
 
 ---
 
-![Figure 5: Framework Hierarchy](https://raw.githubusercontent.com/sanjsvk/ltc_frameworks/feature/dev/outputs/figures/Figure_05_Framework_Hierarchy.png)
+![Figure 5: Framework Hierarchy](../outputs/figures/Figure_05_Framework_Hierarchy.png)
 
 **Figure 5: Framework Hierarchy –” Distribution by Class.** *Boxplot showing baseline (S1) recovery accuracy distributions for three framework classes: Framework 3 (State-Space) dominates with median 82%, IQR [72–82%], showing BSTS (82.4%) and Kalman DLM (82.0%) outperforming Framework 2 (median ~48%, range 46–50%) and Framework 1 (median ~40%, range 0–70% with high variability). Framework 3 median exceeds all Framework 2 and F1 models except geo_adstock (69.9%), establishing state-space as architectural standard for LTC recovery.* Data source: Section 4, Table 3 "Framework Hierarchy" (lines 83–98).
 
@@ -459,7 +459,7 @@ LTC contributions halved (50% of S1). All 10 models return 0% recovery with froz
 
 ---
 
-![Figure 2: Cross-Scenario Heatmap](https://raw.githubusercontent.com/sanjsvk/ltc_frameworks/feature/dev/outputs/figures/Figure_02_Cross_Scenario_Heatmap.png)
+![Figure 2: Cross-Scenario Heatmap](../outputs/figures/Figure_02_Cross_Scenario_Heatmap.png)
 
 **Figure 2: Cross-Scenario Recovery Heatmap.** *Ten models (rows) evaluated across five scenarios (S1–S5 columns) with LTC recovery accuracy encoded as color gradient (red 0% to green 100%). BSTS and Kalman DLM (Framework 3) maintain consistent high recovery across scenarios (S1–S4: 76–82%), while ARDL (Framework 2) shows catastrophic S1 failure (0%) followed by S2 recovery (68.8%), and all Framework 1 models degrade sharply in S5 to 0% recovery, highlighting framework-dependent scenario sensitivity.* Data source: Section 4, Table 3 "Full Recovery Matrix" (lines 83–98).
 
@@ -486,7 +486,7 @@ Beyond average performance, a critical secondary dimension emerges: robustness t
 
 ---
 
-![Figure 1: Robustness Spectrum](https://raw.githubusercontent.com/sanjsvk/ltc_frameworks/feature/dev/outputs/figures/Figure_01_Robustness_Spectrum.png)
+![Figure 1: Robustness Spectrum](../outputs/figures/Figure_01_Robustness_Spectrum.png)
 
 **Figure 1: Robustness Spectrum.** *Horizontal bar chart ranking all ten models by pause-window robustness ratio (S2 pause-window MAPE / full-series MAPE), from most robust (left) to most fragile (right): BSTS 1.023Ã—, finite_dl 0.675Ã—, koyck 0.782Ã— (Tier 1: <1.10Ã—); ardl 1.246Ã—, almon_pdl 1.278Ã—, mcmc_stock 1.309Ã—, dual_adstock 1.307Ã— (Tier 2: 1.10–1.35Ã—); kalman_dlm 1.401Ã—, geo_adstock 1.401Ã—, weibull_adstock 1.530Ã— (Tier 3: >1.35Ã—). Vertical dotted lines at ratio=1.10 (yellow, Tier 1 boundary) and ratio=1.35 (purple, Tier 2 boundary) mark architectural classifications. Colors distinguish Framework 3 (green, mix of Tier 1–3), Framework 2 (blue, primarily Tier 1–2), Framework 1 (red, primarily Tier 2–3).* Data source: validation/PHASE2_PAUSE_WINDOW_VALIDATION.md; Section 5, "S2 Scenario Analysis".
 
@@ -568,7 +568,7 @@ Framework architecture dominates over calibration: choosing the right method mat
 
 ---
 
-![Figure C: Framework Comparison Matrix](https://raw.githubusercontent.com/sanjsvk/ltc_frameworks/feature/dev/outputs/figures/Figure_C_Framework_Comparison_Matrix.png)
+![Figure C: Framework Comparison Matrix](../outputs/figures/Figure_C_Framework_Comparison_Matrix.png)
 
 **Figure C: Framework Comparison Matrix (Score 0–100).** *Three-by-five heatmap comparing Framework 1, 2, and 3 across five performance dimensions (Baseline, Robustness, Calibration, Channels, Production): Framework 1 (Static Adstock) scores 20–35 (red/orange) across all dimensions, indicating low performance; Framework 2 (Dynamic Time-Series) scores 32–48 (orange/yellow) with strength in Calibration (48) but weakness in Production (35); Framework 3 (State-Space) dominates all dimensions (72–92, green) with highest performance in Production (92, BSTS and MCMC deployment readiness) and Channel validation (85, correct channel rankings preserved). Synthesis reveals Framework 3 achieves both highest average performance (79.6) and lowest cross-dimension variance (Â±8.1pp), establishing state-space as unambiguous standard for LTC estimation.* Data source: Section 9, "Framework Comparison" (lines 1–85); Section 7, "Framework-Level Aggregates" (lines 29–31); Section 8, "Anomaly Summary" (lines 79–98).
 

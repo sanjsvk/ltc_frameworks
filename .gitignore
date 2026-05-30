@@ -22,9 +22,8 @@ data/processed/*.csv
 data/raw/*.parquet
 data/processed/*.parquet
 
-# Outputs — results and figures are gitignored; reports/ is tracked
+# Outputs — results are gitignored; figures and reports are tracked for Word conversion
 outputs/results/
-outputs/figures/
 
 # OS
 .DS_Store
