@@ -45,7 +45,20 @@ FIGURES_DIR = Path("outputs/figures")
 
 
 def load_config(model_name: str) -> dict:
-    """Load hyperparameters for a model from its framework YAML config."""
+    """
+    Load hyperparameters for a model from its framework YAML config.
+
+    Parameters
+    ----------
+    model_name : str
+        Model identifier (e.g., "geo_adstock", "mcmc_stock", "kalman_dlm").
+
+    Returns
+    -------
+    dict
+        Hyperparameter configuration for the model (e.g., decay_grid, lambda_grid, priors).
+        Returns empty dict if config file not found (non-fatal, uses model defaults).
+    """
     config_key = CONFIG_MAP.get(model_name, "framework1")
     config_path = CONFIG_DIR / f"{config_key}.yaml"
     if not config_path.exists():
@@ -58,11 +71,38 @@ def load_config(model_name: str) -> dict:
 
 def run_one(model_name: str, scenario: str, save_fig: bool = True) -> dict:
     """
-    Run a single model x scenario experiment.
+    Run a single model × scenario experiment from data loading through evaluation.
+
+    Workflow:
+      1. Load scenario CSV (data/raw/{scenario}.csv)
+      2. Split into observed (model input) and ground-truth (evaluation only)
+      3. Instantiate model and load its hyperparameters from YAML config
+      4. Call model.fit(observed_data, config)
+      5. Call model.decompose() to estimate baseline, STC, LTC per channel
+      6. Compare against ground truth to compute recovery_accuracy, MAPE, etc.
+      7. Save results JSON and optional decomposition figure
+
+    Parameters
+    ----------
+    model_name : str
+        Model identifier from MODEL_REGISTRY (e.g., "geo_adstock", "kalman_dlm", "mcmc_stock").
+    scenario : str
+        Scenario ID from ["S1", "S2", "S3", "S4", "S5"].
+    save_fig : bool, optional
+        If True (default), generate and save decomposition figure to outputs/figures/.
 
     Returns
     -------
-    dict - score_model() output (metrics).
+    dict
+        score_model() output with structure:
+        {
+            "model": str,
+            "scenario": str,
+            "ltc": {"total": {mape, recovery_accuracy, ...}, "tv": {...}, ...},
+            "stc": {...},
+            "fitted_params": {...}
+        }
+        Returns empty dict if any step fails (fit, decompose, evaluation, etc.).
     """
     click.echo(f"[run] {model_name} x {scenario} ...")
 
@@ -162,7 +202,21 @@ def main(
     no_fig: bool,
     data_dir: str,
 ) -> None:
-    """Run LTC framework experiments against synthetic MMM scenario data."""
+    """
+    CLI entry point for running LTC model experiments.
+
+    Supports flexible experiment execution:
+      - Single model, single scenario: --model geo_adstock --scenario S1
+      - Single model, all scenarios: --model mcmc_stock --all-scenarios
+      - Framework group, all scenarios: --framework F3_state_space --all-scenarios
+      - Full benchmark: --all-models --all-scenarios (10 models × 5 scenarios = 50 runs)
+
+    Results are written to:
+      - outputs/results/{model}_{scenario}.json — metrics and fitted parameters
+      - outputs/figures/{model}_{scenario}_decomp.png — LTC decomposition visualization (unless --no-fig)
+
+    Prints summary for each run: recovery_accuracy (%), MAPE (%), and total_recovery_ratio.
+    """
     global DATA_DIR
     DATA_DIR = Path(data_dir)
 

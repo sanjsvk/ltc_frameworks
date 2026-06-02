@@ -147,10 +147,13 @@ class KoyckModel(BaseLTCModel):
             ltc_dict[ch] = pd.Series(ltc, index=index)
 
         # Baseline = intercept/(1-λ) + exog effects
-        alpha_true = self._coefs[-1] / (1.0 - self._lambda) if self._lambda < 1 else self._coefs[-1]
-        baseline_val = np.full(T, alpha_true)
-        # exog coefs follow AR lags in feature_names
-        exog_start = n_media + (len(self._feature_names) - n_media - 1 - len(exog_cols))
+        # Note: baseline_coef is the scaled intercept, not ground truth
+        baseline_coef = self._coefs[-1] / (1.0 - self._lambda) if self._lambda < 1 else self._coefs[-1]
+        baseline_val = np.full(T, baseline_coef)
+        # Exog coefficients follow AR lags in feature_names.
+        # Calculate starting index: n_media (channel coefs) + ar_lags (1 per lag) = index before exog
+        n_ar_lags = len(self._feature_names) - n_media - 1 - len(exog_cols)
+        exog_start = n_media + n_ar_lags
         for j, ecol in enumerate(exog_cols):
             coef_idx = exog_start + j
             if coef_idx < len(self._coefs) - 1 and ecol in df.columns:
