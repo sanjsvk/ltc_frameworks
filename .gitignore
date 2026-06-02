@@ -40,6 +40,27 @@ data/processed/*.parquet
 outputs/results/
 outputs/*.json
 
+# Submission & internal working files (keep out of public GitHub)
+submission/
+analysis/*.xlsx
+analysis/*.xlsm
+analysis/temp/
+analysis/scratch/
+
+# Exploratory notebooks & temporary analysis
+notebooks/scratch/
+notebooks/archive/
+notebooks/*.ipynb.bak
+
+# Large model cache & temporary files
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.hdf5
+model_cache/
+cache/
+
 # OS artifacts
 .DS_Store
 .DS_Store?
