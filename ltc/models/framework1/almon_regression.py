@@ -67,6 +67,9 @@ class AlmonPDL(BaseLTCModel):
 
     def fit(self, df: pd.DataFrame, config: dict) -> "AlmonPDL":
         self._stc_max_lag = config.get("stc_max_lag", config.get("max_lag", 6))
+        # Note: stc_degree is read from config but NOT used in fitting.
+        # Almon PDL uses a single polynomial degree (ltc_degree) for the entire distributed lag.
+        # The STC/LTC split is determined post-estimation by stc_cutoff (lag threshold).
         self._stc_degree = config.get("stc_degree", config.get("degree", 2))
         self._ltc_degree = config.get("ltc_degree", config.get("degree", 3))
         self._stc_cutoff = config.get("stc_cutoff", 4)
@@ -89,6 +92,7 @@ class AlmonPDL(BaseLTCModel):
             x_raw = df[col].to_numpy(dtype=float)
             max_lag_ch = self._ltc_max_lag_override.get(ch, self._stc_max_lag)
             self._channel_max_lag[ch] = max_lag_ch
+            # Almon PDL: compressed regressors use ltc_degree (unified polynomial for all lags)
             Z, A = almon_compressed_regressors(x_raw, max_lag_ch, self._ltc_degree)
             X_parts.append(Z)
             channel_A[ch] = A
