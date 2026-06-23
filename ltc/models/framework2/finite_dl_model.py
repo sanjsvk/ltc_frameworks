@@ -119,11 +119,15 @@ class FiniteDLModel(BaseLTCModel):
                         w = weibull_cdf_weights(s, sc, _ml)
                     except Exception:
                         return 1e9
-                    w_full = np.concatenate([[w[0] if len(w) > 0 else 0.0], w])[:_ml + 1]
+                    # weibull_cdf_weights returns shape (max_lag,) for lags 1..max_lag
+                    # Prepend weight for lag 0 (current period effect) as first element
+                    w_full = np.concatenate([[1.0 - w.sum()], w])[:_ml + 1]
+                    # Ensure dimensions match build_lag_matrix output (T, max_lag+1)
                     if len(w_full) < _ml + 1:
                         w_full = np.pad(w_full, (0, _ml + 1 - len(w_full)))
+                    assert len(w_full) == _ml + 1, f"Weight dimension {len(w_full)} != max_lag+1 {_ml+1}"
                     X_lag = build_lag_matrix(_x, _ml)
-                    adstocked = X_lag @ w_full[:_ml + 1]
+                    adstocked = X_lag @ w_full
                     corr = np.corrcoef(adstocked, y)[0, 1]
                     return -(corr ** 2) if not np.isnan(corr) else 1e9
 
@@ -131,11 +135,15 @@ class FiniteDLModel(BaseLTCModel):
                 s_opt, sc_opt = res.x
                 try:
                     w = weibull_cdf_weights(s_opt, sc_opt, max_lag_ch)
-                    w_full = np.concatenate([[w[0] if len(w) > 0 else 0.0], w])[:max_lag_ch + 1]
+                    # weibull_cdf_weights returns shape (max_lag,) for lags 1..max_lag
+                    # Prepend weight for lag 0 (current period effect) as first element
+                    w_full = np.concatenate([[1.0 - w.sum()], w])[:max_lag_ch + 1]
                 except Exception:
                     w_full = np.ones(max_lag_ch + 1) / (max_lag_ch + 1)
+                # Ensure dimensions match build_lag_matrix output (T, max_lag+1)
                 if len(w_full) < max_lag_ch + 1:
                     w_full = np.pad(w_full, (0, max_lag_ch + 1 - len(w_full)))
+                assert len(w_full) == max_lag_ch + 1, f"Weight dimension {len(w_full)} != max_lag+1 {max_lag_ch+1}"
                 self._channel_weights[ch] = w_full
 
             else:  # almon
