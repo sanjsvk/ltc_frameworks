@@ -145,17 +145,26 @@ class WeibullAdstockNLS(BaseLTCModel):
         stc_dict: dict[str, pd.Series] = {}
         ltc_dict: dict[str, pd.Series] = {}
 
-        for i, ch in enumerate(self._channels):
+        for ch in self._channels:
             col = f"{prefix}_{ch}"
             if col not in df.columns:
                 stc_dict[ch] = pd.Series(0.0, index=index)
                 ltc_dict[ch] = pd.Series(0.0, index=index)
                 continue
+
+            # Use feature_names index instead of enumerate to handle missing channels
+            feature_name = f"weibull_adstock_{ch}"
+            if feature_name not in self._feature_names:
+                stc_dict[ch] = pd.Series(0.0, index=index)
+                ltc_dict[ch] = pd.Series(0.0, index=index)
+                continue
+
+            idx = self._feature_names.index(feature_name)
             p = self._channel_params[ch]
             ch_max_lag = p.get("max_lag", self._max_lag)
             x_raw = df[col].to_numpy(dtype=float)
             adstocked = weibull_adstock(x_raw, p["shape"], p["scale"], ch_max_lag)
-            coef = self._coefs[i]
+            coef = self._coefs[idx]
             total = coef * adstocked
             # STC = peak-week response (weight[0] × x[t] × coef)
             # Approximate: weight[0] is the first Weibull CDF weight
