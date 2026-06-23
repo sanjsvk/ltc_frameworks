@@ -153,17 +153,25 @@ class GeometricAdstockOLS(BaseLTCModel):
         stc_dict: dict[str, pd.Series] = {}
         ltc_dict: dict[str, pd.Series] = {}
 
-        for i, ch in enumerate(self._channels):
+        for ch in self._channels:
             col = f"{prefix}_{ch}"
             if col not in df.columns:
                 stc_dict[ch] = pd.Series(0.0, index=index)
                 ltc_dict[ch] = pd.Series(0.0, index=index)
                 continue
 
+            # Use feature_names index instead of enumerate to handle missing channels
+            feature_name = f"adstock_{ch}"
+            if feature_name not in self._feature_names:
+                stc_dict[ch] = pd.Series(0.0, index=index)
+                ltc_dict[ch] = pd.Series(0.0, index=index)
+                continue
+
+            idx = self._feature_names.index(feature_name)
             x_raw = df[col].to_numpy(dtype=float)
             d = self._channel_decays[ch]
             adstocked = geometric_adstock(x_raw, d)
-            coef = self._coefs[i]
+            coef = self._coefs[idx]
 
             total_contrib = coef * adstocked
             # STC = contemporaneous response = coef * raw media
@@ -176,7 +184,6 @@ class GeometricAdstockOLS(BaseLTCModel):
 
         # Baseline = intercept + exogenous effects
         baseline_val = np.zeros(T)
-        n_media = len(self._channels)
         for j, name in enumerate(self._feature_names):
             if name == "intercept":
                 baseline_val += self._coefs[j]
