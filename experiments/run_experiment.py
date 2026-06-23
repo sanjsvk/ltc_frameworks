@@ -36,6 +36,7 @@ from ltc.data.features import build_feature_set
 from ltc.evaluation.scorer import score_model as eval_score_model
 from ltc.visualization.decomposition import plot_ltc_vs_truth, save_figure
 from experiments.registry import MODEL_REGISTRY, CONFIG_MAP, FRAMEWORK_GROUPS
+from validation_pipeline.validate_before_benchmark import run_validation
 
 # Paths (relative to repo root)
 DATA_DIR = Path("data/raw")
@@ -216,9 +217,46 @@ def main(
       - outputs/figures/{model}_{scenario}_decomp.png — LTC decomposition visualization (unless --no-fig)
 
     Prints summary for each run: recovery_accuracy (%), MAPE (%), and total_recovery_ratio.
+
+    Pre-Benchmark Validation
+    -------------------------
+    Before running experiments, automatically runs the validation pipeline to catch:
+      - Interface violations (missing _is_fitted, wrong return types)
+      - Structural issues (hardcoded indices, orphaned config)
+      - Edge case fragility (missing channels, weak exogenous signals)
+
+    If BLOCKER issues found, experiments are aborted. Review validation_pipeline/VALIDATION_REPORT_*.md
     """
     global DATA_DIR
     DATA_DIR = Path(data_dir)
+
+    # =========================================================================
+    # PRE-FLIGHT VALIDATION CHECK
+    # =========================================================================
+    click.echo("\n" + "=" * 100)
+    click.echo("PRE-BENCHMARK VALIDATION (mandatory check)")
+    click.echo("=" * 100)
+
+    validation_result = run_validation()
+
+    if validation_result["blockers"] > 0:
+        click.echo(
+            f"\n❌ FATAL: {validation_result['blockers']} blocking issue(s) found.\n"
+            f"DO NOT PROCEED WITH BENCHMARKING.\n"
+            f"\nReview detailed report:\n  {validation_result['report_path']}"
+        )
+        sys.exit(1)
+    elif validation_result["high_severity"] > 0:
+        click.echo(
+            f"\n⚠️ WARNING: {validation_result['high_severity']} high-severity issue(s) found.\n"
+            f"Proceed with caution. Review before publication:\n  {validation_result['report_path']}"
+        )
+    else:
+        click.echo(f"\n✓ Validation passed. Safe to benchmark.\n")
+
+    # =========================================================================
+    # PROCEED WITH BENCHMARKING
+    # =========================================================================
 
     # Resolve model list
     if all_models:
