@@ -266,5 +266,7 @@ class BayesianStructuralTS(BaseLTCModel):
         return {
             "model": self.name,
             "media_coefs": self._media_coefs,
+            "exog_coefs": self._exog_coefs.tolist() if self._exog_coefs is not None else [],
+            "exog_names": self._exog_names,
             "decays": self._decays,
         }
