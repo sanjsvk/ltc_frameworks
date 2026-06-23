@@ -466,11 +466,44 @@ class MCMCLatentStock(BaseLTCModel):
 
     def get_params(self) -> dict:
         self._check_fitted()
-        return {
+        params = {
             "model": self.name,
             "backend": self._backend,
-            "channel_params": self._channel_params,
             "intercept": self._intercept,
             "exog_coefs": self._exog_coefs.tolist() if self._exog_coefs is not None else [],
             "exog_names": self._exog_names,
+            "channel_params": {},  # Store params for all 5 channels
         }
+
+        # Ensure all 5 channels are represented with their posterior means
+        for ch in self._channels:
+            if ch in self._channel_params:
+                params["channel_params"][ch] = self._channel_params[ch]
+            else:
+                # Channel not fitted (missing data) — use defaults
+                params["channel_params"][ch] = {
+                    "delta": 0.5,
+                    "build_rate": 0.0,
+                    "ltc_coef": 0.0,
+                    "stc_coef": 0.0,
+                }
+
+        # If MCMC backend, include convergence diagnostics
+        if self._backend == "mcmc" and self._posterior is not None:
+            try:
+                import arviz as az
+                rhat_dict = az.rhat(self._posterior)
+                params["convergence_diagnostics"] = {
+                    "n_chains": int(self._posterior.posterior.sizes.get("chain", 0)),
+                    "n_draws": int(self._posterior.posterior.sizes.get("draw", 0)),
+                    "r_hats": {}
+                }
+                # Extract R-hat values for key parameters
+                for var_name in rhat_dict.data_vars:
+                    rhat_val = float(rhat_dict[var_name].values)
+                    params["convergence_diagnostics"]["r_hats"][var_name] = rhat_val
+            except Exception:
+                # If arviz not available or R-hat computation fails, skip diagnostics
+                params["convergence_diagnostics"] = {}
+
+        return params
