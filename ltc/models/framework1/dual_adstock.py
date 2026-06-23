@@ -130,6 +130,12 @@ class DualAdstockOLS(BaseLTCModel):
         self._feature_names = feature_names
         coefs, _, _, _ = np.linalg.lstsq(X, y, rcond=None)
         self._coefs = coefs
+
+        # Verify all channels present in fit data
+        for ch in self._channels:
+            col = f"{prefix}_{ch}"
+            assert col in df.columns, f"Channel {ch} missing in fit data (column {col})"
+
         self._is_fitted = True
         return self
 
@@ -141,21 +147,33 @@ class DualAdstockOLS(BaseLTCModel):
         stc_dict: dict[str, pd.Series] = {}
         ltc_dict: dict[str, pd.Series] = {}
 
+        # Build explicit coefficient mapping to handle missing channels
+        # Maps channel → actual coefficient index in self._coefs array
+        coef_map: dict[str, int | None] = {}
         coef_idx = 0
         for ch in self._channels:
             col = f"{prefix}_{ch}"
-            if col not in df.columns:
+            if col in df.columns:
+                coef_map[ch] = coef_idx
+                coef_idx += 2
+            else:
+                coef_map[ch] = None  # Channel missing in data
+
+        # Now reconstruct contributions using explicit mapping
+        for ch in self._channels:
+            col = f"{prefix}_{ch}"
+            if coef_map[ch] is not None:
+                x_raw = df[col].to_numpy(float)
+                d = self._channel_decays[ch]
+                stc_ad = geometric_adstock(x_raw, d["stc"])
+                ltc_ad = geometric_adstock(x_raw, d["ltc"])
+                idx = coef_map[ch]
+                stc_dict[ch] = pd.Series(self._coefs[idx] * stc_ad, index=index)
+                ltc_dict[ch] = pd.Series(self._coefs[idx + 1] * ltc_ad, index=index)
+            else:
+                # Channel missing → zero contribution
                 stc_dict[ch] = pd.Series(0.0, index=index)
                 ltc_dict[ch] = pd.Series(0.0, index=index)
-                coef_idx += 2
-                continue
-            x_raw = df[col].to_numpy(float)
-            d = self._channel_decays[ch]
-            stc_ad = geometric_adstock(x_raw, d["stc"])
-            ltc_ad = geometric_adstock(x_raw, d["ltc"])
-            stc_dict[ch] = pd.Series(self._coefs[coef_idx] * stc_ad, index=index)
-            ltc_dict[ch] = pd.Series(self._coefs[coef_idx + 1] * ltc_ad, index=index)
-            coef_idx += 2
 
         baseline_val = np.zeros(T)
         for j in range(coef_idx, len(self._feature_names)):
