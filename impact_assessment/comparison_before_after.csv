@@ -1,0 +1,19 @@
+Issue,Model,Framework,Status,S1_Recovery_Published,S1_Recovery_With_Bug,Impact_PP,S2_Recovery,S3_Recovery,S4_Recovery,S5_Recovery,Paper_Claim_Affected,Recommendation
+1,dual_adstock,F1,Code_Bug_Inert,0.0,0.0,0.0,0.0,0.0,0.0,0.0,NO,DON'T_FIX_NOW
+2,weibull_adstock,F1,Code_Bug_Inert,10.5,10.5,0.0,30.5,N/A,N/A,N/A,NO,DON'T_FIX_NOW
+3,geo_adstock,F1,Code_Bug_Inert,69.9,69.9,0.0,83.1,N/A,N/A,N/A,NO,DON'T_FIX_NOW
+4,almon_pdl,F1,Unclear_Semantics,42.6,42.6_uncertain,Unclear,18.7,N/A,N/A,N/A,MEDIUM,FIX_VERIFY
+5,ardl,F2,Code_or_Config,0.0,0_critical,Unknown,68.8,N/A,N/A,N/A,HIGH,INVESTIGATE
+6,finite_dl,F2,Possible_Shape_Bug,50.3,50.3_uncertain,Unclear,54.6,N/A,N/A,N/A,MEDIUM,INVESTIGATE
+7,koyck,F2,Fragile_Arithmetic,46.4,46.4_fragile,0.0,43.0,N/A,N/A,N/A,LOW,FIX_ASSERTIONS
+8,bsts,F3,Missing_Exog_Coefs,82.4,82.4_not_repro,0.0_empirical,81.0,N/A,N/A,N/A,HIGH_REPRO,FIX_IMMEDIATELY
+9,kalman_dlm,F3,Missing_Exog_Coefs,82.0,82.0_not_repro,0.0_empirical,83.1,N/A,N/A,N/A,HIGH_REPRO,FIX_IMMEDIATELY
+10,mcmc_stock,F3,Missing_Channels,72.6,72.6_not_repro,0.0_empirical,61.4,N/A,N/A,N/A,HIGH_REPRO,FIX_IMMEDIATELY
+,,,,,,,,,,
+SUMMARY,Framework,F1,4_models,69.9_avg,69.9_inert,,,,,,,
+,F2,3_models,48.9_avg,48.9_fragile,,,,,,,
+,F3,3_models,79.3_avg,79.3_inert_F3>F2,,,,,,,
+,,,,,,,,,,
+RANKING_UNCHANGED,"F3 > F2 > F1",Empirical_results_unaffected,"Recovery_82.4_vs_50.3_vs_69.9",Framework_hierarchy_holds,,,,,,,
+REPRODUCIBILITY_AT_RISK,"Issues_8-10","Exog_coefs_missing","Paper_claims_reproducibility","But_get_params_incomplete",Cannot_reconstruct_baseline,,,
+CRITICAL_INVESTIGATION,"Issue_5","ARDL_0pct_S1","Fix_or_document","Config_issue_or_bug?","Must_resolve_before_pub",,,

@@ -34,7 +34,7 @@
 
 ## 1. Abstract
 
-Marketing mix models routinely underestimate long-term media contributions (LTC) because estimation methods are designed for short-term elasticities, not sustained brand accumulation. This creates systematic budget misallocation, leaving 10–15% of true ROI unaccounted for in optimization. We benchmark ten LTC estimation methods across three frameworks (static adstock, dynamic lag, state-space) using synthetic data with ground-truth long-term effects, evaluating performance across five diagnostic scenarios from baseline to structural breaks. State-space methods with Bayesian latent stock estimation (BSTS, MCMC) recover 79.3% of true LTC on average across S1–S4, compared to 44.2% for dynamic models and 29.6% for static adstock. Critically, aggregate recovery metrics mask channel-level attribution failures: two models achieve 68.8% aggregate recovery while returning 0% recovery for individual channels, inverting budget allocation recommendations. We propose a three-tier robustness taxonomy based on scenario sensitivity and provide a decision framework for practitioners to select methods according to signal strength and spend pattern characteristics.
+Marketing mix models routinely underestimate long-term media contributions (LTC) because estimation methods are designed for short-term elasticities, not sustained brand accumulation. This creates systematic budget misallocation, leaving 10–15% of true ROI unaccounted for in optimization. We benchmark ten LTC estimation methods across three frameworks (static adstock, dynamic lag, state-space) using synthetic data with ground-truth long-term effects, evaluating performance across five diagnostic scenarios from baseline to structural breaks. On standard diagnostic scenarios (S1 baseline through S4 structural break), state-space methods with Bayesian latent stock estimation recover 79.3% of true LTC on average, compared to 44.2% for dynamic models and 29.6% for static adstock. However, aggregate recovery masks a critical failure mode: two methods achieve 68.8% aggregate recovery while returning 0% for individual channels. This channel-level misattribution inverts budget recommendations, demonstrating that framework selection cannot rely on aggregate metrics alone. We propose a three-tier robustness taxonomy based on scenario sensitivity and provide a decision framework for practitioners to select methods according to signal strength and spend pattern characteristics.
 
 ---
 
@@ -53,18 +53,6 @@ Marketing mix models routinely underestimate long-term media contributions (LTC)
 
 ---
 
-## Checklist Before Evaluation
-- [x] Six-sentence structure
-  - [x] Sentence 1: Problem stated (LTC underestimation)
-  - [x] Sentence 2: Business consequence quantified (10–15% of ROI)
-  - [x] Sentence 3: Methodological approach (benchmarking 10 methods)
-  - [x] Sentences 4–5: Specific findings with numbers (79.3% vs 44.2% vs 29.6%, channel failures)
-  - [x] Sentence 6: Practitioner implication (decision framework)
-- [x] No citations
-- [x] No jargon in problem statement
-- [x] All claims quantified (not hedged)
-- [x] ~150 words (exactly 150)
-- [x] 4–6 keywords provided
 ## 2. Introduction & Literature Review
 
 ### 2.1 The Business Problem
@@ -95,14 +83,6 @@ This paper fills this gap with a reproducible benchmarking framework and four sp
 
 Section 3 describes the synthetic data-generating process, ten estimation methods, and their configuration. Section 4 evaluates framework-level performance on the baseline scenario. Section 5 tests robustness to five diagnostic scenarios, revealing when framework architecture determines success or failure. Section 6 examines channel-level attribution validation, showing where aggregate metrics mislead. Section 7 quantifies calibration sensitivity, comparing frozen parameters from one scenario to optimized parameters from others. Section 8 provides mechanistic explanations for anomalies and failures. Section 9 synthesizes findings into a framework hierarchy and discusses implications for theory and practice. Section 10 concludes with the decision framework and future research directions.
 
----
-
-## Word Count
-893 words
-
----
-
-## Checklist Before Evaluation
 - [x] Paragraph 1: Business problem (no method, scales the issue)
 - [x] Paragraph 2: Identification gap (adstock failure modes)
 - [x] Paragraph 3: Why synthetic data with ground truth is needed
@@ -174,68 +154,27 @@ This paper fills this gap by providing the first reproducible synthetic-data ben
 
 ---
 
-## Verification Checklist (First Pass Complete)
-
-### Verified References (11 total)
-
-**Section 2.1: Adstock and Distributed Lag Models**
-- [x] Koyck (1954): "Distributed Lags and Investment Analysis" – North-Holland, Amsterdam
-- [x] Clarke (1976): "Econometric Measurement of the Duration of Advertising Effect on Sales" – Journal of Marketing Research
-- [x] Broadbent (1979): "One Way TV Advertisements Work" – Journal of the Market Research Society
-- [x] Hanssens et al. (2001): "Market Response Models: Econometric and Time Series Analysis" – Kluwer Academic
-
-**Section 2.2: State-Space and Latent Variable Approaches**
-- [x] Harvey (1989): "Forecasting, Structural Time Series Models and the Kalman Filter" – Cambridge University Press
-- [x] Durbin & Koopman (2012): "Time Series Analysis by State Space Methods" – Oxford University Press
-
-**Section 2.3: Brand Equity and Long-Term Marketing Effects**
-- [x] Keller (1993): "Conceptualizing, Measuring, and Managing Customer-Based Brand Equity" – Journal of Marketing, Vol. 57, pp. 1-22
-- [x] Srinivasan & Hanssens (2009): "Marketing and Firm Value" – Journal of Marketing Research, Vol. XLVI, pp. 293-312
-- [x] Datta, Ailawadi, & van Heerde (2017): "Consumer-Based vs Sales-Based Brand Equity Alignment" – Journal of Marketing, Vol. 81, No. 3
-
-**Section 2.4: MMM Benchmarking and Validation**
-- [x] Jin et al. (2017): "Bayesian Methods for Media Mix Modeling with Carryover and Shape Effects" – Google Research
-- [x] Meta Robyn (2022-2023): Open-source Bayesian MMM package – Facebook/Meta Marketing Science
-
-### Context Validation
-- [x] All papers verified for correct title and publication year
-- [x] All papers verified for relevance to claimed contributions
-- [x] Each gap identified connects to a specific paper in later sections
-- [x] Synthesis shows how paper bridges identified gaps
-
-### Structure Alignment
-- [x] Four subsections (2.1–2.4) per requirements
-- [x] Each subsection follows: What's known → What's missing → How paper addresses it
-- [x] Each subsection identifies a distinct gap
-- [x] Synthesis ties together all four gaps
-- [x] 1,000–1,400 word target (1,387 words) ✓
-
-### Checklist for Second Verification
-- [ ] Read each citation one more time (second verification)
-- [ ] Confirm no citations are inaccurate or fabricated
-- [ ] Verify paper context matches claim
-- [ ] Check that all numbers (years, page numbers) are correct
 ## 3. Methodology
 
 ## 3.1 Synthetic Data Framework
 
 Ground truth is unavailable in real marketing mix modeling data: practitioners cannot observe true long-term contributions, only correlations between spend and observed sales. This asymmetry makes it impossible to determine whether a method that achieves high recovery accuracy on real data does so because it correctly identifies long-term effects or because it happens to fit the particular collinearity structure of that data. We resolve this by generating synthetic data with an explicitly specified, known ground-truth data-generating process. We implement a five-component sales model:
 
-$$\text{Net Sales}[t] = \text{Baseline}[t] + \sum_{c} \text{STC}_c[t] + \sum_{c} \text{LTC}_c[t] + \text{Exog}[t] + \epsilon[t] \quad \text{(Eq 1)}$$
+[Formula] \text{Net Sales}[t] = \text{Baseline}[t] + \sum_{c} \text{STC}_c[t] + \sum_{c} \text{LTC}_c[t] + \text{Exog}[t] + \epsilon[t] \quad \text{(Eq 1)}
 
 **Baseline** (Piecewise Trend + Seasonality + Holidays): A piecewise linear trend spanning 2020–2025 (~$10M–$12M per week), annual seasonality (52-week harmonic), and holiday uplifts (Thanksgiving, Christmas, Black Friday) totaling −$1.5M to +$2.0M per week.
 
 **Short-Term Contribution (STC):** Impressions in each channel decay via a geometric adstock transformation:
 
-$$\text{Adstocked}_c[t] = \text{Impr}_c[t] + \lambda_c \times \text{Adstocked}_c[t-1] \quad \text{(Eq 2)}$$
+[Formula] \text{Adstocked}_c[t] = \text{Impr}_c[t] + \lambda_c \times \text{Adstocked}_c[t-1] \quad \text{(Eq 2)}
 
 where $\lambda_c$ is the channel-specific decay rate. STC is the sum of channel-level elasticity × adstocked impressions, totaling ~$1.58M per week (~15% of observed sales).
 
 **Long-Term Contribution (LTC):** Latent brand stock accumulates via paid media spend and decays at a channel-specific rate:
 
-$$\text{Stock}_{c}[t] = \delta_c \times \text{Stock}_{c}[t-1] + \beta_c \times \sqrt{\text{Spend}_{c}[t]} \quad \text{(Eq 3)}$$
+[Formula] \text{Stock}_{c}[t] = \delta_c \times \text{Stock}_{c}[t-1] + \beta_c \times \sqrt{\text{Spend}_{c}[t]} \quad \text{(Eq 3)}
 
-$$\text{LTC}_{c}[t] = \gamma_c \times \text{Stock}_{c}[t] \quad \text{(Eq 4)}$$
+[Formula] \text{LTC}_{c}[t] = \gamma_c \times \text{Stock}_{c}[t] \quad \text{(Eq 4)}
 
 where $\delta_c$ is the stock retention rate (0.30–0.90 by channel), $\beta_c$ is the build rate (how quickly spending accumulates stock), and $\gamma_c$ is the LTC coefficient (converts stock to sales contribution). LTC totals ~$1.23M per week (~12% of observed sales), with TV and Video constituting 77% of long-term value.
 
@@ -299,11 +238,11 @@ We evaluate ten methods across three structural frameworks.
 
 Mean Absolute Percentage Error on the full 261-week time series:
 
-$$\text{MAPE}_{\text{LTC}} = \text{mean}\left(\frac{|\text{LTC}_{\text{recovered}}[t] - \text{LTC}_{\text{true}}[t]|}{\text{LTC}_{\text{true}}[t]}\right) \times 100 \quad \text{(Eq 5)}$$
+[Formula] \text{MAPE}_{\text{LTC}} = \text{mean}\left(\frac{|\text{LTC}_{\text{recovered}}[t] - \text{LTC}_{\text{true}}[t]|}{\text{LTC}_{\text{true}}[t]}\right) \times 100 \quad \text{(Eq 5)}
 
 Recovery accuracy is the complement:
 
-$$\text{Recovery} = \left(1 - \frac{\text{MAPE}_{\text{LTC}}}{100}\right) \times 100 \quad \text{(Eq 6)}$$
+[Formula] \text{Recovery} = \left(1 - \frac{\text{MAPE}_{\text{LTC}}}{100}\right) \times 100 \quad \text{(Eq 6)}
 
 A recovery of 80% means the method recovers 80% of true long-term contributions on average, with 20% MAPE.
 
@@ -311,7 +250,7 @@ A recovery of 80% means the method recovers 80% of true long-term contributions 
 
 For scenarios with spend pauses or structural breaks, we compute MAPE separately on the pause window (weeks 100–120) and the full series:
 
-$$\text{Robustness Ratio} = \frac{\text{MAPE}_{\text{pause}}}{\text{MAPE}_{\text{full}}} \quad \text{(Eq 7)}$$
+[Formula] \text{Robustness Ratio} = \frac{\text{MAPE}_{\text{pause}}}{\text{MAPE}_{\text{full}}} \quad \text{(Eq 7)}
 
 A ratio near 1.0 indicates the method maintains accuracy during structural changes (robust). A ratio >1.35 indicates error increases sharply during the pause (fragile). This metric operationalizes scenario-robustness differences.
 
@@ -319,7 +258,7 @@ A ratio near 1.0 indicates the method maintains accuracy during structural chang
 
 Aggregate recovery alone is insufficient because offsetting channel-level errors cancel: a method might achieve 70% overall recovery while assigning 0% to one channel and 140% to another, inverting budget allocation. We validate per-channel recovery:
 
-$$\text{Budget Error}_{c} = \frac{\text{Contribution}_{c,\text{recovered}}}{\sum \text{Recovered}} - \frac{\text{Contribution}_{c,\text{true}}}{\sum \text{True}} \quad \text{(Eq 8)}$$
+[Formula] \text{Budget Error}_{c} = \frac{\text{Contribution}_{c,\text{recovered}}}{\sum \text{Recovered}} - \frac{\text{Contribution}_{c,\text{true}}}{\sum \text{True}} \quad \text{(Eq 8)}
 
 If ARDL achieves 68.8% aggregate recovery in S2 but returns 0% for Video (true Video LTC is ~$0.30M per week), the channel-level failure is a critical diagnostic finding that aggregate metrics alone would miss.
 
@@ -336,31 +275,11 @@ All analyses use a fixed random seed (42) for reproducibility across operating s
 
 ---
 
-## Checklist Before Evaluation
-- [x] Three subsections (3.1 Synthetic Data, 3.2 Frameworks, 3.3 Metrics)
-- [x] 1500–2000 words (1,847 words)
-- [x] 8 numbered equations (Eq 1–8)
-- [x] All symbols defined
-- [x] Five scenarios described (S1–S5, one paragraph each)
-- [x] Parameter table concept (stated in 3.1, structure clear)
-- [x] Assumed vs estimated table concept (stated in 3.2)
-- [x] Fixed-parameter design justified explicitly
-- [x] Channel-level validation justified with ARDL example
-- [x] Replicability paragraph present (seed, scripts, data location)
-- [x] No results reported
-- [x] No detailed derivations moved to appendix (kept concise)
-- [x] Equations numbered and all symbols defined
 ## 4. Results
 
-**Status:** DRAFT – Framework Comparison on Baseline Scenario (S1) + Scenario Sensitivity (S2-S5)  
-**Length Target:** ~2 pages (consolidated from extended draft)  
-**Focus:** Establish baseline hierarchy with frozen parameters; test robustness across scenarios
+![Figure 1: Cross-Scenario Heatmap](../outputs/figures/Figure_01_Cross_Scenario_Heatmap.png)
 
----
-
-![Figure 2: Cross-Scenario Heatmap](../outputs/figures/Figure_02_Cross_Scenario_Heatmap.png)
-
-**Figure 2: Cross-Scenario Recovery Heatmap.** *Ten models (rows) evaluated across five scenarios (S1–S5 columns) with LTC recovery accuracy encoded as color gradient (red 0% to green 100%). BSTS and Kalman DLM (Framework 3) maintain consistent high recovery across scenarios (S1–S4: 76–82%), while ARDL (Framework 2) shows catastrophic S1 failure (0%) followed by S2 recovery (68.8%), and all Framework 1 models degrade sharply in S5 to 0% recovery, highlighting framework-dependent scenario sensitivity.* Data source: Section 4, Table 3 "Full Recovery Matrix".
+**Figure 1: Cross-Scenario Recovery Heatmap.** *Ten models (rows) evaluated across five scenarios (S1–S5 columns) with LTC recovery accuracy encoded as color gradient (red 0% to green 100%). BSTS and Kalman DLM (Framework 3) maintain consistent high recovery across scenarios (S1–S4: 76–82%), while ARDL (Framework 2) shows catastrophic S1 failure (0%) followed by S2 recovery (68.8%), and all Framework 1 models degrade sharply in S5 to 0% recovery, highlighting framework-dependent scenario sensitivity.* Data source: Section 4, Table 3 "Full Recovery Matrix".
 
 ---
 
@@ -394,9 +313,9 @@ The baseline scenario reveals clear separation. State-space models exploit expli
 
 ---
 
-![Figure 5: Framework Hierarchy](../outputs/figures/Figure_05_Framework_Hierarchy.png)
+![Figure 2: Framework Hierarchy](../outputs/figures/Figure_02_Framework_Hierarchy.png)
 
-**Figure 5: Framework Hierarchy – Distribution by Class.** *Boxplot showing baseline (S1) recovery accuracy distributions for three framework classes: Framework 3 (State-Space) dominates with median 82%, IQR [72–82%], showing BSTS (82.4%) and Kalman DLM (82.0%) outperforming Framework 2 (median ~48%, range 46–50%) and Framework 1 (median ~40%, range 0–70% with high variability). Framework 3 median exceeds all Framework 2 and F1 models except geo_adstock (69.9%), establishing state-space as architectural standard for LTC recovery.* Data source: Section 4, Table 3 "Framework Hierarchy" (lines 83–98).
+**Figure 2: Framework Hierarchy – Distribution by Class.** *Boxplot showing baseline (S1) recovery accuracy distributions for three framework classes: Framework 3 (State-Space) dominates with median 82%, IQR [72–82%], showing BSTS (82.4%) and Kalman DLM (82.0%) outperforming Framework 2 (median ~48%, range 46–50%) and Framework 1 (median ~40%, range 0–70% with high variability). Framework 3 median exceeds all Framework 2 and F1 models except geo_adstock (69.9%), establishing state-space as architectural standard for LTC recovery.* Data source: Section 4, Table 3 "Framework Hierarchy" (lines 83–98).
 
 ---
 
@@ -440,9 +359,9 @@ Geo_adstock S2 improvement fully reverses (−39.9pp drop S2→S3), confirming i
 
 ---
 
-![Figure 8: S3 High Seasonality](../outputs/figures/Figure_08_Pause_Window_Timeline.png)
+![Figure 5: S3 High Seasonality](../outputs/figures/Figure_05_S3_High_Seasonality.png)
 
-**Figure 8: S3 High Seasonality Model Performance.** *Scenario 3 (high seasonality, 85% intensity) shows MCMC achieving exceptional recovery (99.0%, leveraging Bayesian flexibility to posterior-shift build_rate), followed by BSTS (76.8%), Kalman DLM (64.9%, degraded from S1 due to lack of explicit seasonal state), ARDL (63.3%). MCMC's S3 uniqueness (99% vs. 72.6% S1) demonstrates Bayesian advantage for seasonal confounding.* Data source: Section 4.3 and Table 3 S3 recovery values.
+**Figure 5: S3 High Seasonality Model Performance.** *Scenario 3 (high seasonality, 85% intensity) shows MCMC achieving exceptional recovery (99.0%, leveraging Bayesian flexibility to posterior-shift build_rate), followed by BSTS (76.8%), Kalman DLM (64.9%, degraded from S1 due to lack of explicit seasonal state), ARDL (63.3%). MCMC's S3 uniqueness (99% vs. 72.6% S1) demonstrates Bayesian advantage for seasonal confounding.* Data source: Section 4.3 and Table 3 S3 recovery values.
 
 ---
 
@@ -458,12 +377,6 @@ Almon PDL unexpectedly improves (68.6%, +26.0pp from S1) because permanent shift
 
 ---
 
-![Figure 9: S4 Structural Break](../outputs/figures/Figure_09_Channel_Level_Detail.png)
-
-**Figure 9: S4 Structural Break Regime Change Sensitivity.** *Scenario 4 applies permanent budget reallocation (continuous regime shift, not discrete pause) to frozen S1 parameters, revealing model brittleness: MCMC achieves highest recovery (90.9%), BSTS (81.6%), Kalman DLM (75.4%), but ARDL fails catastrophically (−19.8%, structural-break-induced sign-flip), demonstrating architectural limitations when parameters diverge from true values. Framework 3 shows bounded degradation (±9pp); Framework 1/2 show unbounded failure.* Data source: Section 4.4 and Table 3 S4 recovery values.
-
----
-
 ![Figure 6: Calibration Sensitivity](../outputs/figures/Figure_06_Calibration_Sensitivity.png)
 
 **Figure 6: Calibration Sensitivity by Model.** *Paired bar chart comparing frozen (grid-search initialized) vs. optimized (scenario-specific calibration) recovery reveals calibration-structure trade-off: Framework 3 models show minimal improvement (BSTS +1.7pp, Kalman +2.3pp, MCMC +2.6pp) indicating structural dominance; Framework 2 shows moderate gains (koyck +5.2pp, finite_dl +5.5pp, ARDL +6.2pp); Framework 1 shows highly variable response indicating calibration cannot overcome architectural limitations.* Data source: Section 4.4 calibration sensitivity analysis.
@@ -476,15 +389,15 @@ LTC contributions halved (50% of S1). All 10 models return 0% recovery with froz
 
 ---
 
-![Figure 10: S5 Weak Signal Identification](../outputs/figures/Figure_10_Video_LTC_Signal_Loss.png)
+![Figure 7: S5 Weak Signal Identification](../outputs/figures/Figure_07_S5_Weak_Signal.png)
 
-**Figure 10: S5 Weak Signal Identification Boundary.** *Scenario 5 (weak signal: low spend variance, high noise) causes complete identification failure for all models with frozen parameters (0% recovery), but MCMC recovers 88.5% when scenario-specific logit-normal priors are applied. All other models remain at 0% recovery regardless of prior adjustment, indicating that fixed-parameter structures cannot adapt to fundamentally different signal conditions.* Data source: Section 4.5 and supplementary MCMC analysis.
+**Figure 7: S5 Weak Signal Identification Boundary.** *Scenario 5 (weak signal: low spend variance, high noise) causes complete identification failure for all models with frozen parameters (0% recovery), but MCMC recovers 88.5% when scenario-specific logit-normal priors are applied. All other models remain at 0% recovery regardless of prior adjustment, indicating that fixed-parameter structures cannot adapt to fundamentally different signal conditions.* Data source: Section 4.5 and supplementary MCMC analysis.
 
 ---
 
-![Figure 13: Robustness Taxonomy](../outputs/figures/Figure_13_Robustness_Taxonomy.png)
+![Figure 8: Robustness Taxonomy](../outputs/figures/Figure_08_Robustness_Taxonomy.png)
 
-**Figure 13: Robustness Taxonomy (Tier Classification).** *Two-dimensional scatter plot positioning all ten models by pause-window robustness ratio (x-axis, 1.0–1.5×) and S1 recovery accuracy (y-axis, 0–100%), with tier zones marked by vertical lines at 1.10× (Tier 1 boundary) and 1.35× (Tier 2 boundary). Tier 1 (<1.10×, architecturally robust): BSTS (~1.02, 82%) and Kalman DLM; Tier 2 (1.10–1.35×, identification-sensitive): finite_dl, koyck, mcmc_stock; Tier 3 (>1.35×, data-dependent and fragile): almon_pdl, geo_adstock, weibull_adstock, ARDL, dual_adstock. Taxonomy reveals that framework architecture determines robustness, not average recovery alone.* Data source: Section 7 robustness score table and pause-window validation.
+**Figure 8: Robustness Taxonomy (Tier Classification).** *Two-dimensional scatter plot positioning all ten models by pause-window robustness ratio (x-axis, 1.0–1.5×) and S1 recovery accuracy (y-axis, 0–100%), with tier zones marked by vertical lines at 1.10× (Tier 1 boundary) and 1.35× (Tier 2 boundary). Tier 1 (<1.10×, architecturally robust): BSTS (~1.02, 82%) and Kalman DLM; Tier 2 (1.10–1.35×, identification-sensitive): finite_dl, koyck, mcmc_stock; Tier 3 (>1.35×, data-dependent and fragile): almon_pdl, geo_adstock, weibull_adstock, ARDL, dual_adstock. Taxonomy reveals that framework architecture determines robustness, not average recovery alone.* Data source: Section 7 robustness score table and pause-window validation.
 
 ---
 
@@ -505,19 +418,7 @@ LTC contributions halved (50% of S1). All 10 models return 0% recovery with froz
 
 *Note.* S1–S4 average excludes S5 (all models collapse under weak signal with frozen parameters). BSTS 1.02× pause-window ratio is paper centrepiece. *Recovery accuracy is floored at 0% per definition `max(0, 100 - MAPE)`; S4 entries marked with * indicate models whose underlying `100 - MAPE` value is negative (uncapped: weibull -21.5%, ARDL -119.8%, dual_adstock -1478%), reflecting predictions worse than zero-LTC baseline.
 
----
-
-![Figure 2: Cross-Scenario Heatmap](../outputs/figures/Figure_02_Cross_Scenario_Heatmap.png)
-
-**Figure 2: Cross-Scenario Recovery Heatmap.** *Ten models (rows) evaluated across five scenarios (S1–S5 columns) with LTC recovery accuracy encoded as color gradient (red 0% to green 100%). BSTS and Kalman DLM (Framework 3) maintain consistent high recovery across scenarios (S1–S4: 76–82%), while ARDL (Framework 2) shows catastrophic S1 failure (0%) followed by S2 recovery (68.8%), and all Framework 1 models degrade sharply in S5 to 0% recovery, highlighting framework-dependent scenario sensitivity.* Data source: Section 4, Table 3 "Full Recovery Matrix" (lines 83–98).
-
----
-
----
-
-## Word Count Check
-
-Current: ~2,800 words  
+  
 **Status:** Consolidated; ready for evaluation.
 
 ---
@@ -530,19 +431,13 @@ The empirical findings in Sections 4–8 establish a clear hierarchy: state-spac
 
 ### 5.2 The Robustness Spectrum: A Four-Tier Taxonomy
 
-![Figure 1: Robustness Spectrum](../outputs/figures/Figure_01_Robustness_Spectrum.png)
-
-**Figure 1: Robustness Spectrum.** *Horizontal bar chart ranking all ten models by pause-window robustness ratio (S2 pause-window MAPE / full-series MAPE), with bars indicating robustness from most robust (BSTS ~1.02) to most fragile (weibull_adstock ~1.53). Vertical dotted lines at ratio=1.10 (Tier 1 boundary) and ratio=1.35 (Tier 2 boundary) mark architectural classifications. Framework 3 models (green, left side) cluster on Tier 1; Framework 1 models (red, right side) cluster on Tier 3; Framework 2 mixed distribution.* Data source: Phase 2 pause-window validation and Table 3.
-
----
-
 Beyond average performance, a critical secondary dimension emerges: robustness to structural variation. Across the five scenarios, pause-window ratios reveal how error concentrates when spend patterns change (Section 8.5).
 
 ---
 
-![Figure 1: Robustness Spectrum](../outputs/figures/Figure_01_Robustness_Spectrum.png)
+![Figure 9: Robustness Spectrum](../outputs/figures/Figure_09_Robustness_Spectrum.png)
 
-**Figure 1: Robustness Spectrum.** *Horizontal bar chart ranking all ten models by pause-window robustness ratio (S2 pause-window MAPE / full-series MAPE), from most robust (left) to most fragile (right): BSTS 1.023×, finite_dl 0.675×, koyck 0.782× (Tier 1: <1.10×); ardl 1.246×, almon_pdl 1.278×, mcmc_stock 1.309×, dual_adstock 1.307× (Tier 2: 1.10–1.35×); kalman_dlm 1.401×, geo_adstock 1.401×, weibull_adstock 1.530× (Tier 3: >1.35×). Vertical dotted lines at ratio=1.10 (yellow, Tier 1 boundary) and ratio=1.35 (purple, Tier 2 boundary) mark architectural classifications. Colors distinguish Framework 3 (green, mix of Tier 1–3), Framework 2 (blue, primarily Tier 1–2), Framework 1 (red, primarily Tier 2–3).* Data source: validation/PHASE2_PAUSE_WINDOW_VALIDATION.md; Section 5, "S2 Scenario Analysis".
+**Figure 9: Robustness Spectrum.** *Horizontal bar chart ranking all ten models by pause-window robustness ratio (S2 pause-window MAPE / full-series MAPE), from most robust (left) to most fragile (right): BSTS 1.023×, finite_dl 0.675×, koyck 0.782× (Tier 1: <1.10×); ardl 1.246×, almon_pdl 1.278×, mcmc_stock 1.309×, dual_adstock 1.307× (Tier 2: 1.10–1.35×); kalman_dlm 1.401×, geo_adstock 1.401×, weibull_adstock 1.530× (Tier 3: >1.35×). Vertical dotted lines at ratio=1.10 (yellow, Tier 1 boundary) and ratio=1.35 (purple, Tier 2 boundary) mark architectural classifications. Colors distinguish Framework 3 (green, mix of Tier 1–3), Framework 2 (blue, primarily Tier 1–2), Framework 1 (red, primarily Tier 2–3).* Data source: validation/PHASE2_PAUSE_WINDOW_VALIDATION.md; Section 5, "S2 Scenario Analysis".
 
 ---
 
@@ -568,9 +463,9 @@ A critical finding cuts across frameworks: aggregate LTC recovery can mask sever
 
 ---
 
-![Figure 12: Budget Allocation Error](../outputs/figures/Figure_12_Budget_Allocation_Error.png)
+![Figure 10: Budget Allocation Error](../outputs/figures/Figure_10_Budget_Allocation_Error.png)
 
-**Figure 12: Budget Allocation Error Magnitude.** *Horizontal bar chart showing allocation error (100% − recovery%) for all ten models sorted worst-to-best: dual_adstock and ARDL show catastrophic errors (100.0%), weibull_adstock (89.5%), almon_pdl (57.4%), koyck (53.6%), finite_dl (49.7%), geo_adstock (30.1%), mcmc_stock (27.4%), kalman_dlm (18.0%), and BSTS (17.6% minimum error). Error magnitude represents cumulative per-channel budget misallocation; dual_adstock and ARDL achieve zero true channel recovery despite aggregate figures.* Data source: Section 4 budget allocation analysis and channel recovery validation.
+**Figure 10: Budget Allocation Error Magnitude.** *Horizontal bar chart showing allocation error (100% − recovery%) for all ten models sorted worst-to-best: dual_adstock and ARDL show catastrophic errors (100.0%), weibull_adstock (89.5%), almon_pdl (57.4%), koyck (53.6%), finite_dl (49.7%), geo_adstock (30.1%), mcmc_stock (27.4%), kalman_dlm (18.0%), and BSTS (17.6% minimum error). Error magnitude represents cumulative per-channel budget misallocation; dual_adstock and ARDL achieve zero true channel recovery despite aggregate figures.* Data source: Section 4 budget allocation analysis and channel recovery validation.
 
 ---
 
@@ -597,22 +492,6 @@ The Bayesian latent-stock model (MCMC) achieves highest average recovery (81.0% 
 **Prior sensitivity:** The logit-normal priors on decay ∞ and build_rate are calibrated to realistic ranges (∞ 0.65–0.90, reflecting typical media carryover). New practitioners should validate these priors on historical data; misaligned priors can degrade recovery by 5–15pp (as seen in ARDL S1). Monthly prior re-estimation, using posterior draws from prior campaigns, mitigates this.
 
 **Decision rule:** Use MCMC when (1) portfolio value is >$10M annually, (2) budget allocation precision is critical, or (3) weak-signal scenarios (low variance in media mix) require flexible inference. For smaller portfolios or when model uncertainty is acceptable, BSTS provides 80–85% of MCMC recovery with deterministic inference. Static adstock methods are suitable only when (1) data is highly multicollinear and (2) budget allocation is secondary to top-line ROI reporting.
-
----
-
-### 5.5 Pre-empting Reviewer Objections
-
-### Objection 1: "Results Depend on Synthetic Data Assumptions"
-
-Synthetic data enables controlled ground-truth comparison–the only way to measure exact recovery accuracy. Real-world validation is impossible: practitioners never know true LTC. The scenarios are calibrated to ranges reported in prior studies (Table 2, Methodology Section), and structural breaks (collinearity, discontinuities, seasonality) are not artifacts but represent business realities every practitioner faces. Future work should validate on real data using this framework as a Bayesian prior.
-
-### Objection 2: "MCMC Computation is Too Slow for Production"
-
-Attribution error compounds over planning cycles. Misallocating $1M to a low-ROI channel while underfunding high-ROI channels costs $50K–$100K per month in opportunity loss. MCMC's 60-second runtime, amortized over quarterly planning, adds <$1K in compute cost against potential $600K+ annual allocation gains. Moreover, batch MCMC runs (e.g., overnight) can service portfolios of 100+ campaigns.
-
-### Objection 3: "Results May Not Generalize to Real Data"
-
-Parameter ranges (∞ 0.65–0.90, baseline $10–$12M, noise $150K–$300K weekly) are calibrated to published MMM benchmarks (Vaver & Koehler, 2011). Structural challenges–collinearity from correlated channel spending, seasonal confounding, discontinuous spend shifts–are standard features of real data that practitioners encounter quarterly. This work is not proposing a new algorithm but comparing existing methods on realistic data structures.
 
 ---
 
@@ -762,8 +641,6 @@ Vaver, J., & Koehler, J. (2011). Measuring ad effectiveness using geo experiment
 **Note on Web Appendix:** Figure B provides detailed specification of scenario design characteristics. While informative for reproducibility, it is supplementary to the main narrative in the paper. All main results, framework comparisons, and practitioner guidance are contained in the main manuscript (Sections 4–5).
 
 ---
-
-## Verification Checklist – RIGOROUS AUDIT COMPLETED (2026-05-24)
 
 ### Critical Corrections Made:
 - [x] **Dekimpe & Hanssens (2000):** Fixed journal from "Journal of Economic Literature" 38(2):426-438 to correct "International Journal of Research in Marketing" 17(2-3):183-193
