@@ -107,6 +107,10 @@ class KoyckModel(BaseLTCModel):
 
         # Extract estimated lambda from AR(1) coefficient
         n_media = len(ch_present)
+        # Bounds checking: coef index must be within range
+        assert n_media < len(coefs), (
+            f"AR lag index {n_media} out of bounds: only {len(coefs)} coefficients"
+        )
         self._lambda = float(np.clip(coefs[n_media], 0.0, 0.999))
 
         # Record feature names
@@ -152,8 +156,14 @@ class KoyckModel(BaseLTCModel):
         baseline_val = np.full(T, baseline_coef)
         # Exog coefficients follow AR lags in feature_names.
         # Calculate starting index: n_media (channel coefs) + ar_lags (1 per lag) = index before exog
+        # Structure: [β_ch1, ..., β_chn, ydep_lag1, ..., ydep_lag_p, exog..., intercept]
         n_ar_lags = len(self._feature_names) - n_media - 1 - len(exog_cols)
         exog_start = n_media + n_ar_lags
+        # Bounds checking: exog indices must be within coefficient array
+        assert exog_start + len(exog_cols) <= len(self._coefs), (
+            f"Exog index range [{exog_start}, {exog_start + len(exog_cols)}) "
+            f"out of bounds: only {len(self._coefs)} coefficients"
+        )
         for j, ecol in enumerate(exog_cols):
             coef_idx = exog_start + j
             if coef_idx < len(self._coefs) - 1 and ecol in df.columns:
